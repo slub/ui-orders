@@ -20,7 +20,7 @@ import {
   OrganizationValue,
 } from '@folio/stripes-acq-components';
 
-import { INTEGRATION_TYPE } from '../../../common/constants';
+import { isEmailIntegrationType } from '../../../common/constants';
 import { FiscalYearOpenedView } from '../components';
 import { isWorkflowStatusNotPending } from '../util';
 import UserValue from './UserValue';
@@ -165,7 +165,7 @@ const PODetailsView = ({
           />
         </Col>
 
-        {get(order, 'integrationName') === INTEGRATION_TYPE.email && (
+        {isEmailIntegrationType(get(order, 'integrationName')) && (
           <Col
             xs={6}
             lg={3}

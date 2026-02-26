@@ -25,9 +25,14 @@ export const ORDER_TYPE = {
 
 export const INTEGRATION_TYPE = {
   edi: 'EDI',
-  email: 'Email',
+  emailDepository: 'Email depository',
+  emailPurchase: 'Email purchase',
   withoutOrderPlacement: 'Without order placement',
 };
+
+export const isEmailIntegrationType = (type) => (
+  type === INTEGRATION_TYPE.emailDepository || type === INTEGRATION_TYPE.emailPurchase
+);
 
 export const ORDERS_DOMAIN = 'orders';
 

@@ -19,7 +19,7 @@ import {
   TextField,
 } from '@folio/stripes-acq-components';
 
-import { INTEGRATION_TYPE, PO_FORM_FIELDS } from '../../../common/constants';
+import { isEmailIntegrationType, PO_FORM_FIELDS } from '../../../common/constants';
 import { getAddressOptions } from '../../../common/utils';
 import {
   FieldPrefix,
@@ -247,7 +247,7 @@ class PODetailsForm extends Component {
             <FieldIntegrationName isNonInteractive={isClosedOrder} />
           </Col>
 
-          {formValues?.integrationName === INTEGRATION_TYPE.email && (
+          {isEmailIntegrationType(formValues?.integrationName) && (
             <Col
               xs={6}
               lg={3}
