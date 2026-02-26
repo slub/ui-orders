@@ -19,12 +19,14 @@ import {
   TextField,
 } from '@folio/stripes-acq-components';
 
-import { PO_FORM_FIELDS } from '../../../common/constants';
+import { INTEGRATION_TYPE, PO_FORM_FIELDS } from '../../../common/constants';
 import { getAddressOptions } from '../../../common/utils';
 import {
   FieldPrefix,
   FieldSuffix,
   FieldBillTo,
+  FieldIntegrationName,
+  FieldOrderEmailTemplate,
   FieldShipTo,
   FieldIsManualPO,
   FieldIsReEncumber,
@@ -53,6 +55,7 @@ class PODetailsForm extends Component {
     change: PropTypes.func,
     addresses: PropTypes.arrayOf(PropTypes.object),
     order: PropTypes.object,
+    orderEmailTemplates: PropTypes.arrayOf(PropTypes.object),
     validateNumber: PropTypes.func.isRequired,
     hiddenFields: PropTypes.object,
   }
@@ -70,6 +73,7 @@ class PODetailsForm extends Component {
       addresses,
       formValues,
       orderNumberSetting: { canUserEditOrderNumber },
+      orderEmailTemplates = [],
       prefixesSetting,
       suffixesSetting,
       order,
@@ -234,6 +238,26 @@ class PODetailsForm extends Component {
               />
             </Col>
           </IfFieldVisible>
+        </Row>
+        <Row>
+          <Col
+            xs={6}
+            lg={3}
+          >
+            <FieldIntegrationName isNonInteractive={isClosedOrder} />
+          </Col>
+
+          {formValues?.integrationName === INTEGRATION_TYPE.email && (
+            <Col
+              xs={6}
+              lg={3}
+            >
+              <FieldOrderEmailTemplate
+                isNonInteractive={isClosedOrder}
+                templates={orderEmailTemplates}
+              />
+            </Col>
+          )}
         </Row>
         <Row>
           <IfFieldVisible

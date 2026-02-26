@@ -20,6 +20,7 @@ import {
   OrganizationValue,
 } from '@folio/stripes-acq-components';
 
+import { INTEGRATION_TYPE } from '../../../common/constants';
 import { FiscalYearOpenedView } from '../components';
 import { isWorkflowStatusNotPending } from '../util';
 import UserValue from './UserValue';
@@ -153,6 +154,28 @@ const PODetailsView = ({
             />
           </Col>
         </IfVisible>
+
+        <Col
+          xs={6}
+          lg={3}
+        >
+          <KeyValue
+            label={<FormattedMessage id="ui-orders.orderDetails.integrationName" />}
+            value={get(order, 'integrationName') || <NoValue />}
+          />
+        </Col>
+
+        {get(order, 'integrationName') === INTEGRATION_TYPE.email && (
+          <Col
+            xs={6}
+            lg={3}
+          >
+            <KeyValue
+              label={<FormattedMessage id="ui-orders.orderDetails.orderEmailTemplate" />}
+              value={get(order, 'orderEmailTemplateName') || <NoValue />}
+            />
+          </Col>
+        )}
 
         <IfVisible visible={!hiddenFields.manualPo}>
           <Col

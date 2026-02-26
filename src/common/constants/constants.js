@@ -23,6 +23,12 @@ export const ORDER_TYPE = {
   ongoing: 'Ongoing',
 };
 
+export const INTEGRATION_TYPE = {
+  edi: 'EDI',
+  email: 'Email',
+  withoutOrderPlacement: 'Without order placement',
+};
+
 export const ORDERS_DOMAIN = 'orders';
 
 export const NOTE_TYPES = {

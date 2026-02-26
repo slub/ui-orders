@@ -1,6 +1,8 @@
 export { default as FieldPrefix } from './FieldPrefix';
 export { default as FieldSuffix } from './FieldSuffix';
 export { default as FieldBillTo } from './FieldBillTo';
+export { default as FieldIntegrationName } from './FieldIntegrationName';
+export { default as FieldOrderEmailTemplate } from './FieldOrderEmailTemplate';
 export { default as FieldShipTo } from './FieldShipTo';
 export { default as FieldIsManualPO } from './FieldIsManualPO';
 export { default as FieldIsReEncumber } from './FieldIsReEncumber';

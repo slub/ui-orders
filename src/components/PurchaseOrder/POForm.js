@@ -96,6 +96,7 @@ const POForm = ({
   history,
   initialValues,
   onCancel,
+  orderEmailTemplates,
   parentMutator,
   parentResources,
   instanceId,
@@ -430,6 +431,7 @@ const POForm = ({
                               formValues={formValues}
                               generatedNumber={generatedNumber}
                               order={initialValues}
+                              orderEmailTemplates={orderEmailTemplates}
                               orderNumberSetting={orderNumberSetting}
                               prefixesSetting={prefixesSetting}
                               suffixesSetting={suffixesSetting}
@@ -485,6 +487,7 @@ POForm.propTypes = {
   history: PropTypes.object.isRequired,
   initialValues: PropTypes.object.isRequired,
   onCancel: PropTypes.func.isRequired,
+  orderEmailTemplates: PropTypes.arrayOf(PropTypes.object),
   pristine: PropTypes.bool.isRequired,
   submitting: PropTypes.bool.isRequired,
   parentResources: PropTypes.object.isRequired,

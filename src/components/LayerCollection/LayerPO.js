@@ -24,6 +24,7 @@ import { SUBMIT_ACTION_FIELD } from '../../common/constants';
 import {
   useHandleOrderUpdateError,
   useOrder,
+  useOrderEmailTemplates,
 } from '../../common/hooks';
 import { SUBMIT_ACTION } from '../PurchaseOrder/constants';
 import POForm from '../PurchaseOrder/POForm';
@@ -75,6 +76,10 @@ function LayerPO({
     addresses,
     isLoading: isAddressesLoading,
   } = useAddresses();
+
+  const {
+    orderEmailTemplates,
+  } = useOrderEmailTemplates();
 
   useEffect(() => {
     if (id) {
@@ -196,6 +201,7 @@ function LayerPO({
         initialValues={initialValues}
         onCancel={onCancel}
         onSubmit={updatePO}
+        orderEmailTemplates={orderEmailTemplates}
         parentMutator={memoizedMutator}
         parentResources={resources}
         instanceId={instanceId}

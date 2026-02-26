@@ -11,6 +11,7 @@ export * from './useIsRowSelected';
 export * from './useLinesLimit';
 export * from './useOpenOrderSettings';
 export * from './useOrder';
+export * from './useOrderEmailTemplates';
 export * from './useOrderFiscalYears';
 export * from './useOrderLine';
 export * from './useOrderLines';

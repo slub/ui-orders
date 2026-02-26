@@ -21,6 +21,8 @@ export const PO_FORM_FIELDS = {
   reviewPeriod: 'ongoing.reviewPeriod',
   shipTo: 'shipTo',
   tags: 'tags.tagList',
+  integrationName: 'integrationName',
+  orderEmailTemplateId: 'orderEmailTemplateId',
   template: 'template',
   vendor: 'vendor',
   workflowStatus: 'workflowStatus',
