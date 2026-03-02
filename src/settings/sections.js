@@ -68,16 +68,16 @@ export const SECTIONS = [
         perm: 'ui-orders.settings.order-templates.view',
       },
       {
-        component: EmailTemplates,
-        label: <FormattedMessage id="ui-orders.settings.emailTemplates.label" />,
-        route: 'email-templates',
-        perm: 'ui-orders.settings.email-templates.view',
-      },
-      {
         component: OrderTemplateCategories,
         label: <FormattedMessage id="ui-orders.settings.orderTemplateCategories" />,
         route: 'order-template-categories',
         perm: 'ui-orders.settings.view',
+      },
+      {
+        component: EmailTemplates,
+        label: <FormattedMessage id="ui-orders.settings.emailTemplates.label" />,
+        route: 'email-templates',
+        perm: 'ui-orders.settings.email-templates.view',
       },
       {
         component: POLinesLimit,
