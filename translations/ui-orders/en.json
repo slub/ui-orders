@@ -825,7 +825,7 @@
   "settings.orderTemplates.save.success": "The template was saved",
   "settings.orderTemplates.save.error": "The template was not saved",
 
-  "settings.emailTemplates.label": "Email templates - purchase orders",
+  "settings.emailTemplates.label": "Order email templates",
   "settings.emailTemplates.new": "New email template",
   "settings.emailTemplates.generalInformation": "General information",
   "settings.emailTemplates.name": "Template name",
