@@ -8,7 +8,11 @@ import { stripesConnect, TitleManager } from '@folio/stripes/core';
 
 import EmailTemplateDetail from './EmailTemplateDetail';
 import EmailTemplateForm from './EmailTemplateForm';
-import { EMAIL_TEMPLATE_CATEGORY } from './constants';
+import {
+  EMAIL_TEMPLATE_CATEGORY,
+  RECIPIENT_LOGIC,
+  TEMPLATE_MODULE,
+} from './constants';
 
 /**
  * EmailTemplates - Settings page for managing email templates for purchase orders.
@@ -16,7 +20,7 @@ import { EMAIL_TEMPLATE_CATEGORY } from './constants';
  * Uses EntryManager from stripes-smart-components for CRUD operations.
  * Similar to PatronNotices in ui-circulation.
  *
- * API: GET /templates?query=category==EMAIL_TEMPLATE_CATEGORY
+ * API: GET /templates?query=module==orders OR category==OrderEmail
  *
  * Tickets: UIOR-1492, UIOR-1493, UIOR-1494, UIOR-1495
  */
@@ -52,7 +56,7 @@ class EmailTemplates extends React.Component {
       path: 'templates',
       records: 'templates',
       params: {
-        query: `cql.allRecords=1 AND category=="${EMAIL_TEMPLATE_CATEGORY}"`,
+        query: `cql.allRecords=1 AND (module=="${TEMPLATE_MODULE}" OR category=="${EMAIL_TEMPLATE_CATEGORY}")`,
       },
       perRequest: 100,
     },
@@ -86,7 +90,9 @@ class EmailTemplates extends React.Component {
             active: true,
             outputFormats: ['text/html'],
             templateResolver: 'mustache',
-            category: EMAIL_TEMPLATE_CATEGORY,
+            module: TEMPLATE_MODULE,
+            recipientLogic: RECIPIENT_LOGIC.PRIMARY_EMAIL,
+            attachmentFormats: [],
           }}
           nameKey="name"
           permissions={{

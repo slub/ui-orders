@@ -3,7 +3,7 @@ import {
   FormattedMessage,
   injectIntl,
 } from 'react-intl';
-import { Field } from 'react-final-form';
+import { Field, useFormState } from 'react-final-form';
 
 import {
   Accordion,
@@ -13,17 +13,25 @@ import {
   Checkbox,
   Col,
   ExpandAllButton,
+  Label,
   Pane,
   PaneFooter,
   Paneset,
+  RadioButton,
   Row,
+  Select,
   TextArea,
   TextField,
 } from '@folio/stripes/components';
 import stripesFinalForm from '@folio/stripes/final-form';
 import { TemplateEditor } from '@folio/stripes-template-editor';
+import { useCategories } from '@folio/stripes-acq-components';
 
-import { ORDER_EMAIL_TOKENS } from './constants';
+import {
+  ATTACHMENT_FORMATS,
+  ORDER_EMAIL_TOKENS,
+  RECIPIENT_LOGIC,
+} from './constants';
 import TokensList from './TokensList';
 import validate from './validate';
 
@@ -45,6 +53,16 @@ const EmailTemplateForm = ({
   pristine,
   submitting,
 }) => {
+  const { values } = useFormState({ subscription: { values: true } });
+  const { categories, isLoading: categoriesLoading } = useCategories();
+
+  const categoryOptions = [
+    { label: formatMessage({ id: 'ui-orders.settings.emailTemplates.category.placeholder' }), value: '' },
+    ...categories.map(c => ({ label: c.value, value: c.id })),
+  ];
+
+  const showCategorySelect = values?.recipientLogic === RECIPIENT_LOGIC.CATEGORY_BASED;
+
   const paneTitle = initialValues?.id
     ? initialValues?.name
     : formatMessage({ id: 'ui-orders.settings.emailTemplates.new' });
@@ -100,8 +118,8 @@ const EmailTemplateForm = ({
                 <ExpandAllButton />
               </Col>
             </Row>
-            {/* Hidden field to ensure category is always sent with form data */}
-            <Field name="category" component="input" type="hidden" />
+            {/* Hidden field to ensure module is always sent with form data */}
+            <Field name="module" component="input" type="hidden" />
             <AccordionSet>
               <Accordion
                 label={<FormattedMessage id="ui-orders.settings.emailTemplates.generalInformation" />}
@@ -142,6 +160,51 @@ const EmailTemplateForm = ({
                 <Row>
                   <Col xs={12}>
                     <Field
+                      name="senderAddress"
+                      label={<FormattedMessage id="ui-orders.settings.emailTemplates.senderAddress" />}
+                      component={TextField}
+                      required
+                    />
+                  </Col>
+                </Row>
+                <Row style={{ marginBottom: '1rem' }}>
+                  <Col xs={12}>
+                    <Label required>
+                      <FormattedMessage id="ui-orders.settings.emailTemplates.recipientLogic" />
+                    </Label>
+                    <Field
+                      name="recipientLogic"
+                      type="radio"
+                      value={RECIPIENT_LOGIC.PRIMARY_EMAIL}
+                      component={RadioButton}
+                      label={<FormattedMessage id="ui-orders.settings.emailTemplates.recipientLogic.primaryEmail" />}
+                    />
+                    <Field
+                      name="recipientLogic"
+                      type="radio"
+                      value={RECIPIENT_LOGIC.CATEGORY_BASED}
+                      component={RadioButton}
+                      label={<FormattedMessage id="ui-orders.settings.emailTemplates.recipientLogic.categoryBased" />}
+                    />
+                  </Col>
+                </Row>
+                {showCategorySelect && (
+                  <Row>
+                    <Col xs={12} md={6}>
+                      <Field
+                        name="category"
+                        label={<FormattedMessage id="ui-orders.settings.emailTemplates.category" />}
+                        component={Select}
+                        dataOptions={categoryOptions}
+                        disabled={categoriesLoading}
+                        required
+                      />
+                    </Col>
+                  </Row>
+                )}
+                <Row>
+                  <Col xs={12}>
+                    <Field
                       name="localizedTemplates.en.header"
                       label={<FormattedMessage id="ui-orders.settings.emailTemplates.subject" />}
                       component={TextField}
@@ -160,6 +223,25 @@ const EmailTemplateForm = ({
                       tokensList={TokensList}
                       previewModalHeader={<FormattedMessage id="ui-orders.settings.emailTemplates.preview" />}
                       required
+                    />
+                  </Col>
+                </Row>
+              </Accordion>
+
+              <Accordion
+                label={<FormattedMessage id="ui-orders.settings.emailTemplates.attachment" />}
+              >
+                <Row>
+                  <Col xs={12}>
+                    <Label>
+                      <FormattedMessage id="ui-orders.settings.emailTemplates.attachmentFormat" />
+                    </Label>
+                    <Field
+                      name="attachmentFormats"
+                      type="checkbox"
+                      value={ATTACHMENT_FORMATS.CSV}
+                      component={Checkbox}
+                      label={<FormattedMessage id="ui-orders.settings.emailTemplates.attachmentFormat.csv" />}
                     />
                   </Col>
                 </Row>

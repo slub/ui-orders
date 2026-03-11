@@ -22,6 +22,7 @@ const TokensList = ({
     tag: ORDER_LINES_LOOP_TAG,
     isDisabledLoop: null,
   };
+
   return (
     <Row data-testid="emailTemplateTokenListWrapper">
       <Col xs={6}>
