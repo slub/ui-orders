@@ -70,8 +70,12 @@ class EmailTemplates extends React.Component {
       mutator,
     } = this.props;
 
-    // Sort entries alphabetically by name
-    const entryList = sortBy((resources.entries || {}).records || [], ['name']);
+    // Ensure module is set on all entries (migration from category-based filtering)
+    const rawEntries = (resources.entries || {}).records || [];
+    const entryList = sortBy(rawEntries.map(entry => ({
+      ...entry,
+      module: entry.module || TEMPLATE_MODULE,
+    })), ['name']);
 
     return (
       <TitleManager
