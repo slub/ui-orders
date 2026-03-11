@@ -10,6 +10,16 @@
  */
 
 export const EMAIL_TEMPLATE_CATEGORY = 'OrderEmail';
+export const TEMPLATE_MODULE = 'orders';
+
+export const RECIPIENT_LOGIC = {
+  PRIMARY_EMAIL: 'primaryEmail',
+  CATEGORY_BASED: 'categoryBased',
+};
+
+export const ATTACHMENT_FORMATS = {
+  CSV: 'csv',
+};
 
 export const TOKEN_SECTIONS = {
   VENDOR: 'vendor',
@@ -54,6 +64,10 @@ export const ORDER_EMAIL_TOKENS = {
       previewValue: 'One-Time',
     },
     {
+      token: 'order.createdBy',
+      previewValue: 'Max Mustermann',
+    },
+    {
       token: 'order.totalEstimatedPrice',
       previewValue: '1,234.56 EUR',
     },
@@ -84,6 +98,14 @@ export const ORDER_EMAIL_TOKENS = {
       previewValue: 'De Gruyter',
     },
     {
+      token: 'orderLine.publicationPlace',
+      previewValue: 'Berlin',
+    },
+    {
+      token: 'orderLine.publicationDate',
+      previewValue: '2024',
+    },
+    {
       token: 'orderLine.edition',
       previewValue: '3rd ed.',
     },
@@ -96,16 +118,48 @@ export const ORDER_EMAIL_TOKENS = {
       previewValue: 'Book',
     },
     {
-      token: 'orderLine.quantity',
+      token: 'orderLine.listUnitPrice',
+      previewValue: '45.00',
+    },
+    {
+      token: 'orderLine.listUnitPriceElectronic',
+      previewValue: '39.95',
+    },
+    {
+      token: 'orderLine.quantityPhysical',
       previewValue: '2',
     },
     {
+      token: 'orderLine.quantityElectronic',
+      previewValue: '1',
+    },
+    {
+      token: 'orderLine.quantity',
+      previewValue: '3',
+    },
+    {
       token: 'orderLine.estimatedPrice',
-      previewValue: '45.00 EUR',
+      previewValue: '129.95 EUR',
     },
     {
       token: 'orderLine.currency',
       previewValue: 'EUR',
+    },
+    {
+      token: 'orderLine.fundCodes',
+      previewValue: 'HIST, GERM',
+    },
+    {
+      token: 'orderLine.noteTitle',
+      previewValue: 'Lieferhinweis',
+    },
+    {
+      token: 'orderLine.noteDetails',
+      previewValue: 'Bitte Rechnung in Kopie an Fachabteilung',
+    },
+    {
+      token: 'orderLine.noteType',
+      previewValue: 'General note',
     },
     {
       token: 'orderLine.vendorRefNumber',
