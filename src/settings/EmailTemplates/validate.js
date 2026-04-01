@@ -1,16 +1,11 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { RECIPIENT_LOGIC } from './constants';
-
 /**
  * Validation for Email Template form
  *
  * Required fields:
  * - name: Template name
- * - senderAddress: Sender email address
- * - recipientLogic: Recipient logic selection
- * - category: Required when recipientLogic is categoryBased
  * - localizedTemplates.en.header: Email subject
  * - localizedTemplates.en.body: Email body content
  */
@@ -31,21 +26,6 @@ const validate = (values) => {
   // Name is required
   if (isEmpty(values.name)) {
     errors.name = <FormattedMessage id="ui-orders.settings.emailTemplates.validation.nameRequired" />;
-  }
-
-  // Sender address is required
-  if (isEmpty(values.senderAddress)) {
-    errors.senderAddress = <FormattedMessage id="ui-orders.settings.emailTemplates.validation.senderAddressRequired" />;
-  }
-
-  // Recipient logic is required
-  if (isEmpty(values.recipientLogic)) {
-    errors.recipientLogic = <FormattedMessage id="ui-orders.settings.emailTemplates.validation.recipientLogicRequired" />;
-  }
-
-  // Category is required when using category based email
-  if (values.recipientLogic === RECIPIENT_LOGIC.CATEGORY_BASED && isEmpty(values.category)) {
-    errors.category = <FormattedMessage id="ui-orders.settings.emailTemplates.validation.categoryRequired" />;
   }
 
   // Initialize nested error object if needed

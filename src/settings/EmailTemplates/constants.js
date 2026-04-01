@@ -10,16 +10,7 @@
  */
 
 export const EMAIL_TEMPLATE_CATEGORY = 'OrderEmail';
-export const TEMPLATE_MODULE = 'orders';
-
-export const RECIPIENT_LOGIC = {
-  PRIMARY_EMAIL: 'primaryEmail',
-  CATEGORY_BASED: 'categoryBased',
-};
-
-export const ATTACHMENT_FORMATS = {
-  CSV: 'csv',
-};
+export const TEMPLATE_SCOPE = 'orders';
 
 export const TOKEN_SECTIONS = {
   VENDOR: 'vendor',

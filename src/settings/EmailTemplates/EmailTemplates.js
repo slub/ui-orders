@@ -10,8 +10,7 @@ import EmailTemplateDetail from './EmailTemplateDetail';
 import EmailTemplateForm from './EmailTemplateForm';
 import {
   EMAIL_TEMPLATE_CATEGORY,
-  RECIPIENT_LOGIC,
-  TEMPLATE_MODULE,
+  TEMPLATE_SCOPE,
 } from './constants';
 
 /**
@@ -48,7 +47,7 @@ class EmailTemplates extends React.Component {
    * Stripes Connect manifest - defines API resources
    *
    * entries: Loads email templates from /templates API
-   * Filter by category to only get order email templates
+   * Filter by scope; OR category for backwards compatibility during migration
    */
   static manifest = Object.freeze({
     entries: {
@@ -56,7 +55,7 @@ class EmailTemplates extends React.Component {
       path: 'templates',
       records: 'templates',
       params: {
-        query: `cql.allRecords=1 AND (module=="${TEMPLATE_MODULE}" OR category=="${EMAIL_TEMPLATE_CATEGORY}")`,
+        query: `cql.allRecords=1 AND (scope=="${TEMPLATE_SCOPE}" OR category=="${EMAIL_TEMPLATE_CATEGORY}")`,
       },
       perRequest: 100,
     },
@@ -70,11 +69,11 @@ class EmailTemplates extends React.Component {
       mutator,
     } = this.props;
 
-    // Ensure module is set on all entries (migration from category-based filtering)
+    // Ensure scope is set on all entries (migration from category/module-based filtering)
     const rawEntries = (resources.entries || {}).records || [];
     const entryList = sortBy(rawEntries.map(entry => ({
       ...entry,
-      module: entry.module || TEMPLATE_MODULE,
+      scope: entry.scope || TEMPLATE_SCOPE,
     })), ['name']);
 
     return (
@@ -94,9 +93,7 @@ class EmailTemplates extends React.Component {
             active: true,
             outputFormats: ['text/html'],
             templateResolver: 'mustache',
-            module: TEMPLATE_MODULE,
-            recipientLogic: RECIPIENT_LOGIC.PRIMARY_EMAIL,
-            attachmentFormats: [],
+            scope: TEMPLATE_SCOPE,
           }}
           nameKey="name"
           permissions={{
