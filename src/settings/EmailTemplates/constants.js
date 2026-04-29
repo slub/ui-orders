@@ -85,6 +85,10 @@ export const ORDER_EMAIL_TOKENS = {
       previewValue: 'Introduction to Library Science',
     },
     {
+      token: 'orderLine.contributors',
+      previewValue: 'Mustermann, Max; Schmidt, Anna',
+    },
+    {
       token: 'orderLine.publisher',
       previewValue: 'De Gruyter',
     },
@@ -103,6 +107,10 @@ export const ORDER_EMAIL_TOKENS = {
     {
       token: 'orderLine.productIdentifier',
       previewValue: '978-3-11-069137-8',
+    },
+    {
+      token: 'orderLine.productIdentifierType',
+      previewValue: 'ISBN',
     },
     {
       token: 'orderLine.materialType',
