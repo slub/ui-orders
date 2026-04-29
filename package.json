@@ -401,7 +401,8 @@
         "subPermissions": [
           "settings.orders.enabled",
           "templates.collection.get",
-          "templates.item.get"
+          "templates.item.get",
+          "template-request.post"
         ]
       },
       {

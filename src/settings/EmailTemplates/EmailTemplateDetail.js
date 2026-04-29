@@ -13,12 +13,8 @@ import {
   KeyValue,
   Row,
 } from '@folio/stripes/components';
-import {
-  PreviewModal,
-  tokensReducer,
-} from '@folio/stripes-template-editor';
 
-import { ORDER_EMAIL_TOKENS } from './constants';
+import BackendPreviewModal from './BackendPreviewModal';
 
 /**
  * EmailTemplateDetail - Read-only view of an email template.
@@ -34,17 +30,16 @@ const EmailTemplateDetail = ({ initialValues }) => {
   const [openPreview, setOpenPreview] = useState(false);
 
   const {
+    id,
     name,
     description,
     active,
     localizedTemplates,
   } = initialValues;
 
-  // Get the English template (or first available)
   const template = localizedTemplates?.en || {};
   const { header: subject, body } = template;
 
-  const previewFormat = useMemo(() => tokensReducer(ORDER_EMAIL_TOKENS), []);
   const sanitizedBody = useMemo(() => DOMPurify.sanitize(body || ''), [body]);
 
   const togglePreviewDialog = () => {
@@ -115,20 +110,15 @@ const EmailTemplateDetail = ({ initialValues }) => {
         </Accordion>
       </AccordionSet>
 
-      {/* NOTE: template-resolver in stripes-template-editor only replaces simple
-          {{token}} placeholders. Mustache loops ({{#orderLines}}...{{/orderLines}})
-          are not iterated — order line tokens appear once. For multi-row preview,
-          a real Mustache library would be needed (TODO: UIOR-1495). */}
-      <PreviewModal
+      <BackendPreviewModal
         open={openPreview}
+        templateId={id}
         header={
           <FormattedMessage
             id="ui-orders.settings.emailTemplates.previewHeader"
             values={{ name }}
           />
         }
-        previewTemplate={body || ''}
-        previewFormat={previewFormat}
         onClose={togglePreviewDialog}
       />
     </AccordionStatus>
@@ -137,6 +127,7 @@ const EmailTemplateDetail = ({ initialValues }) => {
 
 EmailTemplateDetail.propTypes = {
   initialValues: PropTypes.shape({
+    id: PropTypes.string,
     name: PropTypes.string,
     description: PropTypes.string,
     active: PropTypes.bool,
