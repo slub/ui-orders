@@ -1,21 +1,91 @@
 /**
  * Sample data sent to mod-template-engine when rendering the preview.
  *
- * Shape is nested (mustache-friendly), with two orders and two order lines
- * per order so loop iteration is visible in the preview.
+ * Structure follows the FOLIO notice-template convention used by
+ * mod-circulation: each loop element wraps its fields in a sub-object
+ * named after the dotted-token prefix the user inserts via the
+ * Token-Picker.
  *
- * Token-Picker still inserts dotted placeholders like {{order.poNumber}}.
- * As long as the user wraps tokens in their loop tags
- * ({{#orders}}...{{/orders}}, {{#orderLines}}...{{/orderLines}}),
- * mustache will resolve {{poNumber}} inside the order section etc.
+ * For example, {{order.poNumber}} inside {{#orders}}...{{/orders}} only
+ * resolves correctly if every element of `orders[]` has an `order` sub-
+ * object containing `poNumber`. Same for {{orderLine.title}} inside
+ * {{#orderLines}}...{{/orderLines}}.
  *
- * The flat dotted-key tokens (e.g. {{vendor.name}}) outside of any loop
- * still resolve because each section also has its data exposed at the
- * top level.
+ * Outside any loop, top-level `order`, `orderLine`, `vendor`, `library`
+ * sub-objects let the same dotted tokens resolve at root level.
+ *
+ * Addresses are nested sub-objects (vendor.address, library.address,
+ * order.shipTo, order.billTo) so users can place each line where they
+ * want it in the template.
  */
 
-const sampleOrderLineA1 = {
-  poLineNumber: 'PO-2026-001234-1',
+const vendorAddress = {
+  addressLine1: 'Hauptstraße 1',
+  city: 'Berlin',
+  zipCode: '10115',
+  country: 'Germany',
+};
+
+const libraryAddress = {
+  addressLine1: '100 University Avenue',
+  city: 'Auckland',
+  zipCode: '1010',
+  country: 'New Zealand',
+};
+
+const shipToAddress = {
+  name: 'Main Library',
+  addressLine1: '100 University Avenue',
+  city: 'Auckland',
+  zipCode: '1010',
+  country: 'New Zealand',
+};
+
+const billToAddress = {
+  name: 'Acquisitions Dept.',
+  addressLine1: '100 University Avenue',
+  city: 'Auckland',
+  zipCode: '1010',
+  country: 'New Zealand',
+};
+
+const vendor = {
+  name: 'Schweitzer Fachinformationen',
+  code: 'SCHW',
+  contactEmail: 'orders@schweitzer-online.de',
+  address: vendorAddress,
+  accountNumber: 'BIB-2026-4711',
+};
+
+const library = {
+  name: 'Main Library',
+  address: libraryAddress,
+};
+
+const orderAFields = {
+  poNumber: '10037',
+  orderDate: '2026-04-15',
+  orderType: 'One-Time',
+  createdBy: 'Max Mustermann',
+  totalEstimatedPrice: '149.95 EUR',
+  shipTo: shipToAddress,
+  billTo: billToAddress,
+  note: 'Please confirm delivery date.',
+};
+
+const orderBFields = {
+  poNumber: '10038',
+  orderDate: '2026-04-22',
+  orderType: 'Ongoing',
+  createdBy: 'Anna Schmidt',
+  totalEstimatedPrice: '197.45 EUR',
+  shipTo: shipToAddress,
+  billTo: billToAddress,
+  note: '',
+};
+
+const lineA1Fields = {
+  poLineNumber: '10037-1',
   title: 'Introduction to Library Science',
   contributors: 'Mustermann, Max; Schmidt, Anna',
   publisher: 'De Gruyter',
@@ -36,12 +106,12 @@ const sampleOrderLineA1 = {
   noteTitle: 'Lieferhinweis',
   noteDetails: 'Bitte Rechnung in Kopie an Fachabteilung',
   noteType: 'General note',
-  vendorRefNumber: 'SCHW-REF-98765',
+  vendorRefNumber: 'V-98765',
   instructions: 'Hardcover preferred',
 };
 
-const sampleOrderLineA2 = {
-  poLineNumber: 'PO-2026-001234-2',
+const lineA2Fields = {
+  poLineNumber: '10037-2',
   title: 'Advanced Cataloging Techniques',
   contributors: 'Becker, Lara',
   publisher: 'Springer',
@@ -62,12 +132,12 @@ const sampleOrderLineA2 = {
   noteTitle: '',
   noteDetails: '',
   noteType: '',
-  vendorRefNumber: 'SCHW-REF-98770',
+  vendorRefNumber: 'V-98770',
   instructions: '',
 };
 
-const sampleOrderLineB1 = {
-  poLineNumber: 'PO-2026-001235-1',
+const lineB1Fields = {
+  poLineNumber: '10038-1',
   title: 'Digital Preservation Handbook',
   contributors: 'Weber, Julia; Krause, Tim',
   publisher: 'Routledge',
@@ -88,46 +158,56 @@ const sampleOrderLineB1 = {
   noteTitle: '',
   noteDetails: '',
   noteType: '',
-  vendorRefNumber: 'SCHW-REF-98801',
+  vendorRefNumber: 'V-98801',
   instructions: 'Express delivery',
 };
 
+const lineB2Fields = {
+  poLineNumber: '10038-2',
+  title: 'Open Access Publishing',
+  contributors: 'Hofmann, Lisa',
+  publisher: 'Cambridge University Press',
+  publicationPlace: 'Cambridge',
+  publicationDate: '2025',
+  edition: '1st ed.',
+  productIdentifier: '978-1-108-12345-6',
+  productIdentifierType: 'ISBN',
+  materialType: 'Book',
+  listUnitPrice: '59.95',
+  listUnitPriceElectronic: '',
+  quantityPhysical: '1',
+  quantityElectronic: '0',
+  quantity: '1',
+  estimatedPrice: '59.95 EUR',
+  currency: 'EUR',
+  fundCodes: 'INFO',
+  noteTitle: '',
+  noteDetails: '',
+  noteType: '',
+  vendorRefNumber: 'V-98810',
+  instructions: '',
+};
+
 const orderA = {
-  poNumber: 'PO-2026-001234',
-  orderDate: '2026-04-15',
-  orderType: 'One-Time',
-  createdBy: 'Max Mustermann',
-  totalEstimatedPrice: '149.95 EUR',
-  shipTo: 'Main Library, 123 Library Street, 01234 Booktown',
-  billTo: 'University Library, Accounting Dept., 456 Campus Road, 01234 Booktown',
-  note: 'Please confirm delivery date.',
-  orderLines: [sampleOrderLineA1, sampleOrderLineA2],
+  order: orderAFields,
+  orderLines: [
+    { orderLine: lineA1Fields },
+    { orderLine: lineA2Fields },
+  ],
 };
 
 const orderB = {
-  poNumber: 'PO-2026-001235',
-  orderDate: '2026-04-22',
-  orderType: 'Ongoing',
-  createdBy: 'Anna Schmidt',
-  totalEstimatedPrice: '137.50 EUR',
-  shipTo: 'Main Library, 123 Library Street, 01234 Booktown',
-  billTo: 'University Library, Accounting Dept., 456 Campus Road, 01234 Booktown',
-  note: '',
-  orderLines: [sampleOrderLineB1],
+  order: orderBFields,
+  orderLines: [
+    { orderLine: lineB1Fields },
+    { orderLine: lineB2Fields },
+  ],
 };
 
 export const SAMPLE_PREVIEW_CONTEXT = {
-  vendor: {
-    name: 'Schweitzer Fachinformationen',
-    code: 'SCHW',
-    contactEmail: 'orders@schweitzer-online.de',
-    accountNumber: 'BIB-2026-4711',
-  },
-  library: {
-    name: 'University Library',
-    address: '456 Campus Road, 01234 Booktown',
-  },
-  order: orderA,
-  orderLine: sampleOrderLineA1,
+  vendor,
+  library,
+  order: orderAFields,
+  orderLine: lineA1Fields,
   orders: [orderA, orderB],
 };

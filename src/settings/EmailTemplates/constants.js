@@ -37,18 +37,34 @@ export const ORDER_EMAIL_TOKENS = {
       previewValue: 'orders@schweitzer-online.de',
     },
     {
+      token: 'vendor.address.addressLine1',
+      previewValue: 'Hauptstraße 1',
+    },
+    {
+      token: 'vendor.address.city',
+      previewValue: 'Berlin',
+    },
+    {
+      token: 'vendor.address.zipCode',
+      previewValue: '10115',
+    },
+    {
+      token: 'vendor.address.country',
+      previewValue: 'Germany',
+    },
+    {
       token: 'vendor.accountNumber',
-      previewValue: 'BIB-2024-4711',
+      previewValue: 'BIB-2026-4711',
     },
   ],
   [TOKEN_SECTIONS.ORDER]: [
     {
       token: 'order.poNumber',
-      previewValue: 'PO-2024-001234',
+      previewValue: '10037',
     },
     {
       token: 'order.orderDate',
-      previewValue: '2024-02-03',
+      previewValue: '2026-04-15',
     },
     {
       token: 'order.orderType',
@@ -60,15 +76,47 @@ export const ORDER_EMAIL_TOKENS = {
     },
     {
       token: 'order.totalEstimatedPrice',
-      previewValue: '1,234.56 EUR',
+      previewValue: '149.95 EUR',
     },
     {
-      token: 'order.shipTo',
-      previewValue: 'Main Library, 123 Library Street, 01234 Booktown',
+      token: 'order.shipTo.name',
+      previewValue: 'Main Library',
     },
     {
-      token: 'order.billTo',
-      previewValue: 'University Library, Accounting Dept., 456 Campus Road, 01234 Booktown',
+      token: 'order.shipTo.addressLine1',
+      previewValue: '100 University Avenue',
+    },
+    {
+      token: 'order.shipTo.city',
+      previewValue: 'Auckland',
+    },
+    {
+      token: 'order.shipTo.zipCode',
+      previewValue: '1010',
+    },
+    {
+      token: 'order.shipTo.country',
+      previewValue: 'New Zealand',
+    },
+    {
+      token: 'order.billTo.name',
+      previewValue: 'Acquisitions Dept.',
+    },
+    {
+      token: 'order.billTo.addressLine1',
+      previewValue: '100 University Avenue',
+    },
+    {
+      token: 'order.billTo.city',
+      previewValue: 'Auckland',
+    },
+    {
+      token: 'order.billTo.zipCode',
+      previewValue: '1010',
+    },
+    {
+      token: 'order.billTo.country',
+      previewValue: 'New Zealand',
     },
     {
       token: 'order.note',
@@ -78,7 +126,7 @@ export const ORDER_EMAIL_TOKENS = {
   [TOKEN_SECTIONS.ORDER_LINES]: [
     {
       token: 'orderLine.poLineNumber',
-      previewValue: 'PO-2024-001234-1',
+      previewValue: '10037-1',
     },
     {
       token: 'orderLine.title',
@@ -162,7 +210,7 @@ export const ORDER_EMAIL_TOKENS = {
     },
     {
       token: 'orderLine.vendorRefNumber',
-      previewValue: 'SCHW-REF-98765',
+      previewValue: 'V-98765',
     },
     {
       token: 'orderLine.instructions',
@@ -172,11 +220,23 @@ export const ORDER_EMAIL_TOKENS = {
   [TOKEN_SECTIONS.LIBRARY]: [
     {
       token: 'library.name',
-      previewValue: 'University Library',
+      previewValue: 'Main Library',
     },
     {
-      token: 'library.address',
-      previewValue: '456 Campus Road, 01234 Booktown',
+      token: 'library.address.addressLine1',
+      previewValue: '100 University Avenue',
+    },
+    {
+      token: 'library.address.city',
+      previewValue: 'Auckland',
+    },
+    {
+      token: 'library.address.zipCode',
+      previewValue: '1010',
+    },
+    {
+      token: 'library.address.country',
+      previewValue: 'New Zealand',
     },
   ],
 };
