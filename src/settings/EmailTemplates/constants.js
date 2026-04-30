@@ -19,6 +19,7 @@ export const TOKEN_SECTIONS = {
   LIBRARY: 'library',
 };
 
+export const ORDERS_LOOP_TAG = 'orders';
 export const ORDER_LINES_LOOP_TAG = 'orderLines';
 
 // TODO: Finalize token list with backend team
