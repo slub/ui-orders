@@ -23,8 +23,6 @@ import BackendPreviewModal from './BackendPreviewModal';
  * - General information (name, description, active status)
  * - Template content (sender, recipient logic, category, subject, body with preview)
  * - Attachment settings
- *
- * TODO (UIOR-1494): Add logo display
  */
 const EmailTemplateDetail = ({ initialValues }) => {
   const [openPreview, setOpenPreview] = useState(false);

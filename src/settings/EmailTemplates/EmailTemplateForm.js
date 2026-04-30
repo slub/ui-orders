@@ -34,8 +34,6 @@ import css from './EmailTemplateForm.css';
  *
  * Similar structure to PatronNoticeForm in ui-circulation.
  * Uses Paneset/Pane wrapper for proper styling.
- *
- * TODO (UIOR-1494): Add logo upload functionality
  */
 const EmailTemplateForm = ({
   handleSubmit,
@@ -151,7 +149,6 @@ const EmailTemplateForm = ({
                 </Row>
                 <Row>
                   <Col xs={12}>
-                    {/* Preview: loops not iterated by template-resolver (TODO: UIOR-1495) */}
                     <Field
                       name="localizedTemplates.en.body"
                       label={<FormattedMessage id="ui-orders.settings.emailTemplates.body" />}
