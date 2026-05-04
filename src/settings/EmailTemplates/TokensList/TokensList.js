@@ -27,9 +27,9 @@ const TokensList = ({
     <Row data-testid="emailTemplateTokenListWrapper">
       <Col xs={6}>
         <TokensSection
-          section={TOKEN_SECTIONS.VENDOR}
-          header={formatMessage({ id: 'ui-orders.settings.emailTemplates.tokens.vendor' })}
-          tokens={tokens[TOKEN_SECTIONS.VENDOR]}
+          section={TOKEN_SECTIONS.ORGANIZATION}
+          header={formatMessage({ id: 'ui-orders.settings.emailTemplates.tokens.organization' })}
+          tokens={tokens[TOKEN_SECTIONS.ORGANIZATION]}
           onSectionInit={onSectionInit}
           onTokenSelect={onTokenSelect}
         />
