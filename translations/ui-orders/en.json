@@ -839,7 +839,7 @@
   "settings.emailTemplates.preview": "Preview",
   "settings.emailTemplates.previewHeader": "Preview of template: {name}",
   "settings.emailTemplates.preview.error": "The template could not be rendered.",
-  "settings.emailTemplates.tokens.vendor": "Vendor",
+  "settings.emailTemplates.tokens.organization": "Organization",
   "settings.emailTemplates.tokens.order": "Order",
   "settings.emailTemplates.tokens.multipleOrders": "Multiple orders",
   "settings.emailTemplates.tokens.orderLines": "Order lines",

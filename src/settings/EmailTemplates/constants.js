@@ -2,7 +2,7 @@
  * Constants for Email Templates
  *
  * Token structure follows Mustache syntax:
- * - Simple tokens: {{vendor.name}}
+ * - Simple tokens: {{organization.name}}
  * - Loops: {{#orderLines}}...{{/orderLines}}
  *
  * Order line tokens are always rendered inside a loop.
@@ -13,7 +13,7 @@ export const EMAIL_TEMPLATE_CATEGORY = 'OrderEmail';
 export const TEMPLATE_SCOPE = 'orders';
 
 export const TOKEN_SECTIONS = {
-  VENDOR: 'vendor',
+  ORGANIZATION: 'organization',
   ORDER: 'order',
   ORDER_LINES: 'orderLines',
   LIBRARY: 'library',
@@ -24,37 +24,37 @@ export const ORDER_LINES_LOOP_TAG = 'orderLines';
 
 // TODO: Finalize token list with backend team
 export const ORDER_EMAIL_TOKENS = {
-  [TOKEN_SECTIONS.VENDOR]: [
+  [TOKEN_SECTIONS.ORGANIZATION]: [
     {
-      token: 'vendor.name',
+      token: 'organization.name',
       previewValue: 'Schweitzer Fachinformationen',
     },
     {
-      token: 'vendor.code',
+      token: 'organization.code',
       previewValue: 'SCHW',
     },
     {
-      token: 'vendor.contactEmail',
+      token: 'organization.contactEmail',
       previewValue: 'orders@schweitzer-online.de',
     },
     {
-      token: 'vendor.address.addressLine1',
+      token: 'organization.address.addressLine1',
       previewValue: 'Hauptstraße 1',
     },
     {
-      token: 'vendor.address.city',
+      token: 'organization.address.city',
       previewValue: 'Berlin',
     },
     {
-      token: 'vendor.address.zipCode',
+      token: 'organization.address.zipCode',
       previewValue: '10115',
     },
     {
-      token: 'vendor.address.country',
+      token: 'organization.address.country',
       previewValue: 'Germany',
     },
     {
-      token: 'vendor.accountNumber',
+      token: 'organization.accountNumber',
       previewValue: 'BIB-2026-4711',
     },
   ],

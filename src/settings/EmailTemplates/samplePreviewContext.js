@@ -11,15 +11,16 @@
  * object containing `poNumber`. Same for {{orderLine.title}} inside
  * {{#orderLines}}...{{/orderLines}}.
  *
- * Outside any loop, top-level `order`, `orderLine`, `vendor`, `library`
- * sub-objects let the same dotted tokens resolve at root level.
+ * Outside any loop, top-level `order`, `orderLine`, `organization`,
+ * `library` sub-objects let the same dotted tokens resolve at root
+ * level.
  *
- * Addresses are nested sub-objects (vendor.address, library.address,
- * order.shipTo, order.billTo) so users can place each line where they
- * want it in the template.
+ * Addresses are nested sub-objects (organization.address,
+ * library.address, order.shipTo, order.billTo) so users can place each
+ * line where they want it in the template.
  */
 
-const vendorAddress = {
+const organizationAddress = {
   addressLine1: 'Hauptstraße 1',
   city: 'Berlin',
   zipCode: '10115',
@@ -49,11 +50,11 @@ const billToAddress = {
   country: 'New Zealand',
 };
 
-const vendor = {
+const organization = {
   name: 'Schweitzer Fachinformationen',
   code: 'SCHW',
   contactEmail: 'orders@schweitzer-online.de',
-  address: vendorAddress,
+  address: organizationAddress,
   accountNumber: 'BIB-2026-4711',
 };
 
@@ -205,7 +206,7 @@ const orderB = {
 };
 
 export const SAMPLE_PREVIEW_CONTEXT = {
-  vendor,
+  organization,
   library,
   order: orderAFields,
   orderLine: lineA1Fields,
