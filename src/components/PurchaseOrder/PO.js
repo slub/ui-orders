@@ -60,10 +60,12 @@ import {
 } from '@folio/stripes/smart-components';
 
 import {
+  CustomFieldGroupAccordion,
   ExportDetailsAccordion,
   ReexportModal,
 } from '../../common';
 import {
+  CUSTOM_FIELD_GROUPS_PO,
   ENTITY_TYPE_ORDER,
   ERROR_CODES,
   INVOICES_ROUTE,
@@ -854,7 +856,28 @@ const PO = ({
                 entityType={ENTITY_TYPE_ORDER}
                 configNamePrefix={PO_CONFIG_NAME_PREFIX}
                 scope={SCOPE_CUSTOM_FIELDS_MANAGE}
+                sectionId="default"
               />
+              {CUSTOM_FIELD_GROUPS_PO.map(({ id, label }) => (
+                <CustomFieldGroupAccordion
+                  key={id}
+                  sectionId={id}
+                  label={label}
+                  backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
+                  entityType={ENTITY_TYPE_ORDER}
+                >
+                  <ViewCustomFieldsRecord
+                    backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
+                    customFieldsValues={customFieldsValues}
+                    entityType={ENTITY_TYPE_ORDER}
+                    configNamePrefix={PO_CONFIG_NAME_PREFIX}
+                    scope={SCOPE_CUSTOM_FIELDS_MANAGE}
+                    sectionId={id}
+                    showAccordion={false}
+                    isSectionTitleEnabled={false}
+                  />
+                </CustomFieldGroupAccordion>
+              ))}
             </IfVisible>
 
             {Boolean(exportHistory?.length) && (
