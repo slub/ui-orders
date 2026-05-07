@@ -15,52 +15,32 @@
  * `library` sub-objects let the same dotted tokens resolve at root
  * level.
  *
- * Addresses are nested sub-objects (organization.address,
- * library.address, order.shipTo, order.billTo) so users can place each
- * line where they want it in the template.
+ * Ship-to / bill-to are plain strings because FOLIO stores tenant
+ * addresses as a single pre-formatted text field selected via a
+ * dropdown per order.
  */
-
-const organizationAddress = {
-  addressLine1: 'Hauptstraße 1',
-  city: 'Berlin',
-  zipCode: '10115',
-  country: 'Germany',
-};
-
-const libraryAddress = {
-  addressLine1: '100 University Avenue',
-  city: 'Auckland',
-  zipCode: '1010',
-  country: 'New Zealand',
-};
-
-const shipToAddress = {
-  name: 'Main Library',
-  addressLine1: '100 University Avenue',
-  city: 'Auckland',
-  zipCode: '1010',
-  country: 'New Zealand',
-};
-
-const billToAddress = {
-  name: 'Acquisitions Dept.',
-  addressLine1: '100 University Avenue',
-  city: 'Auckland',
-  zipCode: '1010',
-  country: 'New Zealand',
-};
 
 const organization = {
   name: 'Schweitzer Fachinformationen',
   code: 'SCHW',
   contactEmail: 'orders@schweitzer-online.de',
-  address: organizationAddress,
+  address: {
+    addressLine1: 'Hauptstraße 1',
+    city: 'Berlin',
+    zipCode: '10115',
+    country: 'Germany',
+  },
   accountNumber: 'BIB-2026-4711',
 };
 
 const library = {
   name: 'Main Library',
-  address: libraryAddress,
+  address: {
+    addressLine1: '100 University Avenue',
+    city: 'Auckland',
+    zipCode: '1010',
+    country: 'New Zealand',
+  },
 };
 
 const orderAFields = {
@@ -69,8 +49,8 @@ const orderAFields = {
   orderType: 'One-Time',
   createdBy: 'Max Mustermann',
   totalEstimatedPrice: '149.95 EUR',
-  shipTo: shipToAddress,
-  billTo: billToAddress,
+  shipTo: 'Branch Library of Humanities\n10 Philosopher Lane\n01234 Booktown',
+  billTo: 'University Library - Acquisitions\n456 Campus Road\n01234 Booktown',
   note: 'Please confirm delivery date.',
 };
 
@@ -80,8 +60,8 @@ const orderBFields = {
   orderType: 'Ongoing',
   createdBy: 'Anna Schmidt',
   totalEstimatedPrice: '197.45 EUR',
-  shipTo: shipToAddress,
-  billTo: billToAddress,
+  shipTo: 'Science Library\n25 Laboratory Drive\n01234 Booktown',
+  billTo: 'University Library - Acquisitions\n456 Campus Road\n01234 Booktown',
   note: '',
 };
 

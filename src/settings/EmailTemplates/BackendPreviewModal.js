@@ -89,7 +89,10 @@ const BackendPreviewModal = ({ open, templateId, header, onClose }) => {
             <h3>{renderedSubject}</h3>
           )}
           {/* eslint-disable-next-line react/no-danger */}
-          <div dangerouslySetInnerHTML={{ __html: sanitizedBody }} />
+          <div
+            style={{ whiteSpace: 'pre-line' }}
+            dangerouslySetInnerHTML={{ __html: sanitizedBody }}
+          />
         </>
       )}
     </Modal>

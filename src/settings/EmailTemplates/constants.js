@@ -80,44 +80,12 @@ export const ORDER_EMAIL_TOKENS = {
       previewValue: '149.95 EUR',
     },
     {
-      token: 'order.shipTo.name',
-      previewValue: 'Main Library',
+      token: 'order.shipTo',
+      previewValue: 'Branch Library of Humanities\n10 Philosopher Lane\n01234 Booktown',
     },
     {
-      token: 'order.shipTo.addressLine1',
-      previewValue: '100 University Avenue',
-    },
-    {
-      token: 'order.shipTo.city',
-      previewValue: 'Auckland',
-    },
-    {
-      token: 'order.shipTo.zipCode',
-      previewValue: '1010',
-    },
-    {
-      token: 'order.shipTo.country',
-      previewValue: 'New Zealand',
-    },
-    {
-      token: 'order.billTo.name',
-      previewValue: 'Acquisitions Dept.',
-    },
-    {
-      token: 'order.billTo.addressLine1',
-      previewValue: '100 University Avenue',
-    },
-    {
-      token: 'order.billTo.city',
-      previewValue: 'Auckland',
-    },
-    {
-      token: 'order.billTo.zipCode',
-      previewValue: '1010',
-    },
-    {
-      token: 'order.billTo.country',
-      previewValue: 'New Zealand',
+      token: 'order.billTo',
+      previewValue: 'University Library - Acquisitions\n456 Campus Road\n01234 Booktown',
     },
     {
       token: 'order.note',
