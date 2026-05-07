@@ -64,11 +64,11 @@ export const ORDER_EMAIL_TOKENS = {
     },
     {
       token: 'order.shipTo',
-      previewValue: 'Main Library, 123 Library Street, 01234 Booktown',
+      previewValue: 'Branch Library of Humanities\n10 Philosopher Lane\n01234 Booktown',
     },
     {
       token: 'order.billTo',
-      previewValue: 'University Library, Accounting Dept., 456 Campus Road, 01234 Booktown',
+      previewValue: 'University Library - Acquisitions\n456 Campus Road\n01234 Booktown',
     },
     {
       token: 'order.note',
