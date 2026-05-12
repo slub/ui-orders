@@ -11,9 +11,8 @@
  * object containing `poNumber`. Same for {{orderLine.title}} inside
  * {{#orderLines}}...{{/orderLines}}.
  *
- * Outside any loop, top-level `order`, `orderLine`, `organization`,
- * `library` sub-objects let the same dotted tokens resolve at root
- * level.
+ * Outside any loop, top-level `order`, `orderLine`, `organization`
+ * sub-objects let the same dotted tokens resolve at root level.
  *
  * Ship-to / bill-to are plain strings because FOLIO stores tenant
  * addresses as a single pre-formatted text field selected via a
@@ -31,16 +30,6 @@ const organization = {
     country: 'Germany',
   },
   accountNumber: 'BIB-2026-4711',
-};
-
-const library = {
-  name: 'Main Library',
-  address: {
-    addressLine1: '100 University Avenue',
-    city: 'Auckland',
-    zipCode: '1010',
-    country: 'New Zealand',
-  },
 };
 
 const orderAFields = {
@@ -187,7 +176,6 @@ const orderB = {
 
 export const SAMPLE_PREVIEW_CONTEXT = {
   organization,
-  library,
   order: orderAFields,
   orderLine: lineA1Fields,
   orders: [orderA, orderB],

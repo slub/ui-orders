@@ -86,13 +86,6 @@ const TokensList = ({
             onSectionInit={onSectionInit}
             onTokenSelect={onTokenSelect}
           />
-          <TokensSection
-            section={TOKEN_SECTIONS.LIBRARY}
-            header={formatMessage({ id: 'ui-orders.settings.emailTemplates.tokens.library' })}
-            tokens={tokens[TOKEN_SECTIONS.LIBRARY]}
-            onSectionInit={onSectionInit}
-            onTokenSelect={onTokenSelect}
-          />
         </Col>
       </Row>
     </>

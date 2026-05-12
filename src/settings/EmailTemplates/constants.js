@@ -16,7 +16,6 @@ export const TOKEN_SECTIONS = {
   ORGANIZATION: 'organization',
   ORDER: 'order',
   ORDER_LINES: 'orderLines',
-  LIBRARY: 'library',
 };
 
 export const ORDERS_LOOP_TAG = 'orders';
@@ -184,28 +183,6 @@ export const ORDER_EMAIL_TOKENS = {
     {
       token: 'orderLine.instructions',
       previewValue: 'Hardcover preferred',
-    },
-  ],
-  [TOKEN_SECTIONS.LIBRARY]: [
-    {
-      token: 'library.name',
-      previewValue: 'Main Library',
-    },
-    {
-      token: 'library.address.addressLine1',
-      previewValue: '100 University Avenue',
-    },
-    {
-      token: 'library.address.city',
-      previewValue: 'Auckland',
-    },
-    {
-      token: 'library.address.zipCode',
-      previewValue: '1010',
-    },
-    {
-      token: 'library.address.country',
-      previewValue: 'New Zealand',
     },
   ],
 };

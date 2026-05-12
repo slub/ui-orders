@@ -844,7 +844,6 @@
   "settings.emailTemplates.tokens.multipleOrders": "Multiple orders",
   "settings.emailTemplates.tokens.orderLines": "Order lines",
   "settings.emailTemplates.tokens.multipleOrderLines": "Multiple order lines",
-  "settings.emailTemplates.tokens.library": "Library",
   "settings.emailTemplates.tokens.help.title": "Tips",
   "settings.emailTemplates.tokens.help.optional": "To skip empty fields, wrap the line in section tags: {pattern}.",
   "settings.emailTemplates.tokens.help.loops": "Use the {label} option to repeat fields. Order line loops must be nested inside an orders loop.",
