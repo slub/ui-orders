@@ -87,8 +87,8 @@ export const ORDER_EMAIL_TOKENS = {
       previewValue: 'University Library - Acquisitions\n456 Campus Road\n01234 Booktown',
     },
     {
-      token: 'order.note',
-      previewValue: 'Please confirm delivery date.',
+      token: 'order.notes',
+      previewValue: 'Please confirm delivery date; Handle with care - fragile items',
     },
   ],
   [TOKEN_SECTIONS.ORDER_LINES]: [

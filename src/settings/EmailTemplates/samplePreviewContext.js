@@ -40,7 +40,7 @@ const orderAFields = {
   totalEstimatedPrice: '149.95 EUR',
   shipTo: 'Branch Library of Humanities\n10 Philosopher Lane\n01234 Booktown',
   billTo: 'University Library - Acquisitions\n456 Campus Road\n01234 Booktown',
-  note: 'Please confirm delivery date.',
+  notes: 'Please confirm delivery date; Handle with care - fragile items',
 };
 
 const orderBFields = {
@@ -51,7 +51,7 @@ const orderBFields = {
   totalEstimatedPrice: '197.45 EUR',
   shipTo: 'Science Library\n25 Laboratory Drive\n01234 Booktown',
   billTo: 'University Library - Acquisitions\n456 Campus Road\n01234 Booktown',
-  note: '',
+  notes: '',
 };
 
 const lineA1Fields = {
