@@ -16,7 +16,6 @@ export const TOKEN_SECTIONS = {
   ORGANIZATION: 'organization',
   ORDER: 'order',
   ORDER_LINES: 'orderLines',
-  LIBRARY: 'library',
 };
 
 export const ORDER_LINES_LOOP_TAG = 'orderLines';
@@ -167,16 +166,6 @@ export const ORDER_EMAIL_TOKENS = {
     {
       token: 'orderLine.instructions',
       previewValue: 'Hardcover preferred',
-    },
-  ],
-  [TOKEN_SECTIONS.LIBRARY]: [
-    {
-      token: 'library.name',
-      previewValue: 'University Library',
-    },
-    {
-      token: 'library.address',
-      previewValue: '456 Campus Road, 01234 Booktown',
     },
   ],
 };
