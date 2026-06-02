@@ -58,11 +58,11 @@ export const ORDER_EMAIL_TOKENS = {
     },
     {
       token: 'order.shipTo',
-      previewValue: 'Branch Library of Humanities\n10 Philosopher Lane\n01234 Booktown',
+      previewValue: 'Branch Library of Humanities<br>10 Philosopher Lane<br>01234 Booktown',
     },
     {
       token: 'order.billTo',
-      previewValue: 'University Library - Acquisitions\n456 Campus Road\n01234 Booktown',
+      previewValue: 'University Library - Acquisitions<br>456 Campus Road<br>01234 Booktown',
     },
   ],
   [TOKEN_SECTIONS.ORDER_LINES]: [
