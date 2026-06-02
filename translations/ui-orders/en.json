@@ -847,6 +847,7 @@
   "settings.emailTemplates.tokens.help.title": "Tips",
   "settings.emailTemplates.tokens.help.optional": "To skip empty fields, wrap the line in section tags: {pattern}.",
   "settings.emailTemplates.tokens.help.loops": "Use the {label} option to repeat fields. Order line loops must be nested inside an orders loop.",
+  "settings.emailTemplates.tokens.help.tripleBraces": "Use triple braces to preserve HTML tags and line breaks, e.g. {pattern}.",
   "settings.emailTemplates.validation.nameRequired": "Template name is required",
   "settings.emailTemplates.validation.subjectRequired": "Email subject is required",
   "settings.emailTemplates.validation.bodyRequired": "Email body is required",

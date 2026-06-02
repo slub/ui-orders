@@ -54,6 +54,12 @@ const TokensList = ({
                 values={{ label: <em>Multiple</em> }}
               />
             </li>
+            <li>
+              <FormattedMessage
+                id="ui-orders.settings.emailTemplates.tokens.help.tripleBraces"
+                values={{ pattern: <code>{'{{{order.shipTo}}}'}</code> }}
+              />
+            </li>
           </ul>
         </Col>
       </Row>

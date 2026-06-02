@@ -33,16 +33,16 @@ const orderAFields = {
   poNumber: '10037',
   orderDate: '2026-04-15',
   createdBy: 'Max Mustermann',
-  shipTo: 'Branch Library of Humanities\n10 Philosopher Lane\n01234 Booktown',
-  billTo: 'University Library - Acquisitions\n456 Campus Road\n01234 Booktown',
+  shipTo: 'Branch Library of Humanities<br>10 Philosopher Lane<br>01234 Booktown',
+  billTo: 'University Library - Acquisitions<br>456 Campus Road<br>01234 Booktown',
 };
 
 const orderBFields = {
   poNumber: '10038',
   orderDate: '2026-04-22',
   createdBy: 'Anna Schmidt',
-  shipTo: 'Science Library\n25 Laboratory Drive\n01234 Booktown',
-  billTo: 'University Library - Acquisitions\n456 Campus Road\n01234 Booktown',
+  shipTo: 'Science Library<br>25 Laboratory Drive<br>01234 Booktown',
+  billTo: 'University Library - Acquisitions<br>456 Campus Road<br>01234 Booktown',
 };
 
 const lineA1Fields = {
