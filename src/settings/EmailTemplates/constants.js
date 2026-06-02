@@ -20,7 +20,6 @@ export const TOKEN_SECTIONS = {
 
 export const ORDER_LINES_LOOP_TAG = 'orderLines';
 
-// TODO: Finalize token list with backend team
 export const ORDER_EMAIL_TOKENS = {
   [TOKEN_SECTIONS.ORGANIZATION]: [
     {
@@ -28,38 +27,34 @@ export const ORDER_EMAIL_TOKENS = {
       previewValue: 'Schweitzer Fachinformationen',
     },
     {
-      token: 'organization.code',
-      previewValue: 'SCHW',
+      token: 'organization.primaryAddress.addressLine1',
+      previewValue: 'Hauptstraße 1',
     },
     {
-      token: 'organization.contactEmail',
-      previewValue: 'orders@schweitzer-online.de',
+      token: 'organization.primaryAddress.city',
+      previewValue: 'Berlin',
     },
     {
-      token: 'organization.accountNumber',
-      previewValue: 'BIB-2024-4711',
+      token: 'organization.primaryAddress.zipCode',
+      previewValue: '10115',
+    },
+    {
+      token: 'organization.primaryAddress.country',
+      previewValue: 'Germany',
     },
   ],
   [TOKEN_SECTIONS.ORDER]: [
     {
       token: 'order.poNumber',
-      previewValue: 'PO-2024-001234',
+      previewValue: '10037',
     },
     {
       token: 'order.orderDate',
-      previewValue: '2024-02-03',
-    },
-    {
-      token: 'order.orderType',
-      previewValue: 'One-Time',
+      previewValue: '2026-04-15',
     },
     {
       token: 'order.createdBy',
       previewValue: 'Max Mustermann',
-    },
-    {
-      token: 'order.totalEstimatedPrice',
-      previewValue: '1,234.56 EUR',
     },
     {
       token: 'order.shipTo',
@@ -69,31 +64,15 @@ export const ORDER_EMAIL_TOKENS = {
       token: 'order.billTo',
       previewValue: 'University Library - Acquisitions\n456 Campus Road\n01234 Booktown',
     },
-    {
-      token: 'order.notes',
-      previewValue: 'Please confirm delivery date; Handle with care - fragile items',
-    },
   ],
   [TOKEN_SECTIONS.ORDER_LINES]: [
     {
       token: 'orderLine.poLineNumber',
-      previewValue: 'PO-2024-001234-1',
+      previewValue: '10037-1',
     },
     {
       token: 'orderLine.title',
       previewValue: 'Introduction to Library Science',
-    },
-    {
-      token: 'orderLine.contributors',
-      previewValue: 'Mustermann, Max; Schmidt, Anna',
-    },
-    {
-      token: 'orderLine.publisher',
-      previewValue: 'De Gruyter',
-    },
-    {
-      token: 'orderLine.publicationPlace',
-      previewValue: 'Berlin',
     },
     {
       token: 'orderLine.publicationDate',
@@ -110,10 +89,6 @@ export const ORDER_EMAIL_TOKENS = {
     {
       token: 'orderLine.productIdentifierType',
       previewValue: 'ISBN',
-    },
-    {
-      token: 'orderLine.materialType',
-      previewValue: 'Book',
     },
     {
       token: 'orderLine.listUnitPrice',
@@ -142,30 +117,6 @@ export const ORDER_EMAIL_TOKENS = {
     {
       token: 'orderLine.currency',
       previewValue: 'EUR',
-    },
-    {
-      token: 'orderLine.fundCodes',
-      previewValue: 'HIST, GERM',
-    },
-    {
-      token: 'orderLine.noteTitle',
-      previewValue: 'Lieferhinweis',
-    },
-    {
-      token: 'orderLine.noteDetails',
-      previewValue: 'Bitte Rechnung in Kopie an Fachabteilung',
-    },
-    {
-      token: 'orderLine.noteType',
-      previewValue: 'General note',
-    },
-    {
-      token: 'orderLine.vendorRefNumber',
-      previewValue: 'SCHW-REF-98765',
-    },
-    {
-      token: 'orderLine.instructions',
-      previewValue: 'Hardcover preferred',
     },
   ],
 };
