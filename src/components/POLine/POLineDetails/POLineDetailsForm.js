@@ -21,6 +21,7 @@ import {
   FieldPOLineNumber,
   FieldAcquisitionMethod,
   FieldAutomaticExport,
+  AutomaticExportInfo,
   FieldOrderFormat,
   FieldReceiptDate,
   FieldDonor,
@@ -196,6 +197,13 @@ function POLineDetailsForm({
             <FieldAutomaticExport
               disabled={isPostPendingOrder || isManualOrder}
               isManualOrder={isManualOrder}
+            />
+
+            <AutomaticExportInfo
+              automaticExport={formValues?.automaticExport}
+              integrationConfigs={integrationConfigs}
+              vendorAccount={formValues?.vendorDetail?.vendorAccount}
+              acquisitionMethod={formValues?.acquisitionMethod}
             />
           </Col>
         </IfFieldVisible>

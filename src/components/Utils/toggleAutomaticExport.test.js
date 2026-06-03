@@ -73,4 +73,32 @@ describe('toggleAutomaticExport', () => {
 
     expect(change).toBeCalledWith('automaticExport', false);
   });
+
+  it('should set automatic export to checked for an account-less integration (matches all)', () => {
+    toggleAutomaticExport({
+      ...args,
+      vendorAccount: 'anyAccount',
+      integrationConfigs: [{
+        exportTypeSpecificParameters: {
+          vendorEdiOrdersExportConfig: {
+            ediConfig: {
+              defaultAcquisitionMethods: [acquisitionMethod],
+              accountNoList: [],
+            },
+          },
+        },
+      }],
+    });
+
+    expect(change).toBeCalledWith('automaticExport', true);
+  });
+
+  it('should set automatic export to unchecked when no acquisition method is selected', () => {
+    toggleAutomaticExport({
+      ...args,
+      acquisitionMethod: undefined,
+    });
+
+    expect(change).toBeCalledWith('automaticExport', false);
+  });
 });
