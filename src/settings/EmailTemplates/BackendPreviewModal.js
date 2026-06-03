@@ -13,7 +13,7 @@ import { useOkapiKy } from '@folio/stripes/core';
 
 import { SAMPLE_PREVIEW_CONTEXT } from './samplePreviewContext';
 
-const BackendPreviewModal = ({ open, templateId, header, onClose }) => {
+const BackendPreviewModal = ({ open, subjectTemplate, bodyTemplate, header, onClose }) => {
   const ky = useOkapiKy();
   const kyRef = useRef(ky);
 
@@ -25,26 +25,27 @@ const BackendPreviewModal = ({ open, templateId, header, onClose }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!open || !templateId) return undefined;
+    if (!open) return undefined;
 
     let cancelled = false;
 
     setLoading(true);
     setError(null);
 
-    kyRef.current.post('template-request', {
+    // MODTEMPENG-135: non-persisted preview - renders inline header/body
+    // against the sample context, no saved templateId required.
+    kyRef.current.post('template-request/preview', {
       json: {
-        templateId,
-        lang: 'en',
-        outputFormat: 'text/html',
+        header: subjectTemplate || '',
+        body: bodyTemplate || '',
         context: SAMPLE_PREVIEW_CONTEXT,
       },
     })
       .json()
       .then(data => {
         if (cancelled) return;
-        setRenderedSubject(data?.result?.header || '');
-        setRenderedBody(data?.result?.body || '');
+        setRenderedSubject(data?.header || '');
+        setRenderedBody(data?.body || '');
       })
       .catch(err => {
         if (cancelled) return;
@@ -55,7 +56,7 @@ const BackendPreviewModal = ({ open, templateId, header, onClose }) => {
       });
 
     return () => { cancelled = true; };
-  }, [open, templateId]);
+  }, [open, subjectTemplate, bodyTemplate]);
 
   const footer = (
     <ModalFooter>
@@ -101,7 +102,8 @@ const BackendPreviewModal = ({ open, templateId, header, onClose }) => {
 
 BackendPreviewModal.propTypes = {
   open: PropTypes.bool.isRequired,
-  templateId: PropTypes.string,
+  subjectTemplate: PropTypes.string,
+  bodyTemplate: PropTypes.string,
   header: PropTypes.node.isRequired,
   onClose: PropTypes.func.isRequired,
 };

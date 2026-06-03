@@ -28,7 +28,6 @@ const EmailTemplateDetail = ({ initialValues }) => {
   const [openPreview, setOpenPreview] = useState(false);
 
   const {
-    id,
     name,
     description,
     active,
@@ -110,7 +109,8 @@ const EmailTemplateDetail = ({ initialValues }) => {
 
       <BackendPreviewModal
         open={openPreview}
-        templateId={id}
+        subjectTemplate={subject}
+        bodyTemplate={body}
         header={
           <FormattedMessage
             id="ui-orders.settings.emailTemplates.previewHeader"
