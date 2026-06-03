@@ -98,14 +98,11 @@ export const CUSTOM_FIELD_GROUPS_POL = [
 ];
 
 export const CUSTOM_FIELD_GROUPS_PO = [
-  { id: 'bestandserhaltung', label: 'Bestandserhaltungsmaßnahmen' },
-  { id: 'forschung', label: 'Forschung & Projekte' },
-  { id: 'restaurierung', label: 'Restaurierung' },
-  { id: 'testexemplar', label: 'Test Exemplar' },
-  { id: 'testprovenienz', label: 'Test Provenienz' },
-  { id: 'ausstellung', label: 'Ausstellungswesen' },
-  { id: 'schutz', label: 'Schutzbehältnis' },
-  { id: 'restaurierungsgrund', label: 'Grund der Restaurierung' },
+  { id: 'bestandserhaltung', label: 'Bestandserhaltung' },
+  { id: 'erwerbung', label: 'Erwerbung' },
+  { id: 'medienbearbeitung', label: 'Medienbearbeitung' },
+  { id: 'provenienzen', label: 'Provenienzen' },
+  { id: 'zeitschriften', label: 'Zeitschriften' },
 ];
 
 const buildCommonTranslatedDictionary = (dictionary, baseTranslationKey) => {
