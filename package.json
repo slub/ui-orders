@@ -402,7 +402,7 @@
           "settings.orders.enabled",
           "templates.collection.get",
           "templates.item.get",
-          "template-request.post"
+          "template-request.preview.post"
         ]
       },
       {
