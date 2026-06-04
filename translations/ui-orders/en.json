@@ -837,6 +837,7 @@
   "settings.emailTemplates.subject": "Email subject",
   "settings.emailTemplates.body": "Email body",
   "settings.emailTemplates.body.hint": "Use the token picker on the right to insert dynamic values into your template.",
+  "settings.emailTemplates.editAsHtml": "Edit as HTML",
   "settings.emailTemplates.preview": "Preview",
   "settings.emailTemplates.previewHeader": "Preview of template: {name}",
   "settings.emailTemplates.tokens.organization": "Organization",

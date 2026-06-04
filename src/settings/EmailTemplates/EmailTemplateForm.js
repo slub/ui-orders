@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   FormattedMessage,
@@ -45,6 +46,8 @@ const EmailTemplateForm = ({
   pristine,
   submitting,
 }) => {
+  const [editAsHtml, setEditAsHtml] = useState(false);
+
   const paneTitle = initialValues?.id
     ? initialValues?.name
     : formatMessage({ id: 'ui-orders.settings.emailTemplates.new' });
@@ -151,11 +154,21 @@ const EmailTemplateForm = ({
                 </Row>
                 <Row>
                   <Col xs={12}>
+                    <Checkbox
+                      label={<FormattedMessage id="ui-orders.settings.emailTemplates.editAsHtml" />}
+                      checked={editAsHtml}
+                      onChange={(e) => setEditAsHtml(e.target.checked)}
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col xs={12}>
                     {/* Preview: loops not iterated by template-resolver (TODO: UIOR-1495) */}
                     <Field
                       name="localizedTemplates.en.body"
                       label={<FormattedMessage id="ui-orders.settings.emailTemplates.body" />}
                       component={TemplateEditor}
+                      editAsHtml={editAsHtml}
                       tokens={ORDER_EMAIL_TOKENS}
                       tokensList={TokensList}
                       previewModalHeader={<FormattedMessage id="ui-orders.settings.emailTemplates.preview" />}
