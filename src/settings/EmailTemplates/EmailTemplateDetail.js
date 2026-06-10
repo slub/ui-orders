@@ -109,7 +109,6 @@ const EmailTemplateDetail = ({ initialValues }) => {
 
       <BackendPreviewModal
         open={openPreview}
-        subjectTemplate={subject}
         bodyTemplate={body}
         header={
           <FormattedMessage

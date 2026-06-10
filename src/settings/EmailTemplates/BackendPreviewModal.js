@@ -13,13 +13,12 @@ import { useOkapiKy } from '@folio/stripes/core';
 
 import { SAMPLE_PREVIEW_CONTEXT } from './samplePreviewContext';
 
-const BackendPreviewModal = ({ open, subjectTemplate, bodyTemplate, header, onClose }) => {
+const BackendPreviewModal = ({ open, bodyTemplate, header, onClose }) => {
   const ky = useOkapiKy();
   const kyRef = useRef(ky);
 
   kyRef.current = ky;
 
-  const [renderedSubject, setRenderedSubject] = useState('');
   const [renderedBody, setRenderedBody] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -32,11 +31,12 @@ const BackendPreviewModal = ({ open, subjectTemplate, bodyTemplate, header, onCl
     setLoading(true);
     setError(null);
 
-    // MODTEMPENG-135: non-persisted preview - renders inline header/body
+    // MODTEMPENG-135: non-persisted preview - renders the inline body
     // against the sample context, no saved templateId required.
+    // Subject/header is omitted: the preview mirrors the editor's
+    // single-field (body) preview, like @folio/stripes-template-editor.
     kyRef.current.post('template-request/preview', {
       json: {
-        header: subjectTemplate || '',
         body: bodyTemplate || '',
         context: SAMPLE_PREVIEW_CONTEXT,
       },
@@ -44,7 +44,6 @@ const BackendPreviewModal = ({ open, subjectTemplate, bodyTemplate, header, onCl
       .json()
       .then(data => {
         if (cancelled) return;
-        setRenderedSubject(data?.header || '');
         setRenderedBody(data?.body || '');
       })
       .catch(err => {
@@ -56,7 +55,7 @@ const BackendPreviewModal = ({ open, subjectTemplate, bodyTemplate, header, onCl
       });
 
     return () => { cancelled = true; };
-  }, [open, subjectTemplate, bodyTemplate]);
+  }, [open, bodyTemplate]);
 
   const footer = (
     <ModalFooter>
@@ -85,16 +84,11 @@ const BackendPreviewModal = ({ open, subjectTemplate, bodyTemplate, header, onCl
         </div>
       )}
       {!loading && !error && (
-        <>
-          {renderedSubject && (
-            <h3>{renderedSubject}</h3>
-          )}
-          {/* eslint-disable-next-line react/no-danger */}
-          <div
-            style={{ whiteSpace: 'pre-line' }}
-            dangerouslySetInnerHTML={{ __html: sanitizedBody }}
-          />
-        </>
+        <div
+          style={{ whiteSpace: 'pre-line' }}
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: sanitizedBody }}
+        />
       )}
     </Modal>
   );
@@ -102,7 +96,6 @@ const BackendPreviewModal = ({ open, subjectTemplate, bodyTemplate, header, onCl
 
 BackendPreviewModal.propTypes = {
   open: PropTypes.bool.isRequired,
-  subjectTemplate: PropTypes.string,
   bodyTemplate: PropTypes.string,
   header: PropTypes.node.isRequired,
   onClose: PropTypes.func.isRequired,
