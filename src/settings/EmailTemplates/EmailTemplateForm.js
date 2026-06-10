@@ -24,6 +24,7 @@ import stripesFinalForm from '@folio/stripes/final-form';
 import { TemplateEditor } from '@folio/stripes-template-editor';
 
 import { ORDER_EMAIL_TOKENS } from './constants';
+import { SAMPLE_PREVIEW_CONTEXT } from './samplePreviewContext';
 import TokensList from './TokensList';
 import validate from './validate';
 
@@ -156,6 +157,8 @@ const EmailTemplateForm = ({
                       tokens={ORDER_EMAIL_TOKENS}
                       tokensList={TokensList}
                       previewModalHeader={<FormattedMessage id="ui-orders.settings.emailTemplates.preview" />}
+                      previewRenderer="backend"
+                      previewContext={SAMPLE_PREVIEW_CONTEXT}
                       required
                     />
                   </Col>
