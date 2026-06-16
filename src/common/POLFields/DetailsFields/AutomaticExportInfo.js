@@ -84,6 +84,9 @@ const AutomaticExportInfo = ({
       <InfoPopover
         content={(
           <>
+            <strong>
+              <FormattedMessage id="ui-orders.poLine.automaticExport.multipleTitle" />
+            </strong>
             <ul className={css.list}>
               {applicableIntegrations.map((config) => (
                 <li key={config.id}>{formatConfigLabel(config)}</li>
