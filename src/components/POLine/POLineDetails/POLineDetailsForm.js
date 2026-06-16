@@ -97,10 +97,15 @@ function POLineDetailsForm({
   const onAcqMethodChange = useCallback(
     (value) => {
       change(POL_FORM_FIELDS.acquisitionMethod, value);
+
+      // A manual order is excluded from automated transmission, so do not
+      // auto-toggle the (disabled) automatic export checkbox for it.
+      if (isManualOrder) return;
+
       const vendorAccount = formValues?.vendorDetail?.vendorAccount;
 
       toggleAutomaticExport({ vendorAccount, acquisitionMethod: value, integrationConfigs, change });
-    }, [change, formValues, integrationConfigs],
+    }, [change, formValues, integrationConfigs, isManualOrder],
   );
 
   const onReceiptStatusChange = useCallback(async ({ target: { value } }) => {
@@ -197,10 +202,22 @@ function POLineDetailsForm({
             <FieldAutomaticExport
               disabled={isPostPendingOrder || isManualOrder}
               isManualOrder={isManualOrder}
+              exportInfo={(
+                <AutomaticExportInfo
+                  placement="label"
+                  automaticExport={formValues?.automaticExport}
+                  manualOrder={isManualOrder}
+                  integrationConfigs={integrationConfigs}
+                  vendorAccount={formValues?.vendorDetail?.vendorAccount}
+                  acquisitionMethod={formValues?.acquisitionMethod}
+                />
+              )}
             />
 
             <AutomaticExportInfo
+              placement="below"
               automaticExport={formValues?.automaticExport}
+              manualOrder={isManualOrder}
               integrationConfigs={integrationConfigs}
               vendorAccount={formValues?.vendorDetail?.vendorAccount}
               acquisitionMethod={formValues?.acquisitionMethod}

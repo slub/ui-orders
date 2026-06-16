@@ -1,0 +1,12 @@
+.exportVia {
+  margin-bottom: 1rem;
+}
+
+.warningButton {
+  color: var(--warn);
+}
+
+.list {
+  margin: 0;
+  padding-inline-start: 1.1rem;
+}

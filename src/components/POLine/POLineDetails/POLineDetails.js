@@ -7,6 +7,7 @@ import { ClipCopy } from '@folio/stripes/smart-components';
 import {
   Checkbox,
   Col,
+  InfoPopover,
   KeyValue,
   Loading,
   NoValue,
@@ -24,6 +25,7 @@ import {
   PAYMENT_STATUS_TRANSLATED_VALUES,
   RECEIPT_STATUS_TRANSLATED_VALUES,
 } from '../../../common/constants';
+import { AutomaticExportInfo } from '../../../common/POLFields';
 import { useAcqMethod } from '../../../common/hooks';
 import { getTranslatedAcqMethod } from '../../Utils/getTranslatedAcqMethod';
 
@@ -50,9 +52,13 @@ export const getAcquisitionMethodValue = (acqMethodId, acqMethod) => {
 const DEFAULT_HIDDEN_FIELDS = {};
 const DEFAULT_LINE = {};
 
+const DEFAULT_INTEGRATION_CONFIGS = [];
+
 const POLineDetails = ({
   hiddenFields = DEFAULT_HIDDEN_FIELDS,
+  integrationConfigs = DEFAULT_INTEGRATION_CONFIGS,
   line = DEFAULT_LINE,
+  manualOrder = false,
 }) => {
   const receiptDate = get(line, 'receiptDate');
   const { acqMethod, isLoading } = useAcqMethod(line.acquisitionMethod);
@@ -99,8 +105,30 @@ const POLineDetails = ({
             <Checkbox
               checked={line.automaticExport}
               disabled
-              label={<FormattedMessage id="ui-orders.poLine.automaticExport" />}
+              label={(
+                <>
+                  <FormattedMessage id="ui-orders.poLine.automaticExport" />
+                  {manualOrder && <InfoPopover content={<FormattedMessage id="ui-orders.poLine.manualPO.info" />} />}
+                  <AutomaticExportInfo
+                    placement="label"
+                    automaticExport={line.automaticExport}
+                    manualOrder={manualOrder}
+                    integrationConfigs={integrationConfigs}
+                    vendorAccount={line.vendorDetail?.vendorAccount}
+                    acquisitionMethod={line.acquisitionMethod}
+                  />
+                </>
+              )}
               vertical
+            />
+
+            <AutomaticExportInfo
+              placement="below"
+              automaticExport={line.automaticExport}
+              manualOrder={manualOrder}
+              integrationConfigs={integrationConfigs}
+              vendorAccount={line.vendorDetail?.vendorAccount}
+              acquisitionMethod={line.acquisitionMethod}
             />
           </Col>
         </IfVisible>
@@ -342,7 +370,9 @@ const POLineDetails = ({
 
 POLineDetails.propTypes = {
   hiddenFields: PropTypes.object,
+  integrationConfigs: PropTypes.arrayOf(PropTypes.object),
   line: PropTypes.object,
+  manualOrder: PropTypes.bool,
 };
 
 export default POLineDetails;
