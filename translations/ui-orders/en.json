@@ -535,7 +535,7 @@
   "poLine.automaticExport.sentVia": "Export via: {name}",
   "poLine.automaticExport.sentViaMultiple": "Export via: {count} integrations",
   "poLine.automaticExport.multipleTitle": "Multiple integrations:",
-  "poLine.automaticExport.multipleHint": "The first scheduled integration handles the export; the others skip this line.",
+  "poLine.automaticExport.multipleHint": "Only the next scheduled integration handles the export.",
   "poLine.automaticExport.noIntegration": "No matching integration configured",
   "poLine.cancellationRestriction": "Cancellation restriction",
   "poLine.cancellationRestrictionNote": "Cancellation description",
