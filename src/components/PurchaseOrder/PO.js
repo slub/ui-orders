@@ -100,6 +100,7 @@ import {
 } from './hooks';
 import LineListing from './LineListing';
 import LinesLimit from './LinesLimit';
+import { ManualExportModal } from './ManualExportModal';
 import { OngoingOrderInfoView } from './OngoingOrderInfo';
 import OpenOrderConfirmationModal from './OpenOrderConfirmationModal';
 import { PODetailsView } from './PODetails';
@@ -144,6 +145,7 @@ const PO = ({
   const [isDifferentAccountModalOpened, toggleDifferentAccountModal] = useModalToggle();
   const [isCreateInvoiceModalOpened, toggleCreateInvoiceModal] = useModalToggle();
   const [isOrderReexportModalOpened, toggleOrderReexportModal] = useModalToggle();
+  const [isManualExportModalOpened, toggleManualExportModal] = useModalToggle();
 
   const orderId = match.params.id;
 
@@ -752,6 +754,7 @@ const PO = ({
           clickCreateInvoice: toggleCreateInvoiceModal,
           clickDelete: toggleDeleteOrderConfirm,
           clickEdit: onEdit,
+          clickManualExport: toggleManualExportModal,
           clickOpen: toggleOpenOrderModal,
           clickReceive: goToReceiving,
           clickReexport: toggleOrderReexportModal,
@@ -966,6 +969,14 @@ const PO = ({
             exportHistory={exportHistory}
             isLoading={isExportHistoryLoading}
             source={REEXPORT_SOURCES.order}
+          />
+        )}
+        {isManualExportModalOpened && (
+          <ManualExportModal
+            id="manual-export-order-modal"
+            order={order}
+            poLines={orderLines}
+            onClose={toggleManualExportModal}
           />
         )}
       </Pane>
