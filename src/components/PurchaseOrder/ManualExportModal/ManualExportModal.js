@@ -84,9 +84,13 @@ export const ManualExportModal = ({
 }) => {
   const intl = useIntl();
 
+  // NB: the hook exposes `isFetching` (not `isLoading`). Using the wrong key
+  // would make the init guard below truthy on the first render and initialise
+  // the selection before the configs have loaded -> single-match lines wrongly
+  // start without an integration (checkbox greyed) once the configs arrive.
   const {
     integrationConfigs,
-    isLoading,
+    isFetching,
   } = useIntegrationConfigs({ organizationId: order.vendor });
 
   const rows = useMemo(
@@ -94,15 +98,15 @@ export const ManualExportModal = ({
     [poLines, integrationConfigs],
   );
 
-  // Selection is initialised once the integration configs have loaded, so the
-  // defaults reflect the real per-line matches.
+  // Selection is initialised once the integration configs have finished loading,
+  // so the defaults reflect the real per-line matches.
   const [selection, setSelection] = useState(null);
 
   useEffect(() => {
-    if (!isLoading && selection === null) {
+    if (!isFetching && selection === null) {
       setSelection(buildInitialSelection(rows));
     }
-  }, [isLoading, rows, selection]);
+  }, [isFetching, rows, selection]);
 
   const toggleLine = (lineId) => {
     setSelection((prev) => ({
@@ -127,16 +131,19 @@ export const ManualExportModal = ({
   }), []);
 
   const formatter = {
-    selected: ({ line }) => {
+    selected: ({ line, isSent }) => {
       // Selectable only once a concrete integration is set: a single match is
       // pre-filled, an ambiguous line requires the user to pick one, a no-match
       // line never has one. Keeps the checkbox in sync with the Select.
+      // Already-sent lines are not selectable here: re-sending is Reexport's job
+      // (it resets lastEDIExportDate so the line is picked up again); the export
+      // job only processes lines without a date.
       const hasChosenIntegration = Boolean(selection?.[line.id]?.integrationConfigId);
 
       return (
         <Checkbox
           checked={Boolean(selection?.[line.id]?.selected)}
-          disabled={!hasChosenIntegration}
+          disabled={isSent || !hasChosenIntegration}
           onChange={() => toggleLine(line.id)}
           aria-label={intl.formatMessage(
             { id: 'ui-orders.manualExport.selectLine' },
@@ -163,7 +170,11 @@ export const ManualExportModal = ({
 
       return <FormattedMessage id="ui-orders.manualExport.status.ready" />;
     },
-    integration: ({ line, applicable, hasIntegration, isAmbiguous }) => {
+    integration: ({ line, applicable, isSent, hasIntegration, isAmbiguous }) => {
+      // Sent lines are read-only here -> show the matching integration(s) as
+      // plain info text, no interactive control.
+      if (isSent) return applicable.map(formatConfigLabel).join(', ');
+
       if (!hasIntegration) {
         return (
           <Icon icon="exclamation-circle" size="small">
@@ -229,7 +240,7 @@ export const ManualExportModal = ({
       onClose={onClose}
       size="large"
     >
-      {(isLoading || selection === null)
+      {(isFetching || selection === null)
         ? <Loading />
         : (
           <MultiColumnList
