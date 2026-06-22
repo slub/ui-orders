@@ -61,11 +61,13 @@ export function getPOActionMenu({
 
   // "Export now" sends the order to the vendor, so it only makes sense once the
   // order is OPEN (placed): a pending order is not placed yet (and still editable),
-  // a closed order is done. Manual POs are excluded too (like Reexport): the
-  // order-level "Manual" flag means the order is placed outside FOLIO and must not
-  // be transmitted at all. Unlike Reexport we do NOT require an earlier export
-  // (this covers first-time / never-exported lines). PoC: opens the modal only.
-  const isManualExportDisabled = !isOrderInOpenStatus || isManualOrder || !order.poLines?.length;
+  // a closed order is done. Manual POs ARE allowed here: the "Manual" flag only
+  // excludes them from AUTOMATED transmission, while sending them by hand via this
+  // workflow is a key use case (confirmed with backend dev Markus, who adjusts the
+  // matching so integrations apply to manual orders on this manual path; the
+  // automatic export keeps ignoring manual orders). Unlike Reexport we do NOT
+  // require an earlier export (this covers first-time / never-exported lines).
+  const isManualExportDisabled = !isOrderInOpenStatus || !order.poLines?.length;
 
   return ({ onToggle }) => (
     <MenuSection id="order-details-actions">
