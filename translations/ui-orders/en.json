@@ -616,7 +616,6 @@
   "manualExport.column.poLine": "PO line",
   "manualExport.column.title": "Title or package name",
   "manualExport.column.status": "Status",
-  "manualExport.column.integration": "Integration",
   "manualExport.status.ready": "Ready to send",
   "manualExport.status.ambiguous": "Several matching integrations",
   "manualExport.status.noIntegration": "No matching integration",

@@ -183,7 +183,7 @@ export const ManualExportModal = ({
     poLineNumber: <FormattedMessage id="ui-orders.manualExport.column.poLine" />,
     title: <FormattedMessage id="ui-orders.manualExport.column.title" />,
     status: <FormattedMessage id="ui-orders.manualExport.column.status" />,
-    integration: <FormattedMessage id="ui-orders.manualExport.column.integration" />,
+    integration: <FormattedMessage id="ui-orders.export.method" />,
   }), []);
 
   const formatter = {
