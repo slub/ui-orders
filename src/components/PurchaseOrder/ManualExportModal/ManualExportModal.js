@@ -28,7 +28,13 @@ const VISIBLE_COLUMNS = ['selected', 'poLineNumber', 'title', 'status', 'integra
 
 const MAX_TITLE_LENGTH = 20;
 
+// Weekday order for rendering the schedule rule (matches the WEEKDAYS constant
+// in ui-organizations; kept local to avoid a cross-module import).
+const WEEKDAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+
 const getOrderingConfig = (config) => config?.exportTypeSpecificParameters?.vendorEdiOrdersExportConfig;
+
+const getSchedule = (config) => getOrderingConfig(config)?.ediSchedule;
 
 const formatConfigLabel = (config) => {
   const orderingConfig = getOrderingConfig(config);
@@ -36,6 +42,36 @@ const formatConfigLabel = (config) => {
   const method = orderingConfig?.transmissionMethod;
 
   return method ? `${name} (${method})` : name;
+};
+
+// Human-readable summary of an integration's scheduling rule (NOT the computed
+// next run time, just the rule), e.g. "daily at 08:00" or "weekly Mon, Wed at
+// 06:00". The time is the stored schedule time (HH:MM); we deliberately skip the
+// tenant-timezone conversion the SchedulingView does, since this is an
+// informational hint, and we omit scheduleFrequency to keep the phrase readable.
+const formatSchedule = (config, intl) => {
+  const params = getSchedule(config)?.scheduleParameters;
+
+  if (!params?.schedulePeriod) return '';
+
+  const parts = [intl.formatMessage({ id: `ui-orders.manualExport.schedule.period.${params.schedulePeriod}` })];
+
+  if (params.schedulePeriod === 'WEEK') {
+    const days = WEEKDAYS
+      .filter((day) => params.weekDays?.[day])
+      .map((day) => intl.formatMessage({ id: `ui-orders.manualExport.schedule.weekday.${day}` }));
+
+    if (days.length) parts.push(days.join(', '));
+  }
+
+  if (params.scheduleTime) {
+    parts.push(intl.formatMessage(
+      { id: 'ui-orders.manualExport.schedule.atTime' },
+      { time: params.scheduleTime.slice(0, 5) },
+    ));
+  }
+
+  return parts.join(' ');
 };
 
 const truncate = (value) => (
@@ -47,12 +83,28 @@ const truncate = (value) => (
 // (getApplicableIntegrations), but evaluates every line regardless of the
 // automaticExport flag: the user explicitly wants to trigger scheduled AND
 // purely manual lines from here.
-const buildRow = (line, integrationConfigs) => {
+const buildRow = (line, integrationConfigs, isManualOrder) => {
   const applicable = getApplicableIntegrations({
     vendorAccount: line.vendorDetail?.vendorAccount,
     acquisitionMethod: line.acquisitionMethod,
     integrationConfigs,
   });
+
+  // A line is "scheduled" when it is flagged for automatic export AND its single
+  // matching integration runs on a scheduler -> it would be sent automatically
+  // anyway, so we must not pre-select it (avoid a double send) and instead show
+  // when it is due. Only evaluated for the unambiguous single-match case; an
+  // ambiguous line keeps the "several matching integrations" handling.
+  // Manual orders are excluded: the backend never auto-exports them
+  // (`NOT purchaseOrder.manualPo`), so "Scheduled automatically" would be wrong
+  // - they are a "ready" line here (manual export is exactly how they get sent),
+  // matching the manualPo guard in AutomaticExportInfo (UIOR-1556).
+  const isScheduled = Boolean(
+    !isManualOrder
+    && line.automaticExport
+    && applicable.length === 1
+    && getSchedule(applicable[0])?.enableScheduledExport,
+  );
 
   return {
     line,
@@ -60,17 +112,21 @@ const buildRow = (line, integrationConfigs) => {
     isSent: Boolean(line.lastEDIExportDate),
     hasIntegration: applicable.length > 0,
     isAmbiguous: applicable.length > 1,
+    isScheduled,
   };
 };
 
-const buildInitialSelection = (rows) => rows.reduce((acc, { line, applicable, isSent }) => {
+const buildInitialSelection = (rows) => rows.reduce((acc, { line, applicable, isSent, isScheduled }) => {
+  const hasSingleMatch = applicable.length === 1;
+
   acc[line.id] = {
-    // Default-on only when there is exactly one matching integration (pre-filled
-    // below) and the line was not exported yet. Ambiguous lines start unchecked
-    // (and disabled) until the user picks an integration; no-match and
-    // already-sent lines start off too.
-    selected: applicable.length === 1 && !isSent,
-    integrationConfigId: applicable.length === 1 ? applicable[0].id : '',
+    // Single unambiguous match pre-fills the integration (and enables the
+    // checkbox). Pre-checked only when not already sent AND not already
+    // scheduled for automatic export: a scheduled line would otherwise be sent
+    // twice, so the user opts in explicitly. Ambiguous lines start unchecked
+    // (and disabled) until the user picks an integration; no-match lines too.
+    selected: hasSingleMatch && !isSent && !isScheduled,
+    integrationConfigId: hasSingleMatch ? applicable[0].id : '',
   };
 
   return acc;
@@ -94,8 +150,8 @@ export const ManualExportModal = ({
   } = useIntegrationConfigs({ organizationId: order.vendor });
 
   const rows = useMemo(
-    () => poLines.map((line) => buildRow(line, integrationConfigs)),
-    [poLines, integrationConfigs],
+    () => poLines.map((line) => buildRow(line, integrationConfigs, order.manualPo)),
+    [poLines, integrationConfigs, order.manualPo],
   );
 
   // Selection is initialised once the integration configs have finished loading,
@@ -154,7 +210,7 @@ export const ManualExportModal = ({
     },
     poLineNumber: ({ line }) => line.poLineNumber,
     title: ({ line }) => <span title={line.titleOrPackage}>{truncate(line.titleOrPackage)}</span>,
-    status: ({ line, isSent, hasIntegration, isAmbiguous }) => {
+    status: ({ line, applicable, isSent, hasIntegration, isAmbiguous, isScheduled }) => {
       if (isSent) {
         return (
           <FormattedMessage
@@ -167,6 +223,15 @@ export const ManualExportModal = ({
       if (!hasIntegration) return <FormattedMessage id="ui-orders.manualExport.status.noIntegration" />;
 
       if (isAmbiguous) return <FormattedMessage id="ui-orders.manualExport.status.ambiguous" />;
+
+      if (isScheduled) {
+        return (
+          <FormattedMessage
+            id="ui-orders.manualExport.status.scheduled"
+            values={{ schedule: formatSchedule(applicable[0], intl) }}
+          />
+        );
+      }
 
       return <FormattedMessage id="ui-orders.manualExport.status.ready" />;
     },
