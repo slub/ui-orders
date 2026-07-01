@@ -45,12 +45,14 @@ import {
 } from '@folio/stripes-acq-components';
 
 import {
+  CUSTOM_FIELD_GROUPS_PO,
   ENTITY_TYPE_ORDER,
   PO_CONFIG_NAME_PREFIX,
   PO_FORM_FIELDS,
   SCOPE_CUSTOM_FIELDS_MANAGE,
   SUBMIT_ACTION_FIELD,
 } from '../../common/constants';
+import { CustomFieldGroupAccordion } from '../../common';
 import { useErrorAccordionStatus } from '../../common/hooks';
 import { isOngoing } from '../../common/POFields';
 import getOrderNumberSetting from '../../common/utils/getOrderNumberSetting';
@@ -440,7 +442,29 @@ const POForm = ({
                               finalFormCustomFieldsValues={customFieldsValues}
                               configNamePrefix={PO_CONFIG_NAME_PREFIX}
                               scope={SCOPE_CUSTOM_FIELDS_MANAGE}
+                              sectionId="default"
                             />
+                            {CUSTOM_FIELD_GROUPS_PO.map(({ id, label }) => (
+                              <CustomFieldGroupAccordion
+                                key={id}
+                                sectionId={id}
+                                label={label}
+                                backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
+                                entityType={ENTITY_TYPE_ORDER}
+                              >
+                                <EditCustomFieldsRecord
+                                  accordionId={`customFieldsPO-${id}`}
+                                  backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
+                                  changeFinalFormField={change}
+                                  entityType={ENTITY_TYPE_ORDER}
+                                  fieldComponent={Field}
+                                  finalFormCustomFieldsValues={customFieldsValues}
+                                  configNamePrefix={PO_CONFIG_NAME_PREFIX}
+                                  scope={SCOPE_CUSTOM_FIELDS_MANAGE}
+                                  sectionId={id}
+                                />
+                              </CustomFieldGroupAccordion>
+                            ))}
                           </IfFieldVisible>
                         </AccordionSet>
                       </Col>

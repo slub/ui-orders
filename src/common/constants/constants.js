@@ -91,6 +91,20 @@ export const PO_CONFIG_NAME_PREFIX = 'purchase_orders';
 
 export const SCOPE_CUSTOM_FIELDS_MANAGE = 'ui-orders.custom-fields.manage';
 
+// Custom field group sections (demo: hardcoded for SLUB PoC)
+export const CUSTOM_FIELD_GROUPS_POL = [
+  { id: 'altdaten', label: 'Altdaten' },
+  { id: 'libero', label: 'Libero' },
+];
+
+export const CUSTOM_FIELD_GROUPS_PO = [
+  { id: 'bestandserhaltung', label: 'Bestandserhaltung' },
+  { id: 'erwerbung', label: 'Erwerbung' },
+  { id: 'medienbearbeitung', label: 'Medienbearbeitung' },
+  { id: 'provenienzen', label: 'Provenienzen' },
+  { id: 'zeitschriften', label: 'Zeitschriften' },
+];
+
 const buildCommonTranslatedDictionary = (dictionary, baseTranslationKey) => {
   return Object.fromEntries(
     Object.entries(invert(dictionary))

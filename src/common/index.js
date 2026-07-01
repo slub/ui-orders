@@ -1,5 +1,6 @@
 export { default as AddressFilter } from './AddressFilter';
 export { default as ClosingReasonFilter } from './ClosingReasonFilter';
+export { CustomFieldGroupAccordion } from './CustomFieldGroupAccordion';
 export { ExportDetailsAccordion } from './ExportDetailsAccordion';
 export { ExportDetailsList } from './ExportDetailsList';
 export { ReexportActionButton } from './ReexportActionButton';

@@ -64,10 +64,12 @@ import {
 } from '../../PrintOrder';
 import { isWorkflowStatusClosed } from '../PurchaseOrder/util';
 import {
+  CustomFieldGroupAccordion,
   ExportDetailsAccordion,
   ReexportModal,
 } from '../../common';
 import {
+  CUSTOM_FIELD_GROUPS_POL,
   ENTITY_TYPE_PO_LINE,
   NOTE_TYPES,
   NOTES_ROUTE,
@@ -601,7 +603,28 @@ const POLineView = ({
                     entityType={ENTITY_TYPE_PO_LINE}
                     configNamePrefix={PO_LINE_CONFIG_NAME_PREFIX}
                     scope={SCOPE_CUSTOM_FIELDS_MANAGE}
+                    sectionId="default"
                   />
+                  {CUSTOM_FIELD_GROUPS_POL.map(({ id, label }) => (
+                    <CustomFieldGroupAccordion
+                      key={id}
+                      sectionId={id}
+                      label={label}
+                      backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
+                      entityType={ENTITY_TYPE_PO_LINE}
+                    >
+                      <ViewCustomFieldsRecord
+                        backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
+                        customFieldsValues={customFieldsValues}
+                        entityType={ENTITY_TYPE_PO_LINE}
+                        configNamePrefix={PO_LINE_CONFIG_NAME_PREFIX}
+                        scope={SCOPE_CUSTOM_FIELDS_MANAGE}
+                        sectionId={id}
+                        showAccordion={false}
+                        isSectionTitleEnabled={false}
+                      />
+                    </CustomFieldGroupAccordion>
+                  ))}
                 </IfVisible>
               </AccordionSet>
             </>

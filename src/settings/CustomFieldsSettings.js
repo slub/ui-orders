@@ -15,6 +15,8 @@ import {
 } from '@folio/stripes/smart-components';
 
 import {
+  CUSTOM_FIELD_GROUPS_PO,
+  CUSTOM_FIELD_GROUPS_POL,
   ENTITY_TYPE_ORDER,
   ENTITY_TYPE_PO_LINE,
   PO_CONFIG_NAME_PREFIX,
@@ -35,6 +37,16 @@ const CustomFieldsSettings = () => {
     canDelete: stripes.hasPerm('ui-orders.settings.custom-fields.delete'),
   };
 
+  const displayInAccordionOptionsPO = CUSTOM_FIELD_GROUPS_PO.map(({ id, label }) => ({
+    value: id,
+    label,
+  }));
+
+  const displayInAccordionOptionsPOL = CUSTOM_FIELD_GROUPS_POL.map(({ id, label }) => ({
+    value: id,
+    label,
+  }));
+
   return (
     <Switch>
       <Route exact path={basePO}>
@@ -46,6 +58,8 @@ const CustomFieldsSettings = () => {
             permissions={permissions}
             scope={SCOPE_CUSTOM_FIELDS_MANAGE}
             configNamePrefix={PO_CONFIG_NAME_PREFIX}
+            hasDisplayInAccordionField
+            displayInAccordionOptions={displayInAccordionOptionsPO}
           />
         </TitleManager>
       </Route>
@@ -58,6 +72,8 @@ const CustomFieldsSettings = () => {
             permissions={permissions}
             scope={SCOPE_CUSTOM_FIELDS_MANAGE}
             configNamePrefix={PO_CONFIG_NAME_PREFIX}
+            hasDisplayInAccordionField
+            displayInAccordionOptions={displayInAccordionOptionsPO}
           />
         </TitleManager>
       </Route>
@@ -71,6 +87,8 @@ const CustomFieldsSettings = () => {
             permissions={permissions}
             scope={SCOPE_CUSTOM_FIELDS_MANAGE}
             configNamePrefix={PO_LINE_CONFIG_NAME_PREFIX}
+            hasDisplayInAccordionField
+            displayInAccordionOptions={displayInAccordionOptionsPOL}
           />
         </TitleManager>
       </Route>
@@ -83,6 +101,8 @@ const CustomFieldsSettings = () => {
             permissions={permissions}
             scope={SCOPE_CUSTOM_FIELDS_MANAGE}
             configNamePrefix={PO_LINE_CONFIG_NAME_PREFIX}
+            hasDisplayInAccordionField
+            displayInAccordionOptions={displayInAccordionOptionsPOL}
           />
         </TitleManager>
       </Route>
