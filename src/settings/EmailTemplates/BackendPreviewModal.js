@@ -85,7 +85,6 @@ const BackendPreviewModal = ({ open, bodyTemplate, header, onClose }) => {
       )}
       {!loading && !error && (
         <div
-          style={{ whiteSpace: 'pre-line' }}
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: sanitizedBody }}
         />
