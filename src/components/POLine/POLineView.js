@@ -53,6 +53,7 @@ import {
   RoutingListAccordion,
   TagsBadge,
   useAcqRestrictions,
+  useIntegrationConfigs,
   useModalToggle,
   useShowCallout,
   VersionHistoryButton,
@@ -179,6 +180,13 @@ const POLineView = ({
   } = useExportHistory([line.id]);
 
   const isCancelable = isCancelableLine(line, order);
+
+  // Only fetch integration configs when automatic export is on and the order is
+  // not manual, to avoid an extra request on every PO line view. Feeds the
+  // read-only "Export via" hint.
+  const { integrationConfigs } = useIntegrationConfigs({
+    organizationId: (line.automaticExport && !order?.manualPo) ? order?.vendor : undefined,
+  });
 
   const { hasLocationRestrictedFund } = useIsFundsRestrictedByLocationIds(line);
 
@@ -431,6 +439,8 @@ const POLineView = ({
                   <POLineDetails
                     line={line}
                     hiddenFields={hiddenFields}
+                    integrationConfigs={integrationConfigs}
+                    manualOrder={order?.manualPo}
                   />
                 </Accordion>
                 {isOngoing(order.orderType) && (

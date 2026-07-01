@@ -28,6 +28,7 @@ export function getPOActionMenu({
   clickCreateInvoice,
   clickDelete,
   clickEdit,
+  clickManualExport,
   clickOpen,
   clickReceive,
   clickReexport,
@@ -57,6 +58,16 @@ export function getPOActionMenu({
 
   const exportedOrderLines = order.poLines.filter(({ lastEDIExportDate }) => lastEDIExportDate);
   const isOrderReexportDisabled = !(isOrderInOpenStatus && !isManualOrder && exportedOrderLines.length);
+
+  // "Export now" sends the order to the vendor, so it only makes sense once the
+  // order is OPEN (placed): a pending order is not placed yet (and still editable),
+  // a closed order is done. Manual POs ARE allowed here: the "Manual" flag only
+  // excludes them from AUTOMATED transmission, while sending them by hand via this
+  // workflow is a key use case (confirmed with backend dev Markus, who adjusts the
+  // matching so integrations apply to manual orders on this manual path; the
+  // automatic export keeps ignoring manual orders). Unlike Reexport we do NOT
+  // require an earlier export (this covers first-time / never-exported lines).
+  const isManualExportDisabled = !isOrderInOpenStatus || !order.poLines?.length;
 
   return ({ onToggle }) => (
     <MenuSection id="order-details-actions">
@@ -209,6 +220,22 @@ export function getPOActionMenu({
           clickReexport();
         }}
       />
+
+      <IfPermission perm="orders.po-lines.item.put">
+        <Button
+          buttonStyle="dropdownItem"
+          data-testid="manual-export-order-button"
+          disabled={isManualExportDisabled}
+          onClick={() => {
+            onToggle();
+            clickManualExport();
+          }}
+        >
+          <Icon size="small" icon="envelope">
+            <FormattedMessage id="ui-orders.button.manualExport" />
+          </Icon>
+        </Button>
+      </IfPermission>
 
       {isOrderInClosedStatus && (
         <Button
