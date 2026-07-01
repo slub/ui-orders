@@ -3,6 +3,7 @@
 ## 9.1.0 (IN PROGRESS)
 
 * Fix the `budgetExpenseClassNotFound` error handling. Refs UIOR-1552.
+* Add Order email templates settings with token picker and Handlebars backend-rendered preview. Refs UIOR-1492, UIOR-1493, UIOR-1495.
 
 ## [9.0.4](https://github.com/folio-org/ui-orders/tree/v9.0.4) (2026-05-26)
 [Full Changelog](https://github.com/folio-org/ui-orders/compare/v9.0.3...v9.0.4)
