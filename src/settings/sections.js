@@ -6,6 +6,7 @@ import ClosingReasons from './ClosingReasons';
 import { SECTION_KEYS } from './constants';
 import { CreateInventory } from './CreateInventory';
 import CustomFieldsSettings from './CustomFieldsSettings';
+import { EmailTemplates } from './EmailTemplates';
 import { SETTINGS_SECTION_KEY_FIELD_NAME } from './hooks';
 import InstanceMatching from './InstanceMatching';
 import InstanceStatus from './InstanceStatus';
@@ -71,6 +72,12 @@ export const SECTIONS = [
         label: <FormattedMessage id="ui-orders.settings.orderTemplateCategories" />,
         route: 'order-template-categories',
         perm: 'ui-orders.settings.view',
+      },
+      {
+        component: EmailTemplates,
+        label: <FormattedMessage id="ui-orders.settings.emailTemplates.label" />,
+        route: 'email-templates',
+        perm: 'ui-orders.settings.email-templates.view',
       },
       {
         component: POLinesLimit,
