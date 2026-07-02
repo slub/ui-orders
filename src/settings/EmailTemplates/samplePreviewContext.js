@@ -204,15 +204,15 @@ const lineB2Fields = {
   ],
   details: {
     productIds: [
-      { productId: '978-1-108-12345-6', qualifier: 'paperback', productIdType: isbnType },
+      { productId: '978-1-108-12346-3', qualifier: 'ebook', productIdType: isbnType },
     ],
   },
   cost: {
-    listUnitPrice: '59.95',
-    listUnitPriceElectronic: '0.00',
-    quantityPhysical: 1,
-    quantityElectronic: 0,
-    poLineEstimatedPrice: '59.95',
+    listUnitPrice: '0.00',
+    listUnitPriceElectronic: '129.00',
+    quantityPhysical: 0,
+    quantityElectronic: 1,
+    poLineEstimatedPrice: '129.00',
     currency: 'EUR',
   },
   fundDistribution: [
