@@ -74,12 +74,6 @@ const TokensList = ({
             </li>
             <li>
               <FormattedMessage
-                id="ui-orders.settings.emailTemplates.tokens.help.tripleBraces"
-                values={{ pattern: <code>{'{{{order.shipTo.address}}}'}</code> }}
-              />
-            </li>
-            <li>
-              <FormattedMessage
                 id="ui-orders.settings.emailTemplates.tokens.help.customFields"
                 values={{ pattern: <code>{'{{orderLine.customFields.fieldName}}'}</code> }}
               />

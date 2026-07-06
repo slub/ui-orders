@@ -812,7 +812,6 @@
   "settings.emailTemplates.tokens.help.handlebars": "This editor uses {handlebarsLink} with the order data schema ({schemaLink}).",
   "settings.emailTemplates.tokens.help.loops": "Use the {label} option to repeat fields. Nested loops (order lines, contributors, product IDs, funds) must sit inside their parent loop.",
   "settings.emailTemplates.tokens.help.optional": "To skip empty fields, wrap the line in section tags: {pattern}.",
-  "settings.emailTemplates.tokens.help.tripleBraces": "Use triple braces to preserve HTML tags and line breaks, e.g. {pattern}.",
   "settings.emailTemplates.tokens.help.customFields": "Reference custom fields by hand - they have no predefined token, e.g. {pattern}.",
   "settings.emailTemplates.validation.nameRequired": "Template name is required",
   "settings.emailTemplates.validation.subjectRequired": "Email subject is required",

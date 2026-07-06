@@ -79,6 +79,11 @@ const personalNameType = {
   name: 'Personal name',
 };
 
+const corporateNameType = {
+  id: '2e48e713-17f3-4c13-a9f8-23845bb210aa',
+  name: 'Corporate name',
+};
+
 const isbnType = {
   id: '8261054f-be78-422d-bd51-4ed9f33c3422',
   name: 'ISBN',
@@ -103,6 +108,7 @@ const lineA1Fields = {
   rush: false,
   contributors: [
     { contributor: 'Mustermann, Max', contributorNameType: personalNameType },
+    { contributor: 'International Federation of Library Associations', contributorNameType: corporateNameType },
     { contributor: 'Schmidt, Anna', contributorNameType: personalNameType },
   ],
   details: {
