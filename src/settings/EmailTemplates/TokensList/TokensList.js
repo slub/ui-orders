@@ -75,7 +75,10 @@ const TokensList = ({
             <li>
               <FormattedMessage
                 id="ui-orders.settings.emailTemplates.tokens.help.customFields"
-                values={{ pattern: <code>{'{{orderLine.customFields.fieldName}}'}</code> }}
+                values={{
+                  single: <code>{'{{orderLine.customFields.<key>.value}}'}</code>,
+                  multi: <code>{'{{#orderLine.customFields.<key>.values}}{{label}}{{/…}}'}</code>,
+                }}
               />
             </li>
           </ul>
