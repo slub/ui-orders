@@ -17,7 +17,7 @@ import {
 } from '../constants';
 
 const HANDLEBARS_DOCS_URL = 'https://handlebarsjs.com/guide/expressions.html';
-const DATA_SCHEMA_URL = 'https://folio-org.atlassian.net/browse/MODEXPW-635';
+const DATA_SCHEMA_URL = 'https://github.com/folio-org/mod-data-export-worker';
 
 const TokensList = ({
   tokens,
@@ -55,7 +55,7 @@ const TokensList = ({
                     <a href={HANDLEBARS_DOCS_URL} target="_blank" rel="noopener noreferrer">Handlebars</a>
                   ),
                   schemaLink: (
-                    <a href={DATA_SCHEMA_URL} target="_blank" rel="noopener noreferrer">MODEXPW-635</a>
+                    <a href={DATA_SCHEMA_URL} target="_blank" rel="noopener noreferrer">README</a>
                   ),
                 }}
               />
