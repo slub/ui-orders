@@ -76,7 +76,7 @@ const extractBackendError = async (err) => {
   }
 };
 
-const BackendPreviewModal = ({ open, bodyTemplate, header, onClose }) => {
+const BackendPreviewModal = ({ open, bodyTemplate, templateResolver, header, onClose }) => {
   const ky = useOkapiKy();
   const kyRef = useRef(ky);
 
@@ -96,9 +96,14 @@ const BackendPreviewModal = ({ open, bodyTemplate, header, onClose }) => {
 
     // MODTEMPENG-135: non-persisted preview, no saved templateId required.
     // Header omitted, mirroring the editor's body-only preview.
+    //
+    // The resolver comes from the record, so the preview uses the engine the
+    // real dispatch will use. Records saved before the field existed have none;
+    // JSON.stringify drops the undefined key and the backend default applies.
     kyRef.current.post('template-request/preview', {
       json: {
         body: bodyTemplate || '',
+        templateResolver,
         context: SAMPLE_PREVIEW_CONTEXT,
       },
     })
@@ -119,7 +124,7 @@ const BackendPreviewModal = ({ open, bodyTemplate, header, onClose }) => {
       });
 
     return () => { cancelled = true; };
-  }, [open, bodyTemplate]);
+  }, [open, bodyTemplate, templateResolver]);
 
   const footer = (
     <ModalFooter>
@@ -171,6 +176,7 @@ const BackendPreviewModal = ({ open, bodyTemplate, header, onClose }) => {
 BackendPreviewModal.propTypes = {
   open: PropTypes.bool.isRequired,
   bodyTemplate: PropTypes.string,
+  templateResolver: PropTypes.string,
   header: PropTypes.node.isRequired,
   onClose: PropTypes.func.isRequired,
 };

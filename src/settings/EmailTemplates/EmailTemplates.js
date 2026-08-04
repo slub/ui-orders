@@ -95,11 +95,6 @@ class EmailTemplates extends React.Component {
             templateResolver: 'handlebars',
             scope: TEMPLATE_SCOPE,
           }}
-          // The backend renders Handlebars only and the resolver is not an
-          // editable field. Force it on every save so editing a template still
-          // stored with the legacy 'mustache' resolver upgrades it instead of
-          // writing the stale value back.
-          onBeforeSave={(entry) => ({ ...entry, templateResolver: 'handlebars' })}
           nameKey="name"
           permissions={{
             put: 'ui-orders.settings.email-templates.edit',
