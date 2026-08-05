@@ -32,6 +32,7 @@ const EmailTemplateDetail = ({ initialValues }) => {
     description,
     active,
     localizedTemplates,
+    templateResolver,
   } = initialValues;
 
   const template = localizedTemplates?.en || {};
@@ -110,6 +111,8 @@ const EmailTemplateDetail = ({ initialValues }) => {
       <BackendPreviewModal
         open={openPreview}
         bodyTemplate={body}
+        subjectTemplate={subject}
+        templateResolver={templateResolver}
         header={
           <FormattedMessage
             id="ui-orders.settings.emailTemplates.previewHeader"
@@ -134,6 +137,7 @@ EmailTemplateDetail.propTypes = {
         body: PropTypes.string,
       }),
     }),
+    templateResolver: PropTypes.string,
   }),
 };
 

@@ -5,6 +5,7 @@ import DOMPurify from 'dompurify';
 
 import {
   Button,
+  KeyValue,
   Loading,
   Modal,
   ModalFooter,
@@ -15,12 +16,16 @@ import { SAMPLE_PREVIEW_CONTEXT } from './samplePreviewContext';
 
 const EXCERPT_WINDOW = 45;
 
-// mod-template-engine returns a diagnostic on a template error: a first
-// line with the error type + position (e.g. "... :1:3372: found: '}'"),
-// then the whole template on one line, then a caret line pointing at the
-// spot. Turn that into { message, excerpt } where excerpt is a short,
-// readable slice of the template around the error with our own caret.
-// The raw position (a character offset) alone is useless to a human.
+// How much detail mod-template-engine returns depends on the resolver.
+// handlebars, verified against the preview endpoint:
+//   ... inline@f691f91:1:17: found: '}}}', expected: '}}'
+//   Hallo {{user.name}}} {{order.poNumber}}
+//                    ^
+// mustache returns the message alone, no position, no caret.
+//
+// Turn that into { message, excerpt }, excerpt being a short slice of the
+// source line with our own caret. Without a caret line it stays null and the
+// caller shows the message on its own.
 const extractBackendError = async (err) => {
   const fallback = { message: err.message, excerpt: null };
 
@@ -29,7 +34,7 @@ const extractBackendError = async (err) => {
 
     if (!body) return fallback;
 
-    let text = body;
+    let text;
 
     try {
       const json = JSON.parse(body);
@@ -39,21 +44,31 @@ const extractBackendError = async (err) => {
       text = body;
     }
 
-    const lines = text.split('\n');
+    const lines = text.split(/\r?\n/);
     const message = lines[0].trim() || err.message;
 
-    // The caret line is all whitespace followed by a single '^'.
-    const caretIndex = lines.findIndex((line) => /^\s*\^\s*$/.test(line));
+    // Search from the end: the caret closes the diagnostic, a stray one could
+    // sit in the quoted source above it. A plain loop, not findLastIndex -
+    // this code is headed for a shared library.
+    let caretIndex = -1;
+
+    for (let i = lines.length - 1; i > 0; i--) {
+      if (/^\s*\^+\s*$/.test(lines[i])) {
+        caretIndex = i;
+        break;
+      }
+    }
 
     if (caretIndex < 1) return { message, excerpt: null };
 
-    const templateLine = lines[caretIndex - 1];
-    const caretCol = lines[caretIndex].indexOf('^');
+    // Tabs would shift our caret against the rendered source, so flatten them.
+    const sourceLine = lines[caretIndex - 1].replace(/\t/g, ' ');
+    const caretCol = Math.min(lines[caretIndex].indexOf('^'), sourceLine.length);
     const start = Math.max(0, caretCol - EXCERPT_WINDOW);
-    const end = Math.min(templateLine.length, caretCol + EXCERPT_WINDOW);
+    const end = Math.min(sourceLine.length, caretCol + EXCERPT_WINDOW);
     const prefix = start > 0 ? '…' : '';
-    const suffix = end < templateLine.length ? '…' : '';
-    const excerptLine = prefix + templateLine.slice(start, end) + suffix;
+    const suffix = end < sourceLine.length ? '…' : '';
+    const excerptLine = prefix + sourceLine.slice(start, end) + suffix;
     const caretLine = ' '.repeat(prefix.length + (caretCol - start)) + '^';
 
     return { message, excerpt: `${excerptLine}\n${caretLine}` };
@@ -62,13 +77,14 @@ const extractBackendError = async (err) => {
   }
 };
 
-const BackendPreviewModal = ({ open, bodyTemplate, header, onClose }) => {
+const BackendPreviewModal = ({ open, bodyTemplate, subjectTemplate, templateResolver, header, onClose }) => {
   const ky = useOkapiKy();
   const kyRef = useRef(ky);
 
   kyRef.current = ky;
 
   const [renderedBody, setRenderedBody] = useState('');
+  const [renderedSubject, setRenderedSubject] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -80,13 +96,18 @@ const BackendPreviewModal = ({ open, bodyTemplate, header, onClose }) => {
     setLoading(true);
     setError(null);
 
-    // MODTEMPENG-135: non-persisted preview - renders the inline body
-    // against the sample context, no saved templateId required.
-    // Subject/header is omitted: the preview mirrors the editor's
-    // single-field (body) preview, like @folio/stripes-template-editor.
+    // MODTEMPENG-135: non-persisted preview, no saved templateId required.
+    // The subject carries tokens too, so it goes through the same engine and
+    // comes back as data.header.
+    //
+    // The resolver comes from the record, so the preview uses the engine the
+    // real dispatch will use. Records saved before the field existed have none;
+    // JSON.stringify drops the undefined key and the backend default applies.
     kyRef.current.post('template-request/preview', {
       json: {
+        header: subjectTemplate || '',
         body: bodyTemplate || '',
+        templateResolver,
         context: SAMPLE_PREVIEW_CONTEXT,
       },
     })
@@ -94,6 +115,7 @@ const BackendPreviewModal = ({ open, bodyTemplate, header, onClose }) => {
       .then(data => {
         if (cancelled) return;
         setRenderedBody(data?.body || '');
+        setRenderedSubject(data?.header || '');
       })
       .catch(async (err) => {
         if (cancelled) return;
@@ -107,7 +129,7 @@ const BackendPreviewModal = ({ open, bodyTemplate, header, onClose }) => {
       });
 
     return () => { cancelled = true; };
-  }, [open, bodyTemplate]);
+  }, [open, bodyTemplate, subjectTemplate, templateResolver]);
 
   const footer = (
     <ModalFooter>
@@ -147,10 +169,25 @@ const BackendPreviewModal = ({ open, bodyTemplate, header, onClose }) => {
         </div>
       )}
       {!loading && !error && (
-        <div
-          // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: sanitizedBody }}
-        />
+        <>
+          {/* Both parts are labelled, as in the detail view, so the subject
+              does not read as the first line of the mail. Rendered as text,
+              not markup: the subject is a plain-text mail header, and an
+              empty one is worth seeing in a preview. */}
+          <KeyValue
+            label={<FormattedMessage id="ui-orders.settings.emailTemplates.subject" />}
+            value={renderedSubject}
+          />
+          <hr />
+          <KeyValue
+            label={<FormattedMessage id="ui-orders.settings.emailTemplates.body" />}
+          >
+            <div
+              // eslint-disable-next-line react/no-danger
+              dangerouslySetInnerHTML={{ __html: sanitizedBody }}
+            />
+          </KeyValue>
+        </>
       )}
     </Modal>
   );
@@ -159,6 +196,8 @@ const BackendPreviewModal = ({ open, bodyTemplate, header, onClose }) => {
 BackendPreviewModal.propTypes = {
   open: PropTypes.bool.isRequired,
   bodyTemplate: PropTypes.string,
+  subjectTemplate: PropTypes.string,
+  templateResolver: PropTypes.string,
   header: PropTypes.node.isRequired,
   onClose: PropTypes.func.isRequired,
 };
