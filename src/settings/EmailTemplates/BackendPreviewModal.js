@@ -5,6 +5,7 @@ import DOMPurify from 'dompurify';
 
 import {
   Button,
+  KeyValue,
   Loading,
   Modal,
   ModalFooter,
@@ -76,13 +77,14 @@ const extractBackendError = async (err) => {
   }
 };
 
-const BackendPreviewModal = ({ open, bodyTemplate, templateResolver, header, onClose }) => {
+const BackendPreviewModal = ({ open, bodyTemplate, subjectTemplate, templateResolver, header, onClose }) => {
   const ky = useOkapiKy();
   const kyRef = useRef(ky);
 
   kyRef.current = ky;
 
   const [renderedBody, setRenderedBody] = useState('');
+  const [renderedSubject, setRenderedSubject] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -95,13 +97,15 @@ const BackendPreviewModal = ({ open, bodyTemplate, templateResolver, header, onC
     setError(null);
 
     // MODTEMPENG-135: non-persisted preview, no saved templateId required.
-    // Header omitted, mirroring the editor's body-only preview.
+    // The subject carries tokens too, so it goes through the same engine and
+    // comes back as data.header.
     //
     // The resolver comes from the record, so the preview uses the engine the
     // real dispatch will use. Records saved before the field existed have none;
     // JSON.stringify drops the undefined key and the backend default applies.
     kyRef.current.post('template-request/preview', {
       json: {
+        header: subjectTemplate || '',
         body: bodyTemplate || '',
         templateResolver,
         context: SAMPLE_PREVIEW_CONTEXT,
@@ -111,6 +115,7 @@ const BackendPreviewModal = ({ open, bodyTemplate, templateResolver, header, onC
       .then(data => {
         if (cancelled) return;
         setRenderedBody(data?.body || '');
+        setRenderedSubject(data?.header || '');
       })
       .catch(async (err) => {
         if (cancelled) return;
@@ -124,7 +129,7 @@ const BackendPreviewModal = ({ open, bodyTemplate, templateResolver, header, onC
       });
 
     return () => { cancelled = true; };
-  }, [open, bodyTemplate, templateResolver]);
+  }, [open, bodyTemplate, subjectTemplate, templateResolver]);
 
   const footer = (
     <ModalFooter>
@@ -164,10 +169,18 @@ const BackendPreviewModal = ({ open, bodyTemplate, templateResolver, header, onC
         </div>
       )}
       {!loading && !error && (
-        <div
-          // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: sanitizedBody }}
-        />
+        <>
+          {/* Rendered as text, not markup: the subject is a plain-text mail
+              header, and an empty one is worth seeing in a preview. */}
+          <KeyValue
+            label={<FormattedMessage id="ui-orders.settings.emailTemplates.subject" />}
+            value={renderedSubject}
+          />
+          <div
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{ __html: sanitizedBody }}
+          />
+        </>
       )}
     </Modal>
   );
@@ -176,6 +189,7 @@ const BackendPreviewModal = ({ open, bodyTemplate, templateResolver, header, onC
 BackendPreviewModal.propTypes = {
   open: PropTypes.bool.isRequired,
   bodyTemplate: PropTypes.string,
+  subjectTemplate: PropTypes.string,
   templateResolver: PropTypes.string,
   header: PropTypes.node.isRequired,
   onClose: PropTypes.func.isRequired,
