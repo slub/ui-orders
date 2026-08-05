@@ -170,16 +170,23 @@ const BackendPreviewModal = ({ open, bodyTemplate, subjectTemplate, templateReso
       )}
       {!loading && !error && (
         <>
-          {/* Rendered as text, not markup: the subject is a plain-text mail
-              header, and an empty one is worth seeing in a preview. */}
+          {/* Both parts are labelled, as in the detail view, so the subject
+              does not read as the first line of the mail. Rendered as text,
+              not markup: the subject is a plain-text mail header, and an
+              empty one is worth seeing in a preview. */}
           <KeyValue
             label={<FormattedMessage id="ui-orders.settings.emailTemplates.subject" />}
             value={renderedSubject}
           />
-          <div
-            // eslint-disable-next-line react/no-danger
-            dangerouslySetInnerHTML={{ __html: sanitizedBody }}
-          />
+          <hr />
+          <KeyValue
+            label={<FormattedMessage id="ui-orders.settings.emailTemplates.body" />}
+          >
+            <div
+              // eslint-disable-next-line react/no-danger
+              dangerouslySetInnerHTML={{ __html: sanitizedBody }}
+            />
+          </KeyValue>
         </>
       )}
     </Modal>
