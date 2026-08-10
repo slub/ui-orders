@@ -17,9 +17,11 @@
  * real payload has none, so tokens placed outside their loop render empty -
  * which is the correct, faithful behaviour.
  *
- * `shipTo` / `billTo` are objects `{ id, address }`; the address is a
- * pre-formatted string with <br> so the template can emit it via triple
- * braces, e.g. {{{order.shipTo.address}}}.
+ * `shipTo` / `billTo` are objects `{ id, address }`. The address is a
+ * pre-formatted multi-line string separated by \n, verified against a real
+ * export on 2026-08-06. Since the mail is always HTML, those \n collapse into
+ * spaces unless the template converts them: {{nl2br order.shipTo.address}}.
+ * Triple braces would silently produce a single-line address.
  */
 
 const organization = {
@@ -28,7 +30,8 @@ const organization = {
     addressLine1: 'Hagenauer Straße 47',
     city: 'Wiesbaden',
     zipCode: '65203',
-    country: 'Germany',
+    // The payload carries the raw ISO 3166-1 alpha-3 code, not a display name.
+    country: 'DEU',
   },
 };
 
@@ -45,11 +48,11 @@ const orderAFields = {
   },
   shipTo: {
     id: 'b1d2c3e4-5f60-4a71-8b92-0c1d2e3f4a50',
-    address: 'Branch Library of Humanities<br>10 Philosopher Lane<br>01234 Booktown',
+    address: 'Branch Library of Humanities\n10 Philosopher Lane\n01234 Booktown',
   },
   billTo: {
     id: 'a0b1c2d3-4e5f-4061-9a82-1b2c3d4e5f60',
-    address: 'University Library - Acquisitions<br>456 Campus Road<br>01234 Booktown',
+    address: 'University Library - Acquisitions\n456 Campus Road\n01234 Booktown',
   },
 };
 
@@ -66,11 +69,11 @@ const orderBFields = {
   },
   shipTo: {
     id: 'c2d3e4f5-6071-4b82-9c03-1d2e3f4a5b61',
-    address: 'Science Library<br>25 Laboratory Drive<br>01234 Booktown',
+    address: 'Science Library\n25 Laboratory Drive\n01234 Booktown',
   },
   billTo: {
     id: 'a0b1c2d3-4e5f-4061-9a82-1b2c3d4e5f60',
-    address: 'University Library - Acquisitions<br>456 Campus Road<br>01234 Booktown',
+    address: 'University Library - Acquisitions\n456 Campus Road\n01234 Booktown',
   },
 };
 
@@ -99,9 +102,15 @@ const oclcType = {
   name: 'OCLC',
 };
 
+const issnType = {
+  id: '913300b2-03ed-469a-8179-c1092c991227',
+  name: 'ISSN',
+};
+
 const lineA1Fields = {
   poLineNumber: '10037-1',
-  titleOrPackage: 'Introduction to Library Science',
+  // Real titles carry the full statement of responsibility and run long.
+  titleOrPackage: 'Introduction to library science : theory and practice / edited by Jane Roberts ; with contributions by the IFLA working group',
   publisher: 'De Gruyter Saur',
   publicationDate: '2024',
   edition: '3rd ed.',
@@ -113,8 +122,10 @@ const lineA1Fields = {
   ],
   details: {
     productIds: [
-      { productId: '978-3-11-069137-8', qualifier: 'paperback', productIdType: isbnType },
-      { productId: '10.1515/9783110692009', qualifier: 'ebook', productIdType: doiType },
+      // Qualifiers come straight from the catalogue record and often carry
+      // list prices; many product IDs have none at all (the key is absent).
+      { productId: '978-3-11-069137-8', qualifier: 'paperback : EUR 45.00 (DE), EUR 46.30 (AT)', productIdType: isbnType },
+      { productId: '10.1515/9783110692009', productIdType: doiType },
     ],
   },
   cost: {
@@ -136,9 +147,10 @@ const lineA1Fields = {
 
 const lineA2Fields = {
   poLineNumber: '10037-2',
-  titleOrPackage: 'Advanced Cataloging Techniques',
+  titleOrPackage: 'Advanced cataloging techniques',
   publisher: 'Facet Publishing',
-  publicationDate: '2025',
+  // Free-text field: brackets mark an inferred date, so it is not always a bare year.
+  publicationDate: '[2025]',
   edition: '1st ed.',
   rush: true,
   contributors: [
@@ -179,6 +191,7 @@ const lineB1Fields = {
   details: {
     productIds: [
       { productId: '978-1-138-23456-7', qualifier: 'print', productIdType: isbnType },
+      { productId: '2049-3630', productIdType: issnType },
       { productId: '1256789012', qualifier: 'online', productIdType: oclcType },
     ],
   },
