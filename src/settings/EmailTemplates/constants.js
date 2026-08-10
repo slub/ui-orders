@@ -58,7 +58,7 @@ export const ORDER_EMAIL_TOKENS = {
     },
     {
       token: 'organization.primaryAddress.country',
-      previewValue: 'Germany',
+      previewValue: 'DEU',
     },
   ],
   [TOKEN_SECTIONS.ORDER]: [
@@ -75,12 +75,15 @@ export const ORDER_EMAIL_TOKENS = {
       previewValue: 'Max Mustermann',
     },
     {
+      // The payload separates address lines with \n, so the template has to
+      // pass them through {{nl2br …}} to keep them on separate lines in the
+      // HTML mail. Kept identical to samplePreviewContext.js.
       token: 'order.shipTo.address',
-      previewValue: 'Branch Library of Humanities<br>10 Philosopher Lane<br>01234 Booktown',
+      previewValue: 'Branch Library of Humanities\n10 Philosopher Lane\n01234 Booktown',
     },
     {
       token: 'order.billTo.address',
-      previewValue: 'University Library - Acquisitions<br>456 Campus Road<br>01234 Booktown',
+      previewValue: 'University Library - Acquisitions\n456 Campus Road\n01234 Booktown',
     },
   ],
   [TOKEN_SECTIONS.ORDER_LINES]: [
