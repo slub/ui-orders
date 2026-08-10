@@ -6,6 +6,7 @@ import DOMPurify from 'dompurify';
 import {
   Button,
   KeyValue,
+  Label,
   Loading,
   Modal,
   ModalFooter,
@@ -179,14 +180,19 @@ const BackendPreviewModal = ({ open, bodyTemplate, subjectTemplate, templateReso
             value={renderedSubject}
           />
           <hr />
-          <KeyValue
-            label={<FormattedMessage id="ui-orders.settings.emailTemplates.body" />}
-          >
-            <div
-              // eslint-disable-next-line react/no-danger
-              dangerouslySetInnerHTML={{ __html: sanitizedBody }}
-            />
-          </KeyValue>
+          {/* The body is a rendered mail, not a text value, so it deliberately
+              does not sit in a KeyValue: KeyValue styles its value with
+              white-space: pre-wrap, and that is inherited. The mail must render
+              the way a mail client renders it, where only <br> breaks a line.
+              Under pre-wrap every nl2br break is doubled, because the helper
+              emits "<br>\n" and keeps the newline next to the tag. */}
+          <Label tagName="div">
+            <FormattedMessage id="ui-orders.settings.emailTemplates.body" />
+          </Label>
+          <div
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{ __html: sanitizedBody }}
+          />
         </>
       )}
     </Modal>
