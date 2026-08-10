@@ -13,8 +13,16 @@ import {
   KeyValue,
   Row,
 } from '@folio/stripes/components';
+import { IfInterface } from '@folio/stripes/core';
 
 import BackendPreviewModal from './BackendPreviewModal';
+
+// The preview posts to /template-request/preview, which mod-template-engine
+// only offers from interface 2.3 on (MODTEMPENG-135). Below that the button is
+// hidden rather than failing with a 404 on click. The editor's own preview is
+// guarded by stripes-template-editor against the same version (STRIPES-1025).
+const TEMPLATE_ENGINE_PREVIEW_INTERFACE = 'template-engine';
+const TEMPLATE_ENGINE_PREVIEW_VERSION = '2.3';
 
 /**
  * EmailTemplateDetail - Read-only view of an email template.
@@ -90,9 +98,14 @@ const EmailTemplateDetail = ({ initialValues }) => {
               />
             </Col>
             <Col xs={4} style={{ textAlign: 'right' }}>
-              <Button onClick={togglePreviewDialog}>
-                <FormattedMessage id="ui-orders.settings.emailTemplates.preview" />
-              </Button>
+              <IfInterface
+                name={TEMPLATE_ENGINE_PREVIEW_INTERFACE}
+                version={TEMPLATE_ENGINE_PREVIEW_VERSION}
+              >
+                <Button onClick={togglePreviewDialog}>
+                  <FormattedMessage id="ui-orders.settings.emailTemplates.preview" />
+                </Button>
+              </IfInterface>
             </Col>
           </Row>
           <Row>
