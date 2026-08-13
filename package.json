@@ -216,6 +216,8 @@
         "visible": true,
         "subPermissions": [
           "data-export.config.collection.get",
+          "data-export.config.item.execute",
+          "data-export.job.item.get",
           "orders.holding-detail.item.post",
           "orders.item.put",
           "orders.order-templates.collection.get",

@@ -977,6 +977,7 @@ const PO = ({
             order={order}
             poLines={orderLines}
             onClose={toggleManualExportModal}
+            onExported={refetchOrderLines}
           />
         )}
       </Pane>
