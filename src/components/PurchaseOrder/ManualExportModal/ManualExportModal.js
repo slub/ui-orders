@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import {
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -9,6 +10,7 @@ import {
   FormattedMessage,
   useIntl,
 } from 'react-intl';
+import { Link } from 'react-router-dom';
 
 import {
   Button,
@@ -20,19 +22,50 @@ import {
   MultiColumnList,
   Select,
 } from '@folio/stripes/components';
-import { useIntegrationConfigs } from '@folio/stripes-acq-components';
+import { useStripes } from '@folio/stripes/core';
+import {
+  useIntegrationConfigs,
+  useShowCallout,
+} from '@folio/stripes-acq-components';
 
+import {
+  EXPORT_JOB_STATUSES,
+  useManualExport,
+  useManualExportJobs,
+} from '../../../common/hooks';
 import { getApplicableIntegrations } from '../../Utils/toggleAutomaticExport';
 
 const VISIBLE_COLUMNS = ['selected', 'poLineNumber', 'title', 'status', 'integration'];
 
 const MAX_TITLE_LENGTH = 20;
 
-// Weekday order for rendering the schedule rule (matches the WEEKDAYS constant
-// in ui-organizations; kept local to avoid a cross-module import).
+// `errorDetails` is the raw root-cause message from the worker; the full text
+// stays available as a tooltip.
+const MAX_ERROR_LENGTH = 60;
+
+// Kept local to avoid a cross-module import from ui-organizations.
 const WEEKDAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
 
 const getOrderingConfig = (config) => config?.exportTypeSpecificParameters?.vendorEdiOrdersExportConfig;
+
+// The backend runs one export configuration per request (MODEXPS-316).
+const buildExportEntries = (selection) => Object.entries(selection ?? {})
+  .filter(([, { selected, integrationConfigId }]) => selected && integrationConfigId)
+  .reduce((acc, [lineId, { integrationConfigId }]) => {
+    const entry = acc.find((item) => item.integrationConfigId === integrationConfigId);
+
+    if (entry) entry.poLineIds.push(lineId);
+    else acc.push({ integrationConfigId, poLineIds: [lineId] });
+
+    return acc;
+  }, []);
+
+// Results arrive per integration; spread them onto the rows of that group.
+const buildLineResults = (results) => results.reduce((acc, { poLineIds, ...result }) => {
+  poLineIds.forEach((lineId) => { acc[lineId] = result; });
+
+  return acc;
+}, {});
 
 const getSchedule = (config) => getOrderingConfig(config)?.ediSchedule;
 
@@ -44,11 +77,9 @@ const formatConfigLabel = (config) => {
   return method ? `${name} (${method})` : name;
 };
 
-// Human-readable summary of an integration's scheduling rule (NOT the computed
-// next run time, just the rule), e.g. "daily at 08:00" or "weekly Mon, Wed at
-// 06:00". The time is the stored schedule time (HH:MM); we deliberately skip the
-// tenant-timezone conversion the SchedulingView does, since this is an
-// informational hint, and we omit scheduleFrequency to keep the phrase readable.
+// The schedule rule, not the computed next run: e.g. "daily at 08:00". Shows the
+// stored time without the tenant-timezone conversion SchedulingView does, since
+// this is only an informational hint.
 const formatSchedule = (config, intl) => {
   const params = getSchedule(config)?.scheduleParameters;
 
@@ -74,15 +105,12 @@ const formatSchedule = (config, intl) => {
   return parts.join(' ');
 };
 
-const truncate = (value) => (
-  value && value.length > MAX_TITLE_LENGTH ? `${value.slice(0, MAX_TITLE_LENGTH)}…` : value
+const truncate = (value, maxLength = MAX_TITLE_LENGTH) => (
+  value && value.length > maxLength ? `${value.slice(0, maxLength)}…` : value
 );
 
-// Client-side classification of a PO line for the manual export modal. Reuses
-// the same matching simulation as the read-only AutomaticExportInfo hint
-// (getApplicableIntegrations), but evaluates every line regardless of the
-// automaticExport flag: the user explicitly wants to trigger scheduled AND
-// purely manual lines from here.
+// Same matching simulation as the AutomaticExportInfo hint, but for every line
+// regardless of the automaticExport flag - that is the point of a manual export.
 const buildRow = (line, integrationConfigs, isManualOrder) => {
   const applicable = getApplicableIntegrations({
     vendorAccount: line.vendorDetail?.vendorAccount,
@@ -90,15 +118,9 @@ const buildRow = (line, integrationConfigs, isManualOrder) => {
     integrationConfigs,
   });
 
-  // A line is "scheduled" when it is flagged for automatic export AND its single
-  // matching integration runs on a scheduler -> it would be sent automatically
-  // anyway, so we must not pre-select it (avoid a double send) and instead show
-  // when it is due. Only evaluated for the unambiguous single-match case; an
-  // ambiguous line keeps the "several matching integrations" handling.
-  // Manual orders are excluded: the backend never auto-exports them
-  // (`NOT purchaseOrder.manualPo`), so "Scheduled automatically" would be wrong
-  // - they are a "ready" line here (manual export is exactly how they get sent),
-  // matching the manualPo guard in AutomaticExportInfo (UIOR-1556).
+  // Would go out on its own, so it must not be pre-selected (double send).
+  // Manual orders are excluded: the scheduler never picks them up
+  // (`NOT purchaseOrder.manualPo`), so the hint would be a false statement.
   const isScheduled = Boolean(
     !isManualOrder
     && line.automaticExport
@@ -120,11 +142,8 @@ const buildInitialSelection = (rows) => rows.reduce((acc, { line, applicable, is
   const hasSingleMatch = applicable.length === 1;
 
   acc[line.id] = {
-    // Single unambiguous match pre-fills the integration (and enables the
-    // checkbox). Pre-checked only when not already sent AND not already
-    // scheduled for automatic export: a scheduled line would otherwise be sent
-    // twice, so the user opts in explicitly. Ambiguous lines start unchecked
-    // (and disabled) until the user picks an integration; no-match lines too.
+    // Pre-checked only for an unambiguous match that is neither already sent nor
+    // scheduled - both would need an explicit opt-in.
     selected: hasSingleMatch && !isSent && !isScheduled,
     integrationConfigId: hasSingleMatch ? applicable[0].id : '',
   };
@@ -137,25 +156,37 @@ export const ManualExportModal = ({
   order,
   poLines,
   onClose,
+  onExported,
 }) => {
   const intl = useIntl();
 
-  // NB: the hook exposes `isFetching` (not `isLoading`). Using the wrong key
-  // would make the init guard below truthy on the first render and initialise
-  // the selection before the configs have loaded -> single-match lines wrongly
-  // start without an integration (checkbox greyed) once the configs arrive.
+  const stripes = useStripes();
+  const showCallout = useShowCallout();
+
+  // Following up on the jobs is optional: without the permission the modal stops
+  // after the trigger request and points at the export manager instead.
+  const canPollJobs = stripes.hasPerm('data-export.job.item.get');
+  const canViewExportManager = stripes.hasPerm('ui-export-manager.export-manager.view');
+
+  // NB: `isFetching`, not `isLoading` - the wrong key would initialise the
+  // selection before the configs arrive, leaving matched lines unselectable.
   const {
     integrationConfigs,
     isFetching,
   } = useIntegrationConfigs({ organizationId: order.vendor });
+
+  const {
+    manualExport,
+    isLoading: isExporting,
+  } = useManualExport();
 
   const rows = useMemo(
     () => poLines.map((line) => buildRow(line, integrationConfigs, order.manualPo)),
     [poLines, integrationConfigs, order.manualPo],
   );
 
-  // Selection is initialised once the integration configs have finished loading,
-  // so the defaults reflect the real per-line matches.
+  // Initialised only once the configs are loaded, so the defaults reflect the
+  // real per-line matches.
   const [selection, setSelection] = useState(null);
 
   useEffect(() => {
@@ -178,6 +209,94 @@ export const ManualExportModal = ({
     }));
   };
 
+  // Outcome of the last submit per PO line id; `null` until submitted.
+  const [lineResults, setLineResults] = useState(null);
+  const [jobIds, setJobIds] = useState([]);
+
+  const {
+    jobs,
+    isComplete,
+    hasTimedOut,
+  } = useManualExportJobs(jobIds);
+
+  const exportEntries = useMemo(() => buildExportEntries(selection), [selection]);
+
+  const selectedCount = useMemo(
+    () => exportEntries.reduce((sum, { poLineIds }) => sum + poLineIds.length, 0),
+    [exportEntries],
+  );
+
+  const closeAfterExport = useCallback(() => {
+    onExported?.();
+    onClose();
+  }, [onExported, onClose]);
+
+  const onExport = async () => {
+    const results = await manualExport(exportEntries);
+    const failed = results.filter(({ isSuccess }) => !isSuccess);
+
+    setLineResults(buildLineResults(results));
+
+    if (canPollJobs) {
+      setJobIds(results.filter(({ jobId }) => jobId).map(({ jobId }) => jobId));
+    }
+
+    if (failed.length) {
+      showCallout({
+        messageId: 'ui-orders.manualExport.error',
+        type: 'error',
+        values: { count: failed.length },
+      });
+
+      return;
+    }
+
+    // Nothing to wait for without the job permission - report the hand-off.
+    if (!canPollJobs) {
+      showCallout({
+        messageId: 'ui-orders.manualExport.started',
+        values: { count: selectedCount },
+      });
+      closeAfterExport();
+    }
+  };
+
+  // The trigger request only says the job was created. Close once every job
+  // reported back successfully; on failure or timeout stay open so the user can
+  // read what happened and follow the link into the export manager.
+  useEffect(() => {
+    const hasFailure = jobs.some(({ status }) => status === EXPORT_JOB_STATUSES.FAILED);
+
+    if (!isComplete || hasFailure) return;
+
+    showCallout({
+      messageId: 'ui-orders.manualExport.success',
+      values: { count: selectedCount },
+    });
+    closeAfterExport();
+  }, [isComplete, jobs, selectedCount, showCallout, closeAfterExport]);
+
+  // `lastEDIExportDate` is written by mod-orders-storage via its own Kafka event,
+  // so the cached lines are stale after an export. Refetch on every exit path;
+  // the event may lag by a moment, then the value shows up on the next open.
+  const onDismiss = useCallback(() => {
+    if (lineResults) onExported?.();
+    onClose();
+  }, [lineResults, onExported, onClose]);
+
+  const jobsById = useMemo(
+    () => jobs.reduce((acc, job) => ({ ...acc, [job.id]: job }), {}),
+    [jobs],
+  );
+
+  const jobLink = (jobId) => canViewExportManager && (
+    <div>
+      <Link to={`/export-manager/jobs/${jobId}`}>
+        <FormattedMessage id="ui-orders.manualExport.viewJob" />
+      </Link>
+    </div>
+  );
+
   const columnMapping = useMemo(() => ({
     selected: <FormattedMessage id="ui-orders.manualExport.column.selected" />,
     poLineNumber: <FormattedMessage id="ui-orders.manualExport.column.poLine" />,
@@ -188,12 +307,9 @@ export const ManualExportModal = ({
 
   const formatter = {
     selected: ({ line, isSent }) => {
-      // Selectable only once a concrete integration is set: a single match is
-      // pre-filled, an ambiguous line requires the user to pick one, a no-match
-      // line never has one. Keeps the checkbox in sync with the Select.
-      // Already-sent lines are not selectable here: re-sending is Reexport's job
-      // (it resets lastEDIExportDate so the line is picked up again); the export
-      // job only processes lines without a date.
+      // Selectable only once an integration is set, which keeps the checkbox in
+      // sync with the Select. Already-sent lines stay disabled: the export job
+      // filters on `lastEDIExportDate == null`, so they would be dropped silently.
       const hasChosenIntegration = Boolean(selection?.[line.id]?.integrationConfigId);
 
       return (
@@ -211,6 +327,57 @@ export const ManualExportModal = ({
     poLineNumber: ({ line }) => line.poLineNumber,
     title: ({ line }) => <span title={line.titleOrPackage}>{truncate(line.titleOrPackage)}</span>,
     status: ({ line, applicable, isSent, hasIntegration, isAmbiguous, isScheduled }) => {
+      // After a submit the result replaces the status; unsent lines keep theirs.
+      const result = lineResults?.[line.id];
+
+      if (result) {
+        // The request itself failed - no job was created.
+        if (!result.isSuccess) {
+          return (
+            <Icon icon="exclamation-circle" size="small" status="error">
+              <FormattedMessage id="ui-orders.manualExport.status.exportFailed" />
+            </Icon>
+          );
+        }
+
+        const job = jobsById[result.jobId];
+
+        if (job?.status === EXPORT_JOB_STATUSES.FAILED) {
+          return (
+            <Icon icon="exclamation-circle" size="small" status="error">
+              <FormattedMessage id="ui-orders.manualExport.status.exportFailed" />
+              {job.errorDetails && <div title={job.errorDetails}>{truncate(job.errorDetails, MAX_ERROR_LENGTH)}</div>}
+              {jobLink(result.jobId)}
+            </Icon>
+          );
+        }
+
+        if (job?.status === EXPORT_JOB_STATUSES.SUCCESSFUL) {
+          return (
+            <Icon icon="check-circle" size="small">
+              <FormattedMessage id="ui-orders.manualExport.status.exportSucceeded" />
+            </Icon>
+          );
+        }
+
+        // Still queued or running. Kafka may take longer than we wait, so after
+        // the timeout we stop claiming progress and point at the export manager.
+        if (hasTimedOut) {
+          return (
+            <>
+              <FormattedMessage id="ui-orders.manualExport.status.exportPending" />
+              {jobLink(result.jobId)}
+            </>
+          );
+        }
+
+        return (
+          <Icon icon="clock" size="small">
+            <FormattedMessage id="ui-orders.manualExport.status.exportRunning" />
+          </Icon>
+        );
+      }
+
       if (isSent) {
         return (
           <FormattedMessage
@@ -269,22 +436,27 @@ export const ManualExportModal = ({
     },
   };
 
+  // Once submitted the export must not be repeatable from the same modal: the
+  // selection is unchanged, so a second click would send everything again.
+  const isSubmitted = Boolean(lineResults);
+
   const footer = (
     <ModalFooter>
       <Button
         data-testid="manual-export-send-button"
         buttonStyle="primary"
         marginBottom0
-        disabled
+        disabled={!exportEntries.length || isExporting || isSubmitted}
+        onClick={onExport}
       >
         <FormattedMessage id="ui-orders.manualExport.export" />
       </Button>
       <Button
         data-testid="manual-export-cancel-button"
         marginBottom0
-        onClick={onClose}
+        onClick={onDismiss}
       >
-        <FormattedMessage id="ui-orders.buttons.line.cancel" />
+        <FormattedMessage id={`ui-orders.buttons.line.${isSubmitted ? 'close' : 'cancel'}`} />
       </Button>
     </ModalFooter>
   );
@@ -326,4 +498,5 @@ ManualExportModal.propTypes = {
   order: PropTypes.object.isRequired,
   poLines: PropTypes.arrayOf(PropTypes.object).isRequired,
   onClose: PropTypes.func.isRequired,
+  onExported: PropTypes.func,
 };
