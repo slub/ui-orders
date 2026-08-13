@@ -9,6 +9,8 @@ export * from './useHandleOrderUpdateError';
 export * from './useInstance';
 export * from './useIsRowSelected';
 export * from './useLinesLimit';
+export * from './useManualExport';
+export * from './useManualExportJobs';
 export * from './useOpenOrderSettings';
 export * from './useOrder';
 export * from './useOrderFiscalYears';
