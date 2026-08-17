@@ -1,6 +1,21 @@
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import ReactRouterPropTypes from 'react-router-prop-types';
 
-// eslint-disable-next-line import/prefer-default-export
+import { baseManifest } from '@folio/stripes-acq-components';
+
+import {
+  reasonsForClosureResource,
+  updateEncumbrancesResource,
+} from '../../common/resources';
+import {
+  APPROVALS_SETTING,
+  FUND,
+  LINES_LIMIT,
+  ORDER_NUMBER,
+  ORDER,
+} from '../Utils/resources';
+
 export const PO_TEMPLATE_FIELDS_MAP = {
   'tags.tagList': 'poTags.tagList',
 };
@@ -36,4 +51,33 @@ export const MAP_FIELD_ACCORDION = {
 export const SUBMIT_ACTION = {
   saveAndClose: 'saveAndClose',
   saveAndKeepEditing: 'saveAndKeepEditing',
+};
+
+export const PO_MANIFEST = Object.freeze({
+  orderDetails: {
+    ...ORDER,
+    accumulate: true,
+    fetch: false,
+  },
+  linesLimit: LINES_LIMIT,
+  closingReasons: reasonsForClosureResource,
+  fund: FUND,
+  approvalsSetting: APPROVALS_SETTING,
+  expenseClass: {
+    ...baseManifest,
+    accumulate: true,
+    fetch: false,
+  },
+  generatedOrderNumber: ORDER_NUMBER,
+  updateEncumbrances: updateEncumbrancesResource,
+});
+
+export const PO_PROP_TYPES = {
+  history: ReactRouterPropTypes.history.isRequired,
+  location: ReactRouterPropTypes.location.isRequired,
+  match: ReactRouterPropTypes.match.isRequired,
+  mutator: PropTypes.object.isRequired,
+  resources: PropTypes.object.isRequired,
+  refreshList: PropTypes.func.isRequired,
+  stripes: PropTypes.object.isRequired,
 };

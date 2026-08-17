@@ -14,7 +14,7 @@ export const useDefaultReceivingSearchSettings = (options = {}) => {
 
   const searchParams = {
     limit: 1,
-    query: `key=${CENTRAL_ORDERING_DEFAULT_RECEIVING_SEARCH_SETTINGS_KEY}`,
+    query: `key=="${CENTRAL_ORDERING_DEFAULT_RECEIVING_SEARCH_SETTINGS_KEY}"`,
   };
 
   const {

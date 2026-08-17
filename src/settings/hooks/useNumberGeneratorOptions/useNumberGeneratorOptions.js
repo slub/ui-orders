@@ -14,7 +14,7 @@ export const useNumberGeneratorOptions = () => {
 
   const searchParams = {
     limit: 1,
-    query: `key=${NUMBER_GENERATOR_SETTINGS_KEY}`,
+    query: `key=="${NUMBER_GENERATOR_SETTINGS_KEY}"`,
   };
 
   const {

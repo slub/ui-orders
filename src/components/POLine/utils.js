@@ -149,6 +149,24 @@ export const getPoLineFieldsLabelMap = ({
 
     // Ongoing PO details fields
     'renewalNote': 'ui-orders.poLine.renewalNote',
+    'multiYearPayment': 'ui-orders.poLine.multiYearPayment',
+
+    // Payment terms fields
+    'paymentTerms': 'ui-orders.line.accordion.paymentTerms',
+    'paymentTerms.totalPrice': 'ui-orders.poLine.paymentTerms.totalPrice',
+    'paymentTerms.prepaymentTerm': 'ui-orders.poLine.paymentTerms.prepaymentTerm',
+    'paymentTerms.startingFiscalYearId': 'ui-orders.poLine.paymentTerms.startingFY',
+    'paymentTerms.fiscalYearDistributions': 'ui-orders.line.accordion.paymentTerms',
+    'paymentTerms.fiscalYearDistributions[\\d]': 'ui-orders.line.accordion.paymentTerms',
+    'paymentTerms.fiscalYearDistributions[\\d].fiscalYearId': 'ui-orders.poLine.paymentTerms.startingFY',
+    'paymentTerms.fiscalYearDistributions[\\d].fundDistributions': 'ui-orders.line.accordion.fund',
+    'paymentTerms.fiscalYearDistributions[\\d].fundDistributions[\\d]': 'ui-orders.line.accordion.fund',
+    'paymentTerms.fiscalYearDistributions[\\d].fundDistributions[\\d].fundId': 'stripes-acq-components.fundDistribution.name',
+    'paymentTerms.fiscalYearDistributions[\\d].fundDistributions[\\d].code': 'stripes-acq-components.fundDistribution.name',
+    'paymentTerms.fiscalYearDistributions[\\d].fundDistributions[\\d].expenseClassId': 'stripes-acq-components.fundDistribution.expenseClass',
+    'paymentTerms.fiscalYearDistributions[\\d].fundDistributions[\\d].value': 'stripes-acq-components.fundDistribution.value',
+    'paymentTerms.fiscalYearDistributions[\\d].fundDistributions[\\d].distributionType': 'stripes-acq-components.fundDistribution.value',
+    'paymentTerms.fiscalYearDistributions[\\d].fundDistributions[\\d].encumbrance': 'stripes-acq-components.fundDistribution.currentEncumbrance',
 
     // Vendor details fields
     'vendorDetail.noteFromVendor': 'ui-orders.vendor.referenceNumbers',

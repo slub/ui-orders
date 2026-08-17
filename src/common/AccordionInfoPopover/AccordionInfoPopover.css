@@ -1,0 +1,4 @@
+.icon:hover svg,
+.icon.open svg {
+  fill: var(--primary);
+}

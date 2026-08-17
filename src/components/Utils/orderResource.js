@@ -1,6 +1,9 @@
 import { cloneDeep, omit } from 'lodash';
 
-import { ORDER_TYPE } from '../../common/constants';
+import {
+  ORDER_TYPE,
+  WORKFLOW_STATUS,
+} from '../../common/constants';
 
 const saveOrder = (order, mutator) => {
   let method = mutator.POST;
@@ -44,6 +47,14 @@ export const createOrEditOrderResource = (orderFormValues, mutator) => {
   return saveOrder(clonedOrder, mutator);
 };
 
+export const reopenOrder = (order, mutator) => {
+  return updateOrderResource(
+    omit(order, ['closeReason', 'openedById']),
+    mutator,
+    { workflowStatus: WORKFLOW_STATUS.open },
+  );
+};
+
 export const cloneOrder = async (order, mutator, orderNumberMutator, lines) => {
   const orderNumberResponse = await orderNumberMutator.GET();
   const poNumber = orderNumberResponse?.poNumber;
@@ -56,7 +67,7 @@ export const cloneOrder = async (order, mutator, orderNumberMutator, lines) => {
       [
         'id', 'adjustment', 'metadata', 'poNumber', 'workflowStatus',
         'poLines', 'approved', 'approvedById', 'approvalDate',
-        'nextPolNumber',
+        'nextPolNumber', 'closeReason', 'openedById',
       ],
     ),
     poNumber,

@@ -96,6 +96,7 @@ class PODetailsForm extends Component {
               <FieldPrefix
                 isNonInteractive={isPostPendingOrder}
                 prefixes={prefixesSetting}
+                shouldValidate={canUserEditOrderNumber}
               />
             </Col>
           </IfFieldVisible>
@@ -120,6 +121,7 @@ class PODetailsForm extends Component {
               <FieldSuffix
                 isNonInteractive={isPostPendingOrder}
                 suffixes={suffixesSetting}
+                shouldValidate={canUserEditOrderNumber}
               />
             </Col>
           </IfFieldVisible>

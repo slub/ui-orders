@@ -11,6 +11,7 @@ import { PO_FORM_FIELDS } from '../constants';
 const FieldSuffix = ({
   isNonInteractive = false,
   suffixes,
+  shouldValidate,
   ...rest
 }) => {
   return (
@@ -19,7 +20,7 @@ const FieldSuffix = ({
       isNonInteractive={isNonInteractive}
       label={<FormattedMessage id="ui-orders.orderDetails.orderNumberSuffix" />}
       name={PO_FORM_FIELDS.poNumberSuffix}
-      validateFields={[PO_FORM_FIELDS.poNumber]}
+      validateFields={shouldValidate ? [PO_FORM_FIELDS.poNumber] : []}
       {...rest}
     />
   );

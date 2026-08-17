@@ -14,7 +14,7 @@ export const useRoutingAddressSettings = (options = {}) => {
 
   const searchParams = {
     limit: 1,
-    query: `key=${ROUTING_USER_ADDRESS_TYPE_ID}`,
+    query: `key=="${ROUTING_USER_ADDRESS_TYPE_ID}"`,
   };
 
   const {

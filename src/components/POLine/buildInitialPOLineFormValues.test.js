@@ -182,4 +182,46 @@ describe('buildInitialPOLineFormValues', () => {
       source: sourceValues.user,
     });
   });
+
+  it('should keep a template acquisition method that is not deprecated', () => {
+    const template = {
+      id: 'templ-1',
+      acquisitionMethod: 'acq-active',
+    };
+
+    const result = buildInitialPOLineFormValues({
+      enabled: true,
+      template,
+      order: { id: 'ord-4' },
+      acqMethods: [
+        { id: 'acq-active', deprecated: false },
+        { id: 'acq-deprecated', deprecated: true },
+      ],
+    });
+
+    expect(result.acquisitionMethod).toBe('acq-active');
+  });
+
+  it('should clear a deprecated acquisition method coming from a template', () => {
+    const template = {
+      id: 'templ-1',
+      acquisitionMethod: 'acq-deprecated',
+    };
+
+    const result = buildInitialPOLineFormValues({
+      enabled: true,
+      template,
+      order: { id: 'ord-5' },
+      acqMethods: [
+        { id: 'acq-active', deprecated: false },
+        { id: 'acq-deprecated', deprecated: true },
+      ],
+    });
+
+    expect(result).toEqual({
+      purchaseOrderId: 'ord-5',
+      source: sourceValues.user,
+    });
+    expect(result.acquisitionMethod).toBeUndefined();
+  });
 });

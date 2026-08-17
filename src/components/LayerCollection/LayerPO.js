@@ -135,7 +135,7 @@ function LayerPO({
         }
       })
       .catch(async e => {
-        await handleErrorResponse(e, openOrderErrorModalShow);
+        await handleErrorResponse(e, { openModal: openOrderErrorModalShow });
       })
       .finally(() => setIsLoading(false));
   }, [

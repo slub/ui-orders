@@ -1,6 +1,6 @@
 {
   "name": "@folio/orders",
-  "version": "9.0.4",
+  "version": "10.0.0",
   "description": "Description for orders",
   "main": "src/index.js",
   "repository": "",
@@ -16,7 +16,7 @@
     "okapiInterfaces": {
       "acquisition-order-events": "1.0",
       "acquisition-order-line-events": "1.0",
-      "acquisition-methods": "1.0",
+      "acquisition-methods": "1.1",
       "acquisitions-units": "1.1",
       "configuration.prefixes": "1.2",
       "configuration.reasons-for-closure": "1.0",
@@ -606,10 +606,10 @@
     "@bigtest/interactor": "^0.9.3",
     "@bigtest/mocha": "^0.5.1",
     "@bigtest/react": "^0.1.2",
-    "@folio/eslint-config-stripes": "^8.0.0",
-    "@folio/jest-config-stripes": "^3.0.0",
+    "@folio/eslint-config-stripes": "^9.0.0",
+    "@folio/jest-config-stripes": "^3.1.0",
     "@folio/stripes": "^10.0.0",
-    "@folio/stripes-cli": "^4.0.0",
+    "@folio/stripes-cli": "^5.0.0",
     "chai": "^4.2.0",
     "core-js": "^3.6.1",
     "eslint": "^7.32.0",
@@ -631,8 +631,8 @@
     "sinon": "^7.0.0"
   },
   "dependencies": {
-    "@folio/plugin-find-po-line": "^6.1.1",
-    "@folio/stripes-acq-components": "~7.1.0",
+    "@folio/plugin-find-po-line": "^7.0.0",
+    "@folio/stripes-acq-components": "~7.2.0",
     "@folio/stripes-template-editor": "^3.2.0",
     "classnames": "^2.2.5",
     "dompurify": "^3.0.9",

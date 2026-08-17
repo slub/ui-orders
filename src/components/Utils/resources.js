@@ -102,7 +102,7 @@ export const LINES_LIMIT = {
   path: ORDERS_STORAGE_SETTINGS_API,
   GET: {
     params: {
-      query: `key=${CONFIG_LINES_LIMIT}`,
+      query: `key=="${CONFIG_LINES_LIMIT}"`,
     },
   },
 };
@@ -133,7 +133,7 @@ export const CREATE_INVENTORY = {
   records: 'settings',
   GET: {
     params: {
-      query: `key=${CONFIG_CREATE_INVENTORY}`,
+      query: `key=="${CONFIG_CREATE_INVENTORY}"`,
     },
   },
 };
@@ -144,7 +144,7 @@ export const ORDER_NUMBER_SETTING = {
   records: 'settings',
   GET: {
     params: {
-      query: `key=${CONFIG_ORDER_NUMBER}`,
+      query: `key=="${CONFIG_ORDER_NUMBER}"`,
     },
   },
 };
@@ -155,7 +155,7 @@ export const APPROVALS_SETTING = {
   records: 'settings',
   GET: {
     params: {
-      query: `key=${CONFIG_APPROVALS}`,
+      query: `key=="${CONFIG_APPROVALS}"`,
     },
   },
 };
@@ -223,7 +223,7 @@ export const OPEN_ORDER_SETTING = {
   records: 'settings',
   GET: {
     params: {
-      query: `key=${CONFIG_OPEN_ORDER}`,
+      query: `key=="${CONFIG_OPEN_ORDER}"`,
     },
   },
 };

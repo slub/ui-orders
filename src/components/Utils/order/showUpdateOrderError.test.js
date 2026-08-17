@@ -1,5 +1,7 @@
 import showUpdateOrderError from './showUpdateOrderError';
 
+import { PO_UPDATE_ACTION_TYPES } from '../../../common/constants';
+
 const getResponseMock = ({ code, message, parameters }) => {
   return {
     clone: jest.fn().mockReturnThis(),
@@ -22,11 +24,22 @@ const params = {
   openModal: jest.fn(),
 };
 
+const getOptions = (overrides = {}) => ({
+  callout: params.callout,
+  openModal: params.openModal,
+  ...overrides,
+});
+
 describe('showUpdateOrderError', () => {
+  beforeEach(() => {
+    params.callout.sendCallout.mockClear();
+    params.openModal.mockClear();
+  });
+
   it('should handle error and open modal', async () => {
     const response = getResponseMock({ code: 'vendorIsInactive' });
 
-    await showUpdateOrderError(response, params.callout, params.openModal);
+    await showUpdateOrderError(response, getOptions());
 
     expect(params.openModal).toHaveBeenCalled();
   });
@@ -34,7 +47,7 @@ describe('showUpdateOrderError', () => {
   it('should handle error and show message', async () => {
     const response = getResponseMock({ code: 'missingInstanceStatus' });
 
-    await showUpdateOrderError(response, params.callout, params.openModal);
+    await showUpdateOrderError(response, getOptions());
 
     expect(params.callout.sendCallout).toHaveBeenCalled();
   });
@@ -48,7 +61,7 @@ describe('showUpdateOrderError', () => {
       }],
     });
 
-    await showUpdateOrderError(response, params.callout, params.openModal);
+    await showUpdateOrderError(response, getOptions());
 
     expect(params.callout.sendCallout).toHaveBeenCalled();
   });
@@ -65,7 +78,7 @@ describe('showUpdateOrderError', () => {
       }],
     });
 
-    await showUpdateOrderError(response, params.callout, params.openModal);
+    await showUpdateOrderError(response, getOptions());
 
     expect(params.callout.sendCallout).toHaveBeenCalled();
   });
@@ -79,13 +92,61 @@ describe('showUpdateOrderError', () => {
       }],
     });
 
-    await showUpdateOrderError(response, params.callout, params.openModal);
+    await showUpdateOrderError(response, getOptions());
 
     expect(params.callout.sendCallout).toHaveBeenCalled();
   });
 
-  it('should handle default error case', async () => {
-    await showUpdateOrderError(...Object.values(params));
+  it('should append actionType suffix for `budgetNotFoundForFiscalYear` error', async () => {
+    const response = getResponseMock({
+      code: 'budgetNotFoundForFiscalYear',
+      parameters: [{
+        key: 'fundCodes',
+        value: '["F1","F2"]',
+      }, {
+        key: 'fiscalYearCode',
+        value: 'FY26',
+      }],
+    });
+
+    await showUpdateOrderError(response, getOptions({
+      actionType: PO_UPDATE_ACTION_TYPES.APPROVE,
+    }));
+
+    expect(params.callout.sendCallout).toHaveBeenCalledWith(expect.objectContaining({
+      messageId: 'ui-orders.errors.budgetNotFoundForFiscalYear.approve',
+      values: expect.objectContaining({
+        fiscalYearCode: 'FY26',
+        fundCodes: 'F1, F2',
+      }),
+    }));
+  });
+
+  it('should not append suffix for open action in `budgetNotFoundForFiscalYear` error', async () => {
+    const response = getResponseMock({
+      code: 'budgetNotFoundForFiscalYear',
+      parameters: [{
+        key: 'fundCodes',
+        value: '["F1"]',
+      }, {
+        key: 'fiscalYearCode',
+        value: 'FY26',
+      }],
+    });
+
+    await showUpdateOrderError(response, getOptions({
+      actionType: PO_UPDATE_ACTION_TYPES.OPEN,
+    }));
+
+    expect(params.callout.sendCallout).toHaveBeenCalledWith(expect.objectContaining({
+      messageId: 'ui-orders.errors.budgetNotFoundForFiscalYear',
+      values: expect.objectContaining({
+        fiscalYearCode: 'FY26',
+        fundCodes: 'F1',
+      }),
+    }));
+
+    await showUpdateOrderError(params.response, getOptions());
 
     expect(params.callout.sendCallout).toHaveBeenCalled();
   });

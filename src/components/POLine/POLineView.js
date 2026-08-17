@@ -101,6 +101,7 @@ import {
   useChangeInstanceConnection,
 } from './ChangeInstanceConnection';
 import { OngoingOrderView } from './OngoingOrder';
+import { PaymentTermsViewContainer } from './PaymentTerms';
 import { POLineActionMenu } from './POLineActionMenu';
 import {
   ACCORDION_ID,
@@ -126,6 +127,7 @@ const initialAccordionStatus = {
   [ACCORDION_ID.linkedInstances]: false,
   [ACCORDION_ID.exportDetails]: false,
   [ACCORDION_ID.ongoingOrder]: true,
+  [ACCORDION_ID.paymentTerms]: true,
 };
 
 const defaultProps = {
@@ -451,8 +453,9 @@ const POLineView = ({
                     id={ACCORDION_ID.ongoingOrder}
                   >
                     <OngoingOrderView
-                      renewalNote={line.renewalNote}
+                      multiYearPayment={line.multiYearPayment}
                       hiddenFields={hiddenFields}
+                      renewalNote={line.renewalNote}
                     />
                   </Accordion>
                 )}
@@ -497,6 +500,21 @@ const POLineView = ({
                     />
                   </Accordion>
                 </IfVisible>
+
+                {isOngoing(order.orderType) && line.multiYearPayment && (
+                  <IfVisible visible={!hiddenFields?.paymentTerms}>
+                    <Accordion
+                      id={ACCORDION_ID.paymentTerms}
+                      label={<FormattedMessage id="ui-orders.line.accordion.paymentTerms" />}
+                    >
+                      <PaymentTermsViewContainer
+                        currency={currency}
+                        hiddenFields={hiddenFields?.paymentTerms}
+                        paymentTerms={line.paymentTerms}
+                      />
+                    </Accordion>
+                  </IfVisible>
+                )}
 
                 <IfVisible visible={!hiddenFields?.locations}>
                   <Accordion

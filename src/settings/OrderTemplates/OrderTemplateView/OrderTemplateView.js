@@ -54,6 +54,7 @@ import { useIsFundsRestrictedByLocationIds } from '../../../components/POLine/ho
 import { ItemView } from '../../../components/POLine/Item';
 import LocationView from '../../../components/POLine/Location/LocationView';
 import { OngoingOrderView } from '../../../components/POLine/OngoingOrder';
+import { PaymentTermsViewContainer } from '../../../components/POLine/PaymentTerms';
 import { OtherView } from '../../../components/POLine/Other';
 import { PhysicalView } from '../../../components/POLine/Physical';
 import { POLineDetails } from '../../../components/POLine/POLineDetails';
@@ -85,6 +86,7 @@ const sections = {
   [ORDER_TEMPLATES_ACCORDION.POL_ITEM_DETAILS]: false,
   [ORDER_TEMPLATES_ACCORDION.POL_DETAILS]: false,
   [ORDER_TEMPLATES_ACCORDION.POL_ONGOING_ORDER]: false,
+  [ORDER_TEMPLATES_ACCORDION.POL_PAYMENT_TERMS]: false,
   [ORDER_TEMPLATES_ACCORDION.POL_COST_DETAILS]: false,
   [ORDER_TEMPLATES_ACCORDION.POL_VENDOR]: false,
   [ORDER_TEMPLATES_ACCORDION.POL_FUND_DISTIBUTION]: false,
@@ -363,7 +365,10 @@ const OrderTemplateView = (props) => {
                       label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_ONGOING_ORDER]}
                       id={ORDER_TEMPLATES_ACCORDION.POL_ONGOING_ORDER}
                     >
-                      <OngoingOrderView renewalNote={orderTemplate.renewalNote} />
+                      <OngoingOrderView
+                        multiYearPayment={orderTemplate.multiYearPayment}
+                        renewalNote={orderTemplate.renewalNote}
+                      />
                     </Accordion>
                   )}
 
@@ -397,6 +402,18 @@ const OrderTemplateView = (props) => {
                       totalAmount={estimatedPrice}
                     />
                   </Accordion>
+
+                  {isOngoing(orderType) && orderTemplate.multiYearPayment && (
+                    <Accordion
+                      label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_PAYMENT_TERMS]}
+                      id={ORDER_TEMPLATES_ACCORDION.POL_PAYMENT_TERMS}
+                    >
+                      <PaymentTermsViewContainer
+                        currency={orderTemplate.cost?.currency}
+                        paymentTerms={orderTemplate.paymentTerms}
+                      />
+                    </Accordion>
+                  )}
 
                   <Accordion
                     label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_LOCATION]}

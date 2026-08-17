@@ -1,0 +1,1 @@
+export { useDeprecatedAcqMethods } from './useDeprecatedAcqMethods';

@@ -12,9 +12,9 @@ const useHandleOrderUpdateError = (mutatorExpenseClass) => {
   const sendCallout = useShowCallout();
 
   // this is required to avoid huge refactoring of processing error messages for now
-  const context = useMemo(() => ({ sendCallout }), [sendCallout]);
+  const callout = useMemo(() => ({ sendCallout }), [sendCallout]);
 
-  const handleErrorResponse = useCallback(async (response, orderErrorModalShow, defaultCode, toggleDeletePieces) => {
+  const handleErrorResponse = useCallback(async (response, options = {}) => {
     try {
       const { errors } = await response.clone().json();
       const errorCode = errors?.[0]?.code;
@@ -33,13 +33,13 @@ const useHandleOrderUpdateError = (mutatorExpenseClass) => {
           });
         }
       } else {
-        await showUpdateOrderError(response, context, orderErrorModalShow, defaultCode, toggleDeletePieces);
+        await showUpdateOrderError(response, { callout, ...options });
       }
-    } catch (e) {
-      await showUpdateOrderError(response, context);
+    } catch {
+      await showUpdateOrderError(response, { callout, ...options });
     }
     throw new Error('Order update error');
-  }, [context, mutator, sendCallout]);
+  }, [callout, mutator, sendCallout]);
 
   return [handleErrorResponse];
 };

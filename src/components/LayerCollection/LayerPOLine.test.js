@@ -52,6 +52,7 @@ jest.mock('@folio/stripes-acq-components', () => ({
   useShowCallout: jest.fn(),
 }));
 jest.mock('../../common/hooks', () => ({
+  useAcqMethods: jest.fn().mockReturnValue({ acqMethods: [], isLoading: false }),
   useOpenOrderSettings: jest.fn().mockReturnValue({ isFetching: false, openOrderSettings: {} }),
   useLinesLimit: jest.fn().mockReturnValue({ isLoading: false, linesLimit: 1 }),
   useOrder: jest.fn(),

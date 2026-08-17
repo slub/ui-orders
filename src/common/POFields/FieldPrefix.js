@@ -11,6 +11,7 @@ import { PO_FORM_FIELDS } from '../constants';
 const FieldPrefix = ({
   isNonInteractive = false,
   prefixes,
+  shouldValidate,
   ...rest
 }) => {
   return (
@@ -19,7 +20,7 @@ const FieldPrefix = ({
       isNonInteractive={isNonInteractive}
       label={<FormattedMessage id="ui-orders.orderDetails.orderNumberPrefix" />}
       name={PO_FORM_FIELDS.poNumberPrefix}
-      validateFields={[PO_FORM_FIELDS.poNumber]}
+      validateFields={shouldValidate ? [PO_FORM_FIELDS.poNumber] : []}
       {...rest}
     />
   );

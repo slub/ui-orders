@@ -28,6 +28,26 @@ const getExportUserIds = (lines = [], orders = []) => {
 
 const extractUniqueFlat = (array, extractor) => uniq(array.flatMap(item => extractor(item) || []).filter(Boolean));
 
+// Extracts expense class ids from regular POL fund distributions.
+const getFundDistributionExpenseClassIds = ({ fundDistribution }) => (
+  fundDistribution?.map(({ expenseClassId }) => expenseClassId)
+);
+
+// Extracts expense class ids from a payment term's fund distribution list.
+const getFundDistributionsExpenseClassIds = (fundDistributions = []) => (
+  fundDistributions?.map(({ expenseClassId }) => expenseClassId)
+);
+
+// Flattens expense class ids across all payment term fiscal year distributions.
+const getFiscalYearDistributionsExpenseClassIds = (fiscalYearDistributions = []) => (
+  fiscalYearDistributions?.flatMap(({ fundDistributions }) => getFundDistributionsExpenseClassIds(fundDistributions))
+);
+
+// Extracts expense class ids from nested payment terms data on a POL.
+const getPaymentTermsExpenseClassIds = ({ paymentTerms }) => (
+  getFiscalYearDistributionsExpenseClassIds(paymentTerms?.fiscalYearDistributions)
+);
+
 export const getExportData = (
   mutator,
   ky,
@@ -40,7 +60,16 @@ export const getExportData = (
   /* Orders based */
   const acqUnitsIds = extractUniqueFlat(orders, ({ acqUnitIds }) => acqUnitIds);
   const addressIds = extractUniqueFlat(orders, ({ billTo, shipTo }) => [billTo, shipTo]);
-  const fiscalYearIds = extractUniqueFlat(orders, ({ fiscalYearId }) => fiscalYearId);
+  const fiscalYearIds = Array.from(new Set([
+    ...extractUniqueFlat(
+      orders,
+      ({ fiscalYearId }) => fiscalYearId,
+    ), // Fiscal year of the order
+    ...extractUniqueFlat(
+      lines,
+      ({ paymentTerms }) => paymentTerms?.fiscalYearDistributions?.map(({ fiscalYearId }) => fiscalYearId),
+    ), // Fiscal years of the POLine payment term
+  ]));
   const orderVendorIds = extractUniqueFlat(orders, (({ vendor }) => vendor));
 
   /* Lines based */
@@ -51,10 +80,14 @@ export const getExportData = (
     lines,
     ({ contributors }) => contributors?.map(({ contributorNameTypeId }) => contributorNameTypeId),
   );
-  const expenseClassIds = extractUniqueFlat(
-    lines,
-    ({ fundDistribution }) => fundDistribution?.map(({ expenseClassId }) => expenseClassId),
-  );
+  const expenseClassIds = Array.from(new Set([
+    ...extractUniqueFlat(
+      lines,
+      getFundDistributionExpenseClassIds,
+    ), // Expense classes of the POLine fund distribution
+    ...extractUniqueFlat(lines, getPaymentTermsExpenseClassIds), // Expense classes of the POLine payment term fund distribution
+  ]));
+
   const identifierTypeIds = extractUniqueFlat(
     lines,
     ({ details }) => details?.productIds?.map(({ productIdType }) => productIdType),

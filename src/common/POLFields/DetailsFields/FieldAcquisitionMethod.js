@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import { useFormState } from 'react-final-form';
 
 import {
   FieldSelectionFinal,
@@ -15,7 +16,15 @@ const FieldAcquisitionMethod = ({
   ...props
 }) => {
   const { acqMethods } = useAcqMethods();
-  const acquisitionMethods = useAcqMethodsOptions(acqMethods);
+  const { initialValues } = useFormState({ subscription: { initialValues: true } });
+  const initialAcqMethod = initialValues?.[POL_FORM_FIELDS.acquisitionMethod];
+
+  // Deprecated methods are hidden, except the saved (initial) one, which stays selectable with a suffix.
+  const acquisitionMethods = useAcqMethodsOptions(acqMethods, {
+    excludeDeprecated: true,
+    selectedValue: initialAcqMethod,
+    withDeprecatedSuffix: true,
+  });
 
   return (
     <FieldSelectionFinal

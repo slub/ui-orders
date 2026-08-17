@@ -77,7 +77,7 @@ POLinesLimit.manifest = Object.freeze({
     path: ORDERS_STORAGE_SETTINGS_API,
     GET: {
       params: {
-        query: `key=${CONFIG_LINES_LIMIT}`,
+        query: `key=="${CONFIG_LINES_LIMIT}"`,
       },
     },
   },

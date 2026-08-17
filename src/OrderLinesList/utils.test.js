@@ -2,8 +2,6 @@ import { ResponseErrorsContainer } from '@folio/stripes-acq-components';
 
 import { ERROR_CODES } from '../common/constants';
 import {
-  applyExportedFilter,
-  buildExportedQuery,
   fetchLinesOrders,
   handleOrderLinesListLoadingError,
 } from './utils';
@@ -172,46 +170,5 @@ describe('OrderLinesList utils', () => {
         }),
       );
     });
-  });
-});
-
-describe('buildExportedQuery', () => {
-  it('should match lines that carry an export date', () => {
-    expect(buildExportedQuery('true')).toBe('lastEDIExportDate=""');
-  });
-
-  it('should match lines without an export date', () => {
-    expect(buildExportedQuery('false')).toBe('(cql.allRecords=1 NOT lastEDIExportDate="")');
-  });
-
-  it.each([
-    ['no selection', undefined],
-    ['both options selected', ['true', 'false']],
-  ])('should not restrict the query for %s', (_, filterValue) => {
-    expect(buildExportedQuery(filterValue)).toBeUndefined();
-  });
-});
-
-describe('applyExportedFilter', () => {
-  const query = '(cql.allRecords=1) sortby metadata.updatedDate/sort.descending';
-
-  it('should splice the clause in ahead of the sorting', () => {
-    expect(applyExportedFilter(query, 'true')).toBe(
-      '(cql.allRecords=1) and lastEDIExportDate="" sortby metadata.updatedDate/sort.descending',
-    );
-  });
-
-  it('should append the clause when the query is not sorted', () => {
-    expect(applyExportedFilter('(cql.allRecords=1)', 'true')).toBe(
-      '(cql.allRecords=1) and lastEDIExportDate=""',
-    );
-  });
-
-  it('should leave the query untouched when the filter is not set', () => {
-    expect(applyExportedFilter(query, undefined)).toBe(query);
-  });
-
-  it('should not build a query when the plugin did not build one', () => {
-    expect(applyExportedFilter(undefined, 'true')).toBeUndefined();
   });
 });

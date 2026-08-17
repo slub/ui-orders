@@ -17,7 +17,12 @@ import {
 import { ViewMetaData } from '@folio/stripes/smart-components';
 import { ORDER_FORMATS } from '@folio/stripes-acq-components';
 
-import { VersionKeyValue } from '../../../common/VersionView';
+import { isOngoing } from '../../../common/POFields';
+
+import {
+  VersionCheckbox,
+  VersionKeyValue,
+} from '../../../common/VersionView';
 import {
   ACCORDION_ID,
   ERESOURCES,
@@ -32,7 +37,9 @@ import { LocationVersionView } from './LocationVersionView/LocationVersionView';
 import { OtherVersionView } from './OtherVersionView';
 import { PhysicalVersionView } from './PhysicalVersionView';
 import { POLineDetailsVersionView } from './POLineDetailsVersionView';
+import { PaymentTermsVersionView } from './PaymentTermsVersionView';
 import { VendorVersionView } from './VendorVersionView';
+import { POL_FORM_FIELDS } from '../../../common/constants';
 
 const POLineVersion = ({
   version,
@@ -91,11 +98,24 @@ const POLineVersion = ({
             id={ACCORDION_ID.ongoingOrder}
           >
             <Row start="xs">
-              <Col xs={12}>
+              <Col
+                xs={12}
+                lg={6}
+              >
                 <VersionKeyValue
                   name="renewalNote"
                   label={<FormattedMessage id="ui-orders.poLine.renewalNote" />}
                   value={version?.renewalNote}
+                />
+              </Col>
+              <Col
+                xs={12}
+                lg={6}
+              >
+                <VersionCheckbox
+                  name={POL_FORM_FIELDS.multiYearPayment}
+                  checked={version?.multiYearPayment}
+                  label={<FormattedMessage id="ui-orders.poLine.multiYearPayment" />}
                 />
               </Col>
             </Row>
@@ -128,6 +148,15 @@ const POLineVersion = ({
           >
             <FundDistributionVersionView version={version} />
           </Accordion>
+
+          {isOngoing(version?.order?.orderType) && version?.multiYearPayment && (
+            <Accordion
+              label={<FormattedMessage id="ui-orders.line.accordion.paymentTerms" />}
+              id={ACCORDION_ID.paymentTerms}
+            >
+              <PaymentTermsVersionView version={version} />
+            </Accordion>
+          )}
 
           <Accordion
             label={<FormattedMessage id="ui-orders.line.accordion.location" />}

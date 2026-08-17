@@ -50,6 +50,7 @@ import {
   WORKFLOW_STATUS,
 } from '../../common/constants';
 import {
+  useAcqMethods,
   useInstance,
   useLinesLimit,
   useOpenOrderSettings,
@@ -225,7 +226,11 @@ function LayerPOLine({
     funds,
     isLoading: isFundsLoading,
   } = useFunds();
-  /*  */
+
+  const {
+    acqMethods,
+    isLoading: isAcqMethodsLoading,
+  } = useAcqMethods();
 
   const { isOpenOrderEnabled, isDuplicateCheckDisabled } = openOrderSettings;
 
@@ -601,13 +606,15 @@ function LayerPOLine({
     !isOrderLineLoading &&
     !isVendorLoading &&
     !isCustomFieldsLoading &&
-    !isFundsLoading
+    !isFundsLoading &&
+    !isAcqMethodsLoading
   );
 
   const initialValues = useMemo(() => {
     return lineId
       ? poLine
       : buildInitialPOLineFormValues({
+        acqMethods,
         createInventorySetting,
         customFields,
         enabled: !isntLoaded, // to prevent building initial values until all necessary data is loaded
@@ -620,6 +627,7 @@ function LayerPOLine({
         vendor,
       });
   }, [
+    acqMethods,
     createInventorySetting,
     customFields,
     identifierTypeOptions,

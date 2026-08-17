@@ -122,7 +122,7 @@ describe('createExportReport', () => {
       [address],
       [{ id: orderLine.acquisitionMethod, value: 'Purchase' }],
       [{ id: vendor?.organizationTypes?.[0], name: 'Test type' }],
-    )).toEqual(expect.objectContaining(exportReport));
+    )).toEqual(expect.arrayContaining([expect.objectContaining(exportReport[0])]));
   });
 
   it('should properly parse activation due date', () => {
@@ -185,5 +185,79 @@ describe('createExportReport', () => {
     expect(exportRow.orderType).toEqual(order.orderType);
     expect(exportRow.workflowStatus).toEqual(order.workflowStatus);
     expect(exportRow.note).toEqual(order.notes.join('|'));
+  });
+
+  it('should include prepayment data for multi-year payment line', () => {
+    const { result } = renderHook(() => useIntl());
+    const intl = result.current;
+
+    const paymentTermsLine = {
+      ...orderLine,
+      multiYearPayment: true,
+      paymentTerms: {
+        totalPrice: 3500,
+        prepaymentTerm: 2,
+        startingFiscalYearId: 'fy-2026',
+        fiscalYearDistributions: [
+          {
+            fiscalYearId: 'fy-2026',
+            fundDistributions: [
+              {
+                code: 'USHIST',
+                value: 50,
+                distributionType: 'percentage',
+                expenseClassId: expenseClass.id,
+              },
+            ],
+          },
+          {
+            fiscalYearId: 'fy-2027',
+            fundDistributions: [
+              {
+                code: 'USHIST',
+                value: 50,
+                distributionType: 'percentage',
+                expenseClassId: expenseClass.id,
+              },
+            ],
+          },
+        ],
+      },
+    };
+
+    const fiscalYears = [
+      { id: 'fy-2026', code: 'FY2026' },
+      { id: 'fy-2027', code: 'FY2027' },
+    ];
+
+    const [exportRow] = createExportReport(
+      intl,
+      [paymentTermsLine],
+      [order],
+      [],
+      [vendor],
+      [user],
+      [acqUnit],
+      [materialType],
+      [location],
+      [],
+      [contributorNameType],
+      [identifierType],
+      [expenseClass],
+      [address],
+      [{ id: orderLine.acquisitionMethod, value: 'Purchase' }],
+      [{ id: vendor?.organizationTypes?.[0], name: 'Test type' }],
+      fiscalYears,
+    );
+
+    expect(exportRow.multiYearPayment).toBe(true);
+    expect(exportRow.prepaymentTotalPrice).toBe(3500);
+    expect(exportRow.prepaymentTerm).toBe(2);
+    expect(exportRow.prepaymentStartingFY).toBe('FY2026');
+    expect(typeof exportRow.prepaymentFYDistribution).toBe('string');
+    expect(exportRow.prepaymentFYDistribution).toContain('"FY2026"');
+    expect(exportRow.prepaymentFYDistribution).toContain('"FY2027"');
+    expect(exportRow.prepaymentFYDistribution).toContain(expenseClass.name);
+    expect(exportRow.prepaymentFYDistribution).toContain('"1750"');
   });
 });

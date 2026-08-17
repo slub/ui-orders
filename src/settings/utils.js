@@ -40,6 +40,19 @@ export const checkboxFieldType = ({ fieldProps }) => (
   />
 );
 
+export const FormatAcqMethodDeprecated = ({ value, deprecated }) => (
+  <DeprecatedCheckbox
+    name={value}
+    deprecated={deprecated}
+    messageId="ui-orders.settings.acquisitionMethods.aria-label.deprecated"
+  />
+);
+
+FormatAcqMethodDeprecated.propTypes = {
+  value: PropTypes.string.isRequired,
+  deprecated: PropTypes.bool.isRequired,
+};
+
 export const FormatPrefixDeprecated = ({ name, deprecated }) => (
   <DeprecatedCheckbox
     name={name}

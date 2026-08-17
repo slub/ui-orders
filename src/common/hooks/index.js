@@ -1,6 +1,7 @@
 export * from './consortium';
 export * from './useAcqMethod';
 export * from './useAcqMethods';
+export * from './useDeprecatedAcqMethods';
 export * from './useErrorAccordionStatus';
 export { default as useCloseReasonOptions } from './useCloseReasonOptions';
 export * from './useExportHistory';

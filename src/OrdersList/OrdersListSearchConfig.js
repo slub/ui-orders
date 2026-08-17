@@ -22,7 +22,7 @@ const customSearchMap = {
 function getCqlQuery(query, qindex, dateFormat, customField) {
   return customField?.type === CUSTOM_FIELDS_TYPES.DATE_PICKER
     ? searchByDate(query, dateFormat)
-    : customSearchMap[qindex]?.(query, dateFormat) || `*${query}*`;
+    : customSearchMap[qindex]?.(query, dateFormat) || `${query}`;
 }
 
 const getKeywordQuery = (query, dateFormat, customFields) => {
@@ -51,7 +51,7 @@ export function makeSearchQuery(dateFormat, customFields) {
 
       const cqlQuery = getCqlQuery(query, qindex, dateFormat, customField);
 
-      return `(${qindex}==${cqlQuery})`;
+      return `${qindex}=="${cqlQuery}"`;
     }
 
     return getKeywordQuery(query, dateFormat, customFields);

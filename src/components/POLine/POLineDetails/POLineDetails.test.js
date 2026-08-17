@@ -56,27 +56,34 @@ describe('POLineDetails', () => {
   });
 
   describe('getAcquisitionMethodValue', () => {
+    const intl = { formatMessage: ({ id }) => id };
+
     it('should return \'null\' if PO Line \'acquisitionMethod\' is undefined or null', () => {
-      const acqMethodValue = getAcquisitionMethodValue(null, null);
+      const acqMethodValue = getAcquisitionMethodValue(null, null, intl);
 
       expect(acqMethodValue).toBeNull();
     });
 
     it('should return \'invalid reference\' label if acq method with specified ID was not loaded', () => {
-      const acqMethodValue = getAcquisitionMethodValue('testAcqMethod', null);
+      const acqMethodValue = getAcquisitionMethodValue('testAcqMethod', null, intl);
 
       expect(acqMethodValue).toEqual(<FormattedMessage id="ui-orders.acquisitionMethod.invalid" />);
     });
 
     it('should return translated label for acq method', () => {
-      const acqMethodValue = getAcquisitionMethodValue('acqMethod', { value: ACQUISITION_METHOD.approvalPlan });
+      const acqMethodValue = getAcquisitionMethodValue('acqMethod', { value: ACQUISITION_METHOD.approvalPlan }, intl);
 
-      expect(acqMethodValue).toEqual(
-        <FormattedMessage
-          id="stripes-acq-components.acquisition_method.approvalPlan"
-          defaultMessage={ACQUISITION_METHOD.approvalPlan}
-        />,
+      expect(acqMethodValue).toBe('stripes-acq-components.acquisition_method.approvalPlan');
+    });
+
+    it('should suffix a deprecated acq method label', () => {
+      const acqMethodValue = getAcquisitionMethodValue(
+        'acqMethod',
+        { value: ACQUISITION_METHOD.approvalPlan, deprecated: true },
+        intl,
       );
+
+      expect(acqMethodValue).toBe('stripes-acq-components.acquisition_method.deprecatedSuffix');
     });
   });
 

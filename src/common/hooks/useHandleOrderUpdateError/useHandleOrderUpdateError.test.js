@@ -28,6 +28,14 @@ const getMockResponse = (code = 'inactiveExpenseClass', key = 'expenseClassId') 
   }),
 });
 
+const getInvalidResponse = () => ({
+  clone: () => ({
+    json: () => {
+      throw new Error('Invalid response');
+    },
+  }),
+});
+
 describe('useHandleOrderUpdateError', () => {
   const sendCallout = jest.fn();
 
@@ -57,13 +65,49 @@ describe('useHandleOrderUpdateError', () => {
 
   it('should handle response with another error code', async () => {
     const { result } = renderHook(() => useHandleOrderUpdateError(mutator));
+    const openModal = jest.fn();
+    const onNoBudgetForFiscalYear = jest.fn();
 
     try {
-      await result.current[0](() => getMockResponse(''));
+      await result.current[0](getMockResponse('genericError'), {
+        openModal,
+        genericCode: 'custom.error',
+        actionType: 'onNoBudgetForFiscalYear',
+        onNoBudgetForFiscalYear,
+      });
 
-      expect(showUpdateOrderError).toHaveBeenCalled();
+      expect(showUpdateOrderError).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
+        openModal,
+        genericCode: 'custom.error',
+        actionType: 'onNoBudgetForFiscalYear',
+        onNoBudgetForFiscalYear,
+      }));
     } catch (e) {
       expect(e.message).toEqual('Order update error');
     }
+  });
+
+  it('should forward all options when response parsing fails', async () => {
+    const { result } = renderHook(() => useHandleOrderUpdateError(mutator));
+    const openModal = jest.fn();
+    const toggleDeletePieces = jest.fn();
+
+    try {
+      await result.current[0](getInvalidResponse(), {
+        openModal,
+        genericCode: 'custom.error',
+        toggleDeletePieces,
+        actionType: 'approve',
+      });
+    } catch (e) {
+      expect(e.message).toEqual('Order update error');
+    }
+
+    expect(showUpdateOrderError).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
+      openModal,
+      genericCode: 'custom.error',
+      toggleDeletePieces,
+      actionType: 'approve',
+    }));
   });
 });

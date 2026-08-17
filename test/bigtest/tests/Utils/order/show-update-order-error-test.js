@@ -49,7 +49,7 @@ describe('showUpdateOrderError', () => {
         ]);
         fakeOpenModal = sinon.spy();
 
-        await showUpdateOrderError(fakeResponse, fakeCallout, fakeOpenModal);
+        await showUpdateOrderError(fakeResponse, { callout: fakeCallout, openModal: fakeOpenModal });
       });
 
       it('call callout with right error', () => {
@@ -75,7 +75,7 @@ describe('showUpdateOrderError', () => {
       fakeResponse = getMockedResponse(ERRORS);
       fakeOpenModal = sinon.spy();
 
-      await showUpdateOrderError(fakeResponse, fakeCallout, fakeOpenModal);
+      await showUpdateOrderError(fakeResponse, { callout: fakeCallout, openModal: fakeOpenModal });
     });
 
     it('call open error modal with vendorIsInactive error code', () => {
@@ -100,7 +100,7 @@ describe('showUpdateOrderError', () => {
       fakeResponse = getMockedResponse(ERRORS);
       fakeOpenModal = sinon.spy();
 
-      await showUpdateOrderError(fakeResponse, fakeCallout, fakeOpenModal);
+      await showUpdateOrderError(fakeResponse, { callout: fakeCallout, openModal: fakeOpenModal });
     });
 
     it('call open error modal with vendorNotFound error code', () => {
@@ -131,7 +131,7 @@ describe('showUpdateOrderError', () => {
       fakeResponse = getMockedResponse(ERRORS);
       fakeOpenModal = sinon.spy();
 
-      await showUpdateOrderError(fakeResponse, fakeCallout, fakeOpenModal);
+      await showUpdateOrderError(fakeResponse, { callout: fakeCallout, openModal: fakeOpenModal });
     });
 
     it('call open error modal with proper POL number in message', () => {
@@ -166,7 +166,7 @@ describe('showUpdateOrderError', () => {
       fakeResponse = getMockedResponse(ERRORS);
       fakeOpenModal = sinon.spy();
 
-      await showUpdateOrderError(fakeResponse, fakeCallout, fakeOpenModal);
+      await showUpdateOrderError(fakeResponse, { callout: fakeCallout, openModal: fakeOpenModal });
     });
 
     it('call open error modal with proper POL number in message', () => {
@@ -204,7 +204,7 @@ describe('showUpdateOrderError', () => {
       fakeResponse = getMockedResponse(ERRORS);
       fakeOpenModal = sinon.spy();
 
-      await showUpdateOrderError(fakeResponse, fakeCallout, fakeOpenModal);
+      await showUpdateOrderError(fakeResponse, { callout: fakeCallout, openModal: fakeOpenModal });
     });
 
     it('call callout with budgetExpenseClassNotFound error', () => {

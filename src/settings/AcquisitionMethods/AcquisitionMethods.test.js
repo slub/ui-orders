@@ -1,5 +1,3 @@
-import { FormattedMessage } from 'react-intl';
-
 import { render, screen } from '@folio/jest-config-stripes/testing-library/react';
 import { ControlledVocab } from '@folio/stripes/smart-components';
 import { ACQUISITION_METHOD } from '@folio/stripes-acq-components';
@@ -32,14 +30,31 @@ describe('AcquisitionMethods', () => {
     expect(screen.getByText('ControlledVocab')).toBeInTheDocument();
   });
 
-  it('formatter should return formatted message with acq method value', () => {
+  it('formatter should return the translated acq method label', () => {
     renderAcquisitionMethods();
 
-    expect(ControlledVocab.mock.calls[0][0].formatter.value({ value: ACQUISITION_METHOD.purchase })).toEqual(
-      <FormattedMessage
-        id="stripes-acq-components.acquisition_method.purchase"
-        defaultMessage={ACQUISITION_METHOD.purchase}
-      />,
-    );
+    expect(ControlledVocab.mock.calls[0][0].formatter.value({ value: ACQUISITION_METHOD.purchase }))
+      .toBe('stripes-acq-components.acquisition_method.purchase');
+  });
+
+  it('should allow editing all rows and suppress delete only for System methods', () => {
+    renderAcquisitionMethods();
+
+    const { actionSuppressor } = ControlledVocab.mock.calls[0][0];
+
+    expect(actionSuppressor.edit({ source: 'System' })).toBe(false);
+    expect(actionSuppressor.edit({ source: 'User' })).toBe(false);
+
+    expect(actionSuppressor.delete({ source: 'System' })).toBe(true);
+    expect(actionSuppressor.delete({ source: 'User' })).toBe(false);
+  });
+
+  it('should keep the name read-only for System methods only', () => {
+    renderAcquisitionMethods();
+
+    const { getReadOnlyFieldsForItem } = ControlledVocab.mock.calls[0][0];
+
+    expect(getReadOnlyFieldsForItem({ source: 'System' })).toEqual(['value']);
+    expect(getReadOnlyFieldsForItem({ source: 'User' })).toEqual([]);
   });
 });

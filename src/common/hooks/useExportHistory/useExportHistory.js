@@ -5,14 +5,17 @@ import {
   useOkapiKy,
   useNamespace,
 } from '@folio/stripes/core';
-import { batchRequest } from '@folio/stripes-acq-components';
+import {
+  batchRequest,
+  buildMultiOptionCqlQuery,
+} from '@folio/stripes-acq-components';
 
 import { EXPORT_HISTORY_API } from '../../../components/Utils/api';
 
 const buildQueryByPoLineIds = (poLineIds) => {
-  const query = poLineIds.map(id => `"*\\"${id}\\"*"`).join(' or ');
+  const cql = buildMultiOptionCqlQuery('exportedPoLineIds', poLineIds);
 
-  return `exportedPoLineIds==(${query}) sortby exportDate/sort.descending`;
+  return `${cql} sortby exportDate/sort.descending`;
 };
 
 export const useExportHistory = (poLineIds = []) => {

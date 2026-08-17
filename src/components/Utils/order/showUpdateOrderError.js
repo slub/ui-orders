@@ -13,6 +13,16 @@ import {
 
 const POL_NUMBER_KEY = 'poLineNumber';
 
+/**
+ * @typedef {object} ShowUpdateOrderErrorOptions
+ * @property {{ sendCallout: function }} callout
+ * @property {string} [actionType]
+ * @property {string} [genericCode]
+ * @property {function} [openModal]
+ * @property {function} [toggleDeletePieces]
+ * @property {*} [strategyOptions]
+ */
+
 const showMessage = (callout, code, errors, path) => {
   const title = get(errors.getError().parameters, '0.value', '');
 
@@ -28,13 +38,19 @@ const showMessage = (callout, code, errors, path) => {
   });
 };
 
-const showUpdateOrderError = async (
-  response,
-  callout,
-  openModal,
-  genericCode = ERROR_CODES.orderGenericError1,
-  toggleDeletePieces = null,
-) => {
+/**
+ * @param {Response} response
+ * @param {ShowUpdateOrderErrorOptions} [options]
+ */
+const showUpdateOrderError = async (response, options = {}) => {
+  const {
+    callout,
+    openModal,
+    genericCode = ERROR_CODES.orderGenericError1,
+    toggleDeletePieces = null,
+    ...strategyOptions
+  } = options;
+
   const { handler } = await ResponseErrorsContainer.create(response);
 
   const errorCode = handler.getError().code;
@@ -75,7 +91,7 @@ const showUpdateOrderError = async (
       break;
     }
     case ERROR_CODES.budgetExpenseClassNotFound: {
-      handler.handle(noExpenseClassesStrategy({ callout }));
+      handler.handle(noExpenseClassesStrategy({ callout, ...strategyOptions }));
       break;
     }
     case ERROR_CODES.fundCannotBePaid: {
@@ -85,11 +101,11 @@ const showUpdateOrderError = async (
       break;
     }
     case ERROR_CODES.fundLocationRestrictionViolation: {
-      handler.handle(restrictedLocationViolationStrategy({ callout }));
+      handler.handle(restrictedLocationViolationStrategy({ callout, ...strategyOptions }));
       break;
     }
     case ERROR_CODES.budgetNotFoundForFiscalYear: {
-      handler.handle(noBudgetForFiscalYearStrategy({ callout }));
+      handler.handle(noBudgetForFiscalYearStrategy({ callout, ...strategyOptions }));
       break;
     }
     default: {

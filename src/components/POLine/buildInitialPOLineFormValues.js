@@ -25,6 +25,7 @@ const INVENTORY_FIELDS_TO_CLEAR = [
 ];
 
 export const buildInitialPOLineFormValues = ({
+  acqMethods,
   createInventorySetting,
   customFields,
   enabled,
@@ -45,6 +46,7 @@ export const buildInitialPOLineFormValues = ({
 
   const initialValues = template?.id
     ? buildInitialValuesBasedOnTemplate({
+      acqMethods,
       customFields,
       essentialInitialValues,
       template,
@@ -113,6 +115,7 @@ function buildInitialValuesWithoutTemplate({
 }
 
 function buildInitialValuesBasedOnTemplate({
+  acqMethods,
   customFields,
   essentialInitialValues,
   template,
@@ -134,6 +137,16 @@ function buildInitialValuesBasedOnTemplate({
 
     return acc;
   }, { ...essentialInitialValues });
+
+  // Don't carry a deprecated method over from a template — the required field forces a re-pick.
+  const templateAcqMethodId = initialValues[POL_FORM_FIELDS.acquisitionMethod];
+  const isTemplateAcqMethodDeprecated = acqMethods?.some(
+    ({ id, deprecated }) => deprecated && id === templateAcqMethodId,
+  );
+
+  if (isTemplateAcqMethodDeprecated) {
+    delete initialValues[POL_FORM_FIELDS.acquisitionMethod];
+  }
 
   return initialValues;
 }

@@ -25,6 +25,7 @@ import {
   useOrder,
   useOrderLine,
 } from '../../../../common/hooks';
+import { usePaymentTermsFiscalYears } from '../../PaymentTerms/hooks';
 
 export const useSelectedPOLineVersion = ({ versionId, versions, snapshotPath, centralOrdering }, options = {}) => {
   const intl = useIntl();
@@ -42,6 +43,15 @@ export const useSelectedPOLineVersion = ({ versionId, versions, snapshotPath, ce
   ), [snapshotPath, currentVersion]);
 
   const linkedPackagePoLineId = versionSnapshot?.packagePoLineId;
+
+  const startingFiscalYearId = versionSnapshot?.paymentTerms?.startingFiscalYearId;
+  const {
+    fiscalYears: paymentTermsFiscalYears,
+    isLoading: isFiscalYearsLoading,
+  } = usePaymentTermsFiscalYears(
+    startingFiscalYearId,
+    { enabled: Boolean(versionSnapshot?.multiYearPayment && startingFiscalYearId) },
+  );
 
   const {
     order,
@@ -110,6 +120,7 @@ export const useSelectedPOLineVersion = ({ versionId, versions, snapshotPath, ce
       return {
         ...versionSnapshot,
         order,
+        paymentTermsFiscalYears,
         locationsList: locations,
         acquisitionMethod: (
           acqMethods.find(({ id }) => id === versionSnapshot?.acquisitionMethod)?.value || deletedRecordLabel
@@ -146,7 +157,8 @@ export const useSelectedPOLineVersion = ({ versionId, versions, snapshotPath, ce
         && !isOrderLineLoading
         && !isLinkedOrderLineLoading
         && !isAcqMethodsLoading
-        && !isLocationsLoading,
+        && !isLocationsLoading
+        && !isFiscalYearsLoading,
       ),
       ...options,
     },
@@ -159,6 +171,7 @@ export const useSelectedPOLineVersion = ({ versionId, versions, snapshotPath, ce
     || isAcqMethodsLoading
     || isVersionDataLoading
     || isLocationsLoading
+    || isFiscalYearsLoading
   );
 
   return {

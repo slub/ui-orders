@@ -43,19 +43,66 @@ const getProductIdData = (line, identifierTypeMap, invalidReferenceLabel) => (
   }).join(' | ')
 );
 
-const getFundDistributionData = (line, expenseClassMap, invalidReferenceLabel) => (
-  line.fundDistribution?.map(fund => {
-    const expenseClassName = fund?.expenseClassId
-      ? expenseClassMap[fund?.expenseClassId]?.name ?? invalidReferenceLabel
-      : '';
+// Builds a reusable CSV fragment for a single fund distribution row.
+const buildFundDistributionValue = (
+  line,
+  fundDistributionItem,
+  expenseClassMap,
+  invalidReferenceLabel,
+  amountBase = line.cost?.poLineEstimatedPrice || 0,
+) => {
+  const expenseClassName = fundDistributionItem?.expenseClassId
+    ? expenseClassMap[fundDistributionItem?.expenseClassId]?.name ?? invalidReferenceLabel
+    : '';
 
-    return (
-      `"${fund.code || ''}""${expenseClassName}"
-      "${fund.value || '0'}${fund.distributionType === FUND_DISTR_TYPE.percent ? '%' : ''}"
-      "${calculateFundAmount(fund, line.cost?.poLineEstimatedPrice || 0, line.cost?.currency || 0)}"`
-    );
-  }).join(' | ').replace(/\n\s+/g, '')
+  return (
+    `"${fundDistributionItem.code || ''}""${expenseClassName}"
+      "${fundDistributionItem.value || '0'}${fundDistributionItem.distributionType === FUND_DISTR_TYPE.percent ? '%' : ''}"
+      "${calculateFundAmount(fundDistributionItem, amountBase, line.cost?.currency || 0)}"`
+  );
+};
+
+// Formats the regular POL fund distributions into a pipe-delimited CSV value.
+const getFundDistributionData = (line, expenseClassMap, invalidReferenceLabel) => (
+  line.fundDistribution
+    ?.map((fund) => buildFundDistributionValue(line, fund, expenseClassMap, invalidReferenceLabel))
+    ?.join(' | ')
+    ?.replace(/\n\s+/g, '')
 );
+
+// Formats prepayment distributions and prefixes each fund distribution with its fiscal year code.
+const getPrepaymentFYDistributionData = (line, fiscalYearsMap, expenseClassMap, invalidReferenceLabel) => {
+  const prepaymentTotalPrice = line.paymentTerms?.totalPrice || 0;
+
+  return line.paymentTerms?.fiscalYearDistributions?.flatMap((fyDistribution) => {
+    const fiscalYearCode = fiscalYearsMap[fyDistribution?.fiscalYearId]?.code ?? invalidReferenceLabel;
+
+    return fyDistribution?.fundDistributions
+      ?.map((fundDistributionItem) => {
+        const fundDistributionString = buildFundDistributionValue(
+          line,
+          fundDistributionItem,
+          expenseClassMap,
+          invalidReferenceLabel,
+          prepaymentTotalPrice,
+        );
+
+        return `"${fiscalYearCode}"${fundDistributionString}`;
+      })
+      || [];
+  })
+    ?.join(' | ')
+    ?.replace(/\n\s+/g, '');
+};
+
+// Resolves payment terms starting fiscal year id to a fiscal year code for export.
+const getPrepaymentStartingFiscalYearData = (line, fiscalYearsMap, invalidReferenceLabel) => {
+  const startingFiscalYearId = line.paymentTerms?.startingFiscalYearId;
+
+  return startingFiscalYearId
+    ? fiscalYearsMap[startingFiscalYearId]?.code ?? invalidReferenceLabel
+    : '';
+};
 
 const getLocationData = (line, locationMap, holdingMap, invalidReferenceLabel) => (
   line.locations?.map(l => {
@@ -231,9 +278,10 @@ const getOrderExportData = ({
 
 const getOrderLineExportData = ({
   acquisitionMethodsMap,
+  contributorNameTypeMap,
   customFields,
   expenseClassMap,
-  contributorNameTypeMap,
+  fiscalYearsMap,
   holdingMap,
   identifierTypeMap,
   intl,
@@ -292,6 +340,16 @@ const getOrderLineExportData = ({
     poLineEstimatedPrice: lineRecord.cost?.poLineEstimatedPrice,
     currency: lineRecord.cost?.currency,
     fundDistribution: getFundDistributionData(lineRecord, expenseClassMap, invalidReference),
+    multiYearPayment: lineRecord?.multiYearPayment,
+    prepaymentTotalPrice: lineRecord?.paymentTerms?.totalPrice,
+    prepaymentTerm: lineRecord?.paymentTerms?.prepaymentTerm,
+    prepaymentStartingFY: getPrepaymentStartingFiscalYearData(lineRecord, fiscalYearsMap, invalidReference),
+    prepaymentFYDistribution: getPrepaymentFYDistributionData(
+      lineRecord,
+      fiscalYearsMap,
+      expenseClassMap,
+      invalidReference,
+    ),
     location: getLocationData(lineRecord, locationMap, holdingMap, invalidReference),
     materialSupplier: materialSupplier && (vendorMap[materialSupplier]?.code ?? invalidReference),
     receiptDue: formatDate(lineRecord.physical?.receiptDue, intl),
@@ -357,9 +415,10 @@ const getExportRow = ({
   const orderLineExportData = lineRecord
     ? getOrderLineExportData({
       acquisitionMethodsMap,
+      contributorNameTypeMap,
       customFields,
       expenseClassMap,
-      contributorNameTypeMap,
+      fiscalYearsMap,
       holdingMap,
       identifierTypeMap,
       intl,

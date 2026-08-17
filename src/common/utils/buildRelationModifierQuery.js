@@ -1,3 +1,7 @@
+import { buildMultiOptionCqlQuery } from '@folio/stripes-acq-components';
+
 export const buildRelationModifierQuery = (filterKey, relationModifier, filterValue) => {
-  return `${filterKey}=/@${relationModifier} (${Array.isArray(filterValue) ? filterValue.join(' or ') : filterValue})`;
+  const modifiers = [{ name: relationModifier }];
+
+  return buildMultiOptionCqlQuery(filterKey, filterValue, { modifiers });
 };

@@ -15,9 +15,6 @@ import {
 
 import { getLinesQuery } from '@folio/plugin-find-po-line';
 
-import { EXPORTED_FILTER } from '../../constants';
-import { applyExportedFilter } from '../../utils';
-
 export const useOrderLinesList = (
   {
     customFields,
@@ -35,15 +32,13 @@ export const useOrderLinesList = (
   const { search } = useLocation();
   const localeDateFormat = useLocaleDateFormat();
   const queryParams = queryString.parse(search);
-  // Kept out of the plugin's builder, which would render it as `exported==true`.
-  const { [EXPORTED_FILTER]: exportedFilter, ...pluginQueryParams } = queryParams;
-  const buildQuery = getLinesQuery(pluginQueryParams, ky, localeDateFormat, customFields);
+  const buildQuery = getLinesQuery(queryParams, ky, localeDateFormat, customFields);
   const filtersCount = getFiltersCount(queryParams);
 
   const { isFetching, data = {} } = useQuery(
     [namespace, pagination.timestamp, pagination.limit, pagination.offset],
     async ({ signal }) => {
-      const query = applyExportedFilter(await buildQuery({ timezone }), exportedFilter);
+      const query = await buildQuery({ timezone });
 
       if (!filtersCount || !query) {
         return { orderLines: [], orderLinesCount: 0, query };

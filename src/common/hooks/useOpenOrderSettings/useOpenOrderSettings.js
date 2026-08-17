@@ -21,7 +21,7 @@ export const useOpenOrderSettings = (options = {}) => {
   const [namespace] = useNamespace({ key: 'open-order-settings' });
 
   const searchParams = {
-    query: `key=${CONFIG_OPEN_ORDER}`,
+    query: `key=="${CONFIG_OPEN_ORDER}"`,
   };
 
   const { isFetching, data } = useQuery(

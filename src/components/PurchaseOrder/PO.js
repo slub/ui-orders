@@ -1,5 +1,4 @@
 import get from 'lodash/get';
-import PropTypes from 'prop-types';
 import {
   useCallback,
   useEffect,
@@ -11,7 +10,6 @@ import {
   FormattedMessage,
   useIntl,
 } from 'react-intl';
-import ReactRouterPropTypes from 'react-router-prop-types';
 
 import {
   IfPermission,
@@ -19,7 +17,6 @@ import {
   stripesConnect,
 } from '@folio/stripes/core';
 import {
-  baseManifest,
   CUSTOM_FIELDS_ORDERS_BACKEND_NAME,
   getErrorCodeFromResponse,
   handleKeyCommand,
@@ -71,16 +68,13 @@ import {
   INVOICES_ROUTE,
   ORDERS_ROUTE,
   PO_CONFIG_NAME_PREFIX,
+  PO_UPDATE_ACTION_TYPES,
   REEXPORT_SOURCES,
   SCOPE_CUSTOM_FIELDS_MANAGE,
   WORKFLOW_STATUS,
 } from '../../common/constants';
 import { useHandleOrderUpdateError } from '../../common/hooks';
 import { isOngoing } from '../../common/POFields';
-import {
-  reasonsForClosureResource,
-  updateEncumbrancesResource,
-} from '../../common/resources';
 import {
   getCommonErrorMessage,
   getExportAccountNumbers,
@@ -92,17 +86,15 @@ import ModalDeletePieces from '../ModalDeletePieces';
 import { LINES_LIMIT_DEFAULT } from '../Utils/const';
 import {
   cloneOrder,
+  reopenOrder as reopenOrderResource,
   updateOrderResource,
 } from '../Utils/orderResource';
-import {
-  APPROVALS_SETTING,
-  FUND,
-  LINES_LIMIT,
-  ORDER_NUMBER,
-  ORDER,
-} from '../Utils/resources';
 import CloseOrderModal from './CloseOrder';
-import { LINE_LISTING_COLUMN_MAPPING } from './constants';
+import {
+  LINE_LISTING_COLUMN_MAPPING,
+  PO_MANIFEST,
+  PO_PROP_TYPES,
+} from './constants';
 import { getPOActionMenu } from './getPOActionMenu';
 import {
   useOrderMutation,
@@ -263,7 +255,7 @@ const PO = ({
         refreshList();
       })
       .catch(e => {
-        return handleErrorResponse(e, orderErrorModalShow, 'clone.error');
+        return handleErrorResponse(e, { openModal: orderErrorModalShow, genericCode: 'clone.error' });
       })
       .finally(() => setIsLoading(false));
   }, [
@@ -327,6 +319,8 @@ const PO = ({
       },
     };
 
+    const actionType = isCancelReason ? PO_UPDATE_ACTION_TYPES.CANCEL : PO_UPDATE_ACTION_TYPES.CLOSE;
+
     setIsCancelReason(false);
     toggleCloseOrderModal();
     setIsLoading(true);
@@ -339,19 +333,24 @@ const PO = ({
 
           return refetch();
         },
-        e => handleErrorResponse(e, orderErrorModalShow, 'closeOrder'),
+        (e) => handleErrorResponse(e, {
+          actionType,
+          genericCode: 'closeOrder',
+          openModal: orderErrorModalShow,
+        }),
       )
       .finally(() => setIsLoading(false));
   }, [
-    toggleCloseOrderModal,
-    order,
+    handleErrorResponse,
+    isCancelReason,
     mutator.orderDetails,
-    sendCallout,
-    refreshList,
+    order,
+    orderErrorModalShow,
     refetch,
     refetchFiscalYears,
-    handleErrorResponse,
-    orderErrorModalShow,
+    refreshList,
+    sendCallout,
+    toggleCloseOrderModal,
   ]);
 
   const cancelClosingOrder = useCallback(() => {
@@ -371,8 +370,11 @@ const PO = ({
 
           return refetch();
         },
-        e => {
-          return handleErrorResponse(e, orderErrorModalShow);
+        (e) => {
+          return handleErrorResponse(e, {
+            actionType: PO_UPDATE_ACTION_TYPES.APPROVE,
+            openModal: orderErrorModalShow,
+          });
         },
       )
       .finally(() => setIsLoading(false));
@@ -417,8 +419,13 @@ const PO = ({
 
           return refetch();
         },
-        e => {
-          return handleErrorResponse(e, orderErrorModalShow, ERROR_CODES.orderGenericError1, toggleDeletePieces);
+        (e) => {
+          return handleErrorResponse(e, {
+            actionType: PO_UPDATE_ACTION_TYPES.OPEN,
+            genericCode: ERROR_CODES.orderGenericError1,
+            openModal: orderErrorModalShow,
+            toggleDeletePieces,
+          });
         },
       )
       .finally(() => setIsLoading(false));
@@ -440,12 +447,8 @@ const PO = ({
   ]);
 
   const reopenOrder = useCallback(() => {
-    const openOrderProps = {
-      workflowStatus: WORKFLOW_STATUS.open,
-    };
-
     setIsLoading(true);
-    updateOrderResource(order, mutator.orderDetails, openOrderProps)
+    reopenOrderResource(order, mutator.orderDetails)
       .then(
         () => {
           sendCallout({
@@ -458,8 +461,11 @@ const PO = ({
 
           return refetch();
         },
-        e => {
-          return handleErrorResponse(e, orderErrorModalShow);
+        (e) => {
+          return handleErrorResponse(e, {
+            actionType: PO_UPDATE_ACTION_TYPES.REOPEN,
+            openModal: orderErrorModalShow,
+          });
         },
       )
       .finally(() => setIsLoading(false));
@@ -498,7 +504,10 @@ const PO = ({
           return refetch();
         },
         (e) => {
-          return handleErrorResponse(e?.response, orderErrorModalShow);
+          return handleErrorResponse(e?.response, {
+            actionType: PO_UPDATE_ACTION_TYPES.UNOPEN,
+            openModal: orderErrorModalShow,
+          });
         },
       )
       .finally(() => setIsLoading(false));
@@ -526,8 +535,11 @@ const PO = ({
           search: location.search,
         });
       })
-      .catch(e => {
-        return handleErrorResponse(e, orderErrorModalShow, 'noCreatedOrder');
+      .catch((e) => {
+        return handleErrorResponse(e, {
+          genericCode: 'noCreatedOrder',
+          openModal: orderErrorModalShow,
+        });
       })
       .finally(() => setIsLoading(false));
   }, [
@@ -630,8 +642,12 @@ const PO = ({
 
           return refetch();
         },
-        e => {
-          return handleErrorResponse(e, orderErrorModalShow, 'ui-orders.order.updateEncumbrances.error');
+        (e) => {
+          return handleErrorResponse(e, {
+            actionType: PO_UPDATE_ACTION_TYPES.RE_ENCUMBER,
+            genericCode: 'ui-orders.order.updateEncumbrances.error',
+            openModal: orderErrorModalShow,
+          });
         },
       )
       .finally(() => setIsLoading(false));
@@ -782,6 +798,7 @@ const PO = ({
               {isOpenOrderModalOpened && (
                 <OpenOrderConfirmationModal
                   orderNumber={orderNumber}
+                  orderLines={orderLines}
                   submit={openOrder}
                   cancel={toggleOpenOrderModal}
                 />
@@ -1010,33 +1027,7 @@ const PO = ({
   );
 };
 
-PO.manifest = Object.freeze({
-  orderDetails: {
-    ...ORDER,
-    accumulate: true,
-    fetch: false,
-  },
-  linesLimit: LINES_LIMIT,
-  closingReasons: reasonsForClosureResource,
-  fund: FUND,
-  approvalsSetting: APPROVALS_SETTING,
-  expenseClass: {
-    ...baseManifest,
-    accumulate: true,
-    fetch: false,
-  },
-  generatedOrderNumber: ORDER_NUMBER,
-  updateEncumbrances: updateEncumbrancesResource,
-});
-
-PO.propTypes = {
-  history: ReactRouterPropTypes.history.isRequired,
-  location: ReactRouterPropTypes.location.isRequired,
-  match: ReactRouterPropTypes.match.isRequired,
-  mutator: PropTypes.object.isRequired,
-  resources: PropTypes.object.isRequired,
-  refreshList: PropTypes.func.isRequired,
-  stripes: PropTypes.object.isRequired,
-};
+PO.manifest = PO_MANIFEST;
+PO.propTypes = PO_PROP_TYPES;
 
 export default stripesConnect(PO);

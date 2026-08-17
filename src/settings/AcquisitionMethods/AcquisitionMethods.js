@@ -12,25 +12,32 @@ import {
 import { ControlledVocab } from '@folio/stripes/smart-components';
 import {
   ACQUISITION_METHODS_API,
+  getAcqMethodLabel,
   getControlledVocabTranslations,
 } from '@folio/stripes-acq-components';
 
-import { getTranslatedAcqMethod } from '../../components/Utils/getTranslatedAcqMethod';
+import {
+  checkboxFieldType,
+  FormatAcqMethodDeprecated,
+} from '../utils';
 
 const ACQ_METHODS_SYSTEM_SOURCE = 'System';
 
 const columnMapping = {
   value: <FormattedMessage id="ui-orders.settings.acquisitionMethods.name" />,
+  deprecated: <FormattedMessage id="ui-orders.settings.acquisitionMethods.deprecated" />,
 };
-const visibleFields = ['value'];
+const visibleFields = ['value', 'deprecated'];
 const hiddenFields = ['numberOfObjects', 'lastUpdated'];
 
-const formatter = {
-  // eslint-disable-next-line react/prop-types
-  value: ({ value }) => getTranslatedAcqMethod(value),
+const fieldComponents = {
+  deprecated: checkboxFieldType,
 };
 
-const suppressEdit = ({ source }) => source === ACQ_METHODS_SYSTEM_SOURCE;
+// System rows: allow editing deprecated flag but keep the name read-only
+const getReadOnlyFieldsForItem = (item) => (item.source === ACQ_METHODS_SYSTEM_SOURCE ? ['value'] : []);
+
+const suppressEdit = () => false;
 const suppressDelete = ({ source }) => source === ACQ_METHODS_SYSTEM_SOURCE;
 const actionSuppressor = { edit: suppressEdit, delete: suppressDelete };
 
@@ -42,6 +49,11 @@ class AcquisitionMethods extends Component {
 
   render() {
     const { intl, stripes } = this.props;
+
+    const formatter = {
+      value: (acqMethod) => getAcqMethodLabel(acqMethod, { intl }),
+      deprecated: FormatAcqMethodDeprecated,
+    };
 
     return (
       <TitleManager record={intl.formatMessage({ id: 'ui-orders.settings.acquisitionMethods' })}>
@@ -60,6 +72,9 @@ class AcquisitionMethods extends Component {
           formatter={formatter}
           hiddenFields={hiddenFields}
           visibleFields={visibleFields}
+          fieldComponents={fieldComponents}
+          formType="final-form"
+          getReadOnlyFieldsForItem={getReadOnlyFieldsForItem}
           stripes={stripes}
         />
       </TitleManager>

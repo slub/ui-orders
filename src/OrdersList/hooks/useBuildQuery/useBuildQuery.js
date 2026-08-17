@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 
 import {
-  buildArrayFieldQuery,
   buildDateRangeQuery,
   buildDateTimeRangeQuery,
+  buildMultiOptionCqlQuery,
   getCustomFieldsFilterMap,
   makeQueryBuilder,
   ORDER_STATUSES,
@@ -31,9 +31,10 @@ export function useBuildQuery(customFields) {
         [FILTERS.CLOSE_REASON]: (filterValue) => {
           return `(${FILTERS.CLOSE_REASON}=="${filterValue}" and ${FILTERS.STATUS}=="${ORDER_STATUSES.closed}")`;
         },
-        [FILTERS.TAGS]: buildArrayFieldQuery.bind(null, [FILTERS.TAGS]),
-        [FILTERS.ACQUISITIONS_UNIT]: buildArrayFieldQuery.bind(null, [FILTERS.ACQUISITIONS_UNIT]),
-        [FILTERS.FUND_CODE]: buildRelationModifierQuery.bind(null, FILTERS.FUND_CODE, 'fundId'),
+        [FILTERS.TAGS]: buildMultiOptionCqlQuery.bind(null, FILTERS.TAGS),
+        [FILTERS.ACQUISITIONS_UNIT]: buildMultiOptionCqlQuery.bind(null, FILTERS.ACQUISITIONS_UNIT),
+        [FILTERS.FUND_CODE]: buildRelationModifierQuery.bind(null, FILTERS.FUND_CODE, '@fundId'),
+        [FILTERS.RENEWAL_REVIEW_PERIOD]: buildRelationModifierQuery.bind(null, FILTERS.RENEWAL_REVIEW_PERIOD, 'number'),
         ...customFieldsFilterMap,
       },
     )(queryParams, options);

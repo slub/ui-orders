@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 
 import {
   DeprecatedCheckbox,
+  FormatAcqMethodDeprecated,
   FormatPrefixDeprecated,
   FormatSuffixDeprecated,
   validateDuplicates,
@@ -200,6 +201,36 @@ describe('DeprecatedCheckbox', () => {
 
     expect(checkbox).toBeDisabled();
     expect(checkbox).not.toBeChecked();
+  });
+});
+
+describe('FormatAcqMethodDeprecated', () => {
+  it('renders an unchecked checkbox when deprecated is false with an aria-label', () => {
+    const messageId = 'ui-orders.settings.acquisitionMethods.aria-label.deprecated';
+
+    render(
+      <FormatAcqMethodDeprecated value="Test method" deprecated={false} />,
+    );
+
+    const checkbox = screen.getByRole('checkbox', {
+      name: messageId,
+    });
+
+    expect(checkbox).toBeDisabled();
+    expect(checkbox).not.toBeChecked();
+  });
+
+  it('renders a checked checkbox when deprecated is true', () => {
+    render(
+      <FormatAcqMethodDeprecated value="Test method" deprecated />,
+    );
+
+    const checkbox = screen.getByRole('checkbox', {
+      name: 'ui-orders.settings.acquisitionMethods.aria-label.deprecated',
+    });
+
+    expect(checkbox).toBeDisabled();
+    expect(checkbox).toBeChecked();
   });
 });
 

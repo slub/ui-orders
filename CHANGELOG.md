@@ -1,8 +1,21 @@
 # Change history for ui-orders
 
-## 9.1.0 (IN PROGRESS)
+## 10.0.0 (IN PROGRESS)
 
 * Fix the `budgetExpenseClassNotFound` error handling. Refs UIOR-1552.
+* *BREAKING* Update CQL queries to use the new indices. Refs UIOR-1519.
+* Update the "Ongoing order information" for PO Line to define multi-year payments. Refs UIOR-1528.
+* Use `permanentLoanType` as a fallback for the loan type in the item list format. Refs UIOR-1565.
+* Include prepayment information in order CSV export. Refs UIOR-1535.
+* Deprecate acquisition methods in settings, PO line and templates. Refs UIOR-1157.
+* Do not copy closure reason when duplicating or reopening an order. Refs UIOR-1567.
+* Handle the `budgetNotFoundForFiscalYear` error code based on the intended PO action. Refs UIOR-1568.
+* Implement "Payment terms" form. Refs UIOR-1530.
+
+## [9.0.5](https://github.com/folio-org/ui-orders/tree/v9.0.5) (2026-07-20)
+[Full Changelog](https://github.com/folio-org/ui-orders/compare/v9.0.4...v9.0.5)
+
+* Bump up the minimal version of the `stripes-acq-components` dependency.
 * Add Order email templates settings with token picker and Handlebars backend-rendered preview. Refs UIOR-1492, UIOR-1493, UIOR-1495.
 
 ## [9.0.4](https://github.com/folio-org/ui-orders/tree/v9.0.4) (2026-05-26)

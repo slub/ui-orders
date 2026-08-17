@@ -91,6 +91,7 @@
   "openOrderModal.submit": "Submit",
   "openOrderModal.cancel": "Close",
   "openOrderModal.message": "Are you sure you want to open the order?",
+  "openOrderModal.deprecatedAcquisitionMethods": "{count, plural, one {The acquisition method {methods} has} other {The acquisition methods {methods} have}} been set to deprecated. You can proceed without changing {count, plural, one {it} other {them}}, or close this dialog to change {count, plural, one {it} other {them}} before opening the order.",
   "unopenOrderModal.title": "Unopen - purchase order - {orderNumber}",
   "unopenOrderModal.confirmLabel": "Submit",
   "unopenOrderModal.confirmLabel.keepHoldings.synchronized": "Delete items",
@@ -122,14 +123,11 @@
   "cost.rolloverAdjustment.info": "This value was added during rollover to balance the order cost with your desired encumbrance for the new year. If you edit the cost this value will be eliminated, and the encumbered value will be updated based on the new Estimated Price.",
   "createdDateAndTime": "Created date and time",
   "createdSource": "Created source",
-
   "createInvoice.confirmationModal.title": "Create invoice",
   "createInvoice.confirmationModal.order.message": "Do you want to create an invoice from this order?",
-
   "duplicateLines.confirmation.heading": "Save order line",
   "duplicateLines.confirmation.message": "This appears to be a duplicate order line",
   "duplicateLines.confirmation.title": "Possible duplicate order line",
-
   "eresource.accessProvider": "Access provider",
   "eresource.activationDue": "Activation due",
   "eresource.activationStatus": "Activation status",
@@ -138,7 +136,6 @@
   "eresource.trial": "Trial",
   "eresource.userLimit": "User limit",
   "eresource.url": "URL",
-
   "User does not have permissions - operation is restricted": "User does not have permissions - operation is restricted",
   "error.fetching.vendor": "Error on fetching PO Vendor",
   "errors.accessProviderIsInactive": "POL {poLineNumber} is using an Access Provider that is inactive or has been removed, please select an active Access Provider to continue.",
@@ -146,6 +143,10 @@
   "errors.budgetExpenseClassNotFound": "<b>{expenseClassName}</b> expense class not found on <b>{fundCode}</b> Fund",
   "errors.budgetIsInactive": "Cannot create encumbrance from the not active budget",
   "errors.budgetNotFoundForFiscalYear": "Order cannot be opened because there is no current budget for fund(s) <b>{fundCodes}</b> for fiscal year <b>{fiscalYearCode}</b>.",
+  "errors.budgetNotFoundForFiscalYear.cancel": "To cancel the order, the related fund(s) <b>{fundCodes}</b> must have an active budget for fiscal year <b>{fiscalYearCode}</b>.",
+  "errors.budgetNotFoundForFiscalYear.close": "To close the order, the related fund(s) <b>{fundCodes}</b> must have an active budget for fiscal year <b>{fiscalYearCode}</b>.",
+  "errors.budgetNotFoundForFiscalYear.re-encumber": "To update encumbrances, the related fund(s) <b>{fundCodes}</b> must have an active budget for fiscal year <b>{fiscalYearCode}</b>.",
+  "errors.budgetNotFoundForFiscalYear.unopen": "To unopen the order, the related fund(s) <b>{fundCodes}</b> must have an active budget for fiscal year <b>{fiscalYearCode}</b>.",
   "errors.budgetNotFoundForTransaction": "One or more fund distribution(s) on this order can not be encumbered, because there is no current budget",
   "errors.cannotConvertAmountInvalidCurrency": "The selected currency cannot be converted. Please configure an exchange rate provider that supports this currency.",
   "errors.clone.error": "The purchase order was not cloned",
@@ -172,7 +173,7 @@
   "errors.idMismatch": "Mismatch between id in path and request body",
   "errors.incorrectFundDistributionTotal": "Fund distribution total must add to 100% or totalPrice",
   "errors.InstanceIdNotAllowedForPackagePoLine": "Instance id not allowed for package poline",
-  "errors.invalidProductId" : "Product ID number invalid based on product ID type. You can use \"Change instance connection\" to refresh product IDs from the instance record before editing the POL.",
+  "errors.invalidProductId": "Product ID number invalid based on product ID type. You can use \"Change instance connection\" to refresh product IDs from the instance record before editing the POL.",
   "errors.itemCreationFailed": "The item record failed to be created",
   "errors.itemNotFound": "The item record is not found",
   "errors.itemNotRetrieved": "The item record is not retrieved",
@@ -284,7 +285,6 @@
   "filter.claimSent": "Claim sent",
   "filter.collection": "Collection",
   "filter.expenseClass": "Expense class",
-  "filter.exported": "Exported",
   "filter.false": "No",
   "filter.fundCode": "Fund code",
   "filter.materialType.electronic": "Material type, electronic",
@@ -296,7 +296,6 @@
   "filter.createdBy": "Created by",
   "filter.updatedBy": "Updated by",
   "filter.dateUpdated": "Date updated",
-
   "fund.fundIdentifier": "Fund ID",
   "fund.selectAdjustment": "Select adjustment",
   "fund.value": "Value",
@@ -347,6 +346,8 @@
   "line.accordion.location": "Location",
   "line.accordion.other": "Other resource details",
   "line.accordion.ongoingOrder": "Ongoing order information",
+  "line.accordion.paymentTerms": "Payment terms",
+  "line.accordion.paymentTerms.infoPopover": "To enable the fields in the \"Payment terms\" accordion, select \"Multi-year payment\" in the \"Ongoing order information\" accordion",
   "line.accordion.physical": "Physical resource details",
   "line.accordion.poLine": "Purchase order line",
   "line.accordion.relatedInvoiceLines": "Related invoice lines",
@@ -415,7 +416,6 @@
   "order.notes": "Notes",
   "order.notes.date": "Date",
   "order.notes.type": "Type",
-
   "order.fiscalYear": "Fiscal year",
   "order.fiscalYear.current": "Current",
   "order.fiscalYear.previous": "Previous",
@@ -545,6 +545,17 @@
   "poLine.claimingInterval": "Claiming interval",
   "poLine.isBinderyActive": "Bindery active",
   "poLine.donorOrganizationIds": "Donor information",
+  "poLine.paymentTerms.totalPrice": "Total price",
+  "poLine.paymentTerms.prepaymentTerm": "Prepayment term",
+  "poLine.paymentTerms.validation.notEnoughFYs": "Please ensure all fiscal years have been created for the duration of the prepayment term",
+  "poLine.paymentTerms.startingFY": "Starting fiscal year",
+  "poLine.paymentTerms.startingFY.infoPopover": "Fiscal years must have been created for each year of prepayment.",
+  "poLine.paymentTerms.FYDistributions.action.add": "Add fiscal year",
+  "poLine.paymentTerms.FYDistributions.action.remove": "Remove fiscal year",
+  "poLine.paymentTerms.FYDistributions.card.label": "<b>Fiscal year {sequenceNumber} ({code})</b>",
+  "poLine.paymentTerms.FYDistributions.validation.required": "At least 2 fiscal years must be specified for multi-year prepayment",
+  "poLine.paymentTerms.FYDistributions.validation.noMoreFYs": "No more fiscal years available to add.",
+  "poLine.paymentTerms.fetchFYsError": "Unable to load fiscal years. Please try again.",
   "poLine.receivingWorkflow": "Receiving workflow",
   "poLine.receivingWorkflow.infoPopover": "Selecting synchronized will keep the order quantity and the number of pieces to be received, in sync. This also means updating one will update the other. When the order is opened, the system will generate pieces based on the quantity order. Selecting “independent order and receipt quantity” will allow you to manage the number of receiving pieces and their locations independently. You can convert a POL to independent at anytime but you cannot convert back to synchronized when the order is open or closed.",
   "poLine.receivingWorkflow.independent": "Independent order and receipt quantity",
@@ -564,6 +575,8 @@
   "poLine.location": "POL location",
   "poLine.manualPO.info": "This is a Manual PO so all POLs are excluded from automated export workflows",
   "poLine.materialType": "Material type",
+  "poLine.multiYearPayment": "Multi-year prepayment",
+  "poLine.multiYearPayment.infoPopover": "<p>Select <b>Multi-year prepayment</b> if paying for orders over multiple fiscal years.</p><p>When selected, the fields for <b>Prepayment term</b> and <b>Starting fiscal year</b> will become enabled. The fields within the <b>Payment terms</b> accordion will also become enabled.</p>",
   "poLine.notes": "POL notes",
   "poLine.orderFormat": "Order format",
   "poLine.paymentStatus": "Payment status",
@@ -730,10 +743,8 @@
   "relatedInvoiceLines.vendorName": "Vendor name",
   "relatedInvoiceLines.comment": "Comment",
   "resultCount": "{count, number} {count, plural, one {Record found} other {Records found}}",
-
   "routing.list.accordion.create.button": "Add routing list",
   "routing.list.accordion.tokens.description": "To ensure user-related data is parsed correctly by the rich text editor, use <b>'{{#users}}'</b> at the beginning and <b>'{{/users}}'</b> at the end, inserting <i>'{{firstName}}', '{{lastName}}', '{{routingAddress}}'</i> between those tokens. {br} Ex: <i><b>'{{#users}}'</b> '{{firstName}}' '{{lastName}}' - '{{routingAddress}}' <b>'{{/users}}'</b></i>",
-
   "search": "Search",
   "search.contributors": "Contributor",
   "search.dateOpened": "Date opened",
@@ -751,7 +762,6 @@
   "search.titleOrPackage": "Title or package name",
   "search.vendorDetail.referenceNumbers": "Vendor reference number",
   "search.vendorDetail.vendorAccount": "Vendor account",
-
   "settings": "Orders settings",
   "settings.centralOrdering.label": "Central ordering",
   "settings.centralOrdering.receivingSearch.label": "Set default for receiving search",
@@ -857,11 +867,9 @@
   "settings.routing.listConfiguration.preview.display": "Display",
   "settings.routing.listConfiguration.update.success": "The Routing list configuration notice template was successfully updated.",
   "settings.routing.listConfiguration.update.error": "Something went wrong. The Routing list configuration notice template was not updated.",
-
   "settings.openOrder": "Opening purchase orders",
   "settings.openOrder.isDuplicateCheckDisabled": "Disable duplicate check that occurs when opening orders and saving purchase order lines",
   "settings.openOrder.isOpenOrderEnabled": "Allow save and open purchase order when creating or editing a purchase order line",
-
   "settings.orderTemplates": "Order templates",
   "settings.orderTemplates.accordion.template": "Template information",
   "settings.orderTemplates.accordion.poInfo": "PO information",
@@ -875,6 +883,7 @@
   "settings.orderTemplates.accordion.polCostDetails": "Cost details",
   "settings.orderTemplates.accordion.polVendor": "Vendor",
   "settings.orderTemplates.accordion.polFundDistribution": "Fund distribution",
+  "settings.orderTemplates.accordion.polPaymentTerms": "Payment terms",
   "settings.orderTemplates.accordion.polEResources": "E-resources details",
   "settings.orderTemplates.accordion.polFResources": "Physical resource details",
   "settings.orderTemplates.accordion.polOtherResources": "Other resource details",
@@ -901,7 +910,6 @@
   "settings.orderTemplates.remove.error": "The template was not deleted",
   "settings.orderTemplates.save.success": "The template was saved",
   "settings.orderTemplates.save.error": "The template was not saved",
-
   "settings.orderTemplateCategories": "Order template categories",
   "settings.orderTemplateCategories.sub": "Categories",
   "settings.orderTemplateCategories.field.name": "Name",
@@ -913,7 +921,6 @@
   "settings.orderTemplateCategories.termDeleted": "The category <b>{term}</b> was successfully <b>deleted</b>",
   "settings.orderTemplateCategories.termWillBeDeleted": "The order template category <b>{term}</b> will be <b>deleted.</b>",
   "settings.orderTemplateCategories.validation.duplicates": "Category name must be unique",
-
   "settings.numberGenerator.accessionNumber": "Accession number",
   "settings.numberGenerator.accessionNumberEqualCallNumber": "Use the same generated number for accession number and call number",
   "settings.numberGenerator.accessionNumberEqualCallNumber.warning": "Warning: The checkbox has been disabled because the accession number and/or the call number have been set to manual completion.",
@@ -963,32 +970,27 @@
   "settings.setPOLInesLimit.changed": "The limit of purchase order lines has been successfully saved",
   "settings.setPOLInesLimit.validation": "Please enter a whole number greater than 0 and less than 1000 to continue",
   "settings.setPOLInesLimit": "Set purchase order lines limit",
-
   "settings.acquisitionMethods": "Acquisition methods",
+  "settings.acquisitionMethods.aria-label.deprecated": "Mark {name} as deprecated",
   "settings.acquisitionMethods.cannotDeleteTermHeader": "Cannot delete the acquisition method",
   "settings.acquisitionMethods.cannotDeleteTermMessage": "This acquisition method cannot be deleted, as it is in use by one or more records.",
   "settings.acquisitionMethods.deleteEntry": "Delete acquisition method",
+  "settings.acquisitionMethods.deprecated": "Deprecated",
   "settings.acquisitionMethods.name": "Name",
   "settings.acquisitionMethods.singular": "Acquisition method",
   "settings.acquisitionMethods.termDeleted": "The acquisition method <b>{term}</b> was successfully <b>deleted</b>",
   "settings.acquisitionMethods.termWillBeDeleted": "The acquisition method <b>{term}</b> will be <b>deleted.</b>",
-
   "settings.update.error": "Failed to update the settings.",
-  
   "shortcut.duplicateRecord": "Duplicate a record",
   "shortcut.addPOL": "Add POL",
-
   "showTags": "Show tags",
-
   "title.actions.add": "Add",
   "title.actions.save.success": "The title <b>{title}</b> has been successfully added for <b>PO line {poLineNumber}</b>",
   "title.actions.save.error.genericError": "The title {title} has not been added for PO line {poLineNumber}",
   "title.actions.save.error.titleExist": "The title {title} for PO line {poLineNumber} already exists",
   "title.actions.update.error": "The title was not updated",
-
   "updatedDateAndTime": "Updated date and time",
   "updatedSource": "Updated source",
-
   "user.barcode": "Barcode",
   "user.name": "Name",
   "user.patronGroup": "Patron group",
@@ -1000,17 +1002,14 @@
   "vendor.vendor_status": "Status",
   "vendor.accountNumber": "Account number",
   "vendor.accountNumber.inActive": "The selected account number is inactive.",
-
   "dateOpened": "Date opened",
   "assignedToMe": "Assigned to me",
   "workflowStatus": "Status",
   "workflowStatus.closed": "Closed",
   "workflowStatus.open": "Open",
   "workflowStatus.pending": "Pending",
-
   "navigation.orders": "Orders",
   "navigation.orderLines": "Order lines",
-
   "orderLineList.poLineNumber": "POL number",
   "orderLineList.updatedDate": "Updated date",
   "orderLineList.titleOrPackage": "Title or package name",
@@ -1018,7 +1017,6 @@
   "orderLineList.vendorRefNumber": "Vendor reference number",
   "orderLineList.funCodes": "Fund code",
   "orderLineList.orderWorkflow": "Order status",
-
   "requests.title.single": "An item has an open request",
   "requests.title.multiple": "Multiple items have open requests",
   "requests.message.single": "The following item has an open request",
@@ -1028,13 +1026,10 @@
   "requests.footer.close": "Close",
   "requests.request": "Request",
   "requests.request.isOpened": "Yes",
-
   "poLine": "PO line",
   "poLine.pluralized": "{count} {count, plural, one {PO line} other {PO lines}}",
-
   "versionHistory.updatedByUserId": "Updated by",
   "versionHistory.noVersion": "No version history to display.",
-
   "permission.orders.view": "Orders: Can view Orders and Order lines",
   "permission.orders.create": "Orders: Can create new Orders and Order lines",
   "permission.orders.edit": "Orders: Can edit Orders and Order lines",

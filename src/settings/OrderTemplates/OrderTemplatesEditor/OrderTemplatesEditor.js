@@ -70,6 +70,7 @@ import {
 import { ItemForm } from '../../../components/POLine/Item';
 import { CostForm } from '../../../components/POLine/Cost';
 import { OngoingOrderForm } from '../../../components/POLine/OngoingOrder';
+import { PaymentTermsFormContainer } from '../../../components/POLine/PaymentTerms';
 import TemplateInformationForm from './TemplateInformationForm';
 import PurchaseOrderInformationForm from './PurchaseOrderInformationForm';
 import { OngoingInfoForm } from '../../../components/PurchaseOrder/OngoingOrderInfo';
@@ -96,6 +97,7 @@ const fundDistributionVisibilityControl = <VisibilityControl name="hiddenFields.
 const locationsVisibilityControl = <VisibilityControl name="hiddenFields.locations" detached />;
 const customPOFieldsVisibilityControl = <VisibilityControl name="hiddenFields.customPOFields" detached />;
 const customPOLineFieldsVisibilityControl = <VisibilityControl name="hiddenFields.customPOLineFields" detached />;
+const paymentTermsVisibilityControl = <VisibilityControl name="hiddenFields.paymentTerms" detached />;
 
 const OrderTemplatesEditor = ({
   addresses,
@@ -384,6 +386,17 @@ const OrderTemplatesEditor = ({
                           validateFundDistributionTotal={validateFundDistributionTotal}
                         />
                       </Accordion>
+
+                      {isOngoing(orderType) && (
+                        <Accordion
+                          label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_PAYMENT_TERMS]}
+                          id={ORDER_TEMPLATES_ACCORDION.POL_PAYMENT_TERMS}
+                          displayWhenClosed={paymentTermsVisibilityControl}
+                          displayWhenOpen={paymentTermsVisibilityControl}
+                        >
+                          <PaymentTermsFormContainer isTemplate />
+                        </Accordion>
+                      )}
 
                       <Accordion
                         label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_LOCATION]}

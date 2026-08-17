@@ -25,3 +25,13 @@ export const PO_FORM_FIELDS = {
   vendor: 'vendor',
   workflowStatus: 'workflowStatus',
 };
+
+export const PO_UPDATE_ACTION_TYPES = {
+  APPROVE: 'approve',
+  CANCEL: 'cancel',
+  CLOSE: 'close',
+  OPEN: 'open',
+  RE_ENCUMBER: 're-encumber',
+  REOPEN: 'reopen',
+  UNOPEN: 'unopen',
+};

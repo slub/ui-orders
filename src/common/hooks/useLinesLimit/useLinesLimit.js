@@ -16,7 +16,7 @@ export const useLinesLimit = (enabled = true) => {
   const [namespace] = useNamespace({ key: 'order-lines-limit' });
 
   const searchParams = {
-    query: `key=${CONFIG_LINES_LIMIT}`,
+    query: `key=="${CONFIG_LINES_LIMIT}"`,
   };
 
   const { isLoading, data = {} } = useQuery(
