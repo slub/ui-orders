@@ -51,6 +51,7 @@ import {
 import { POLineVersionView } from '../components/POLine';
 import { isOrderLineCancelled } from '../components/POLine/utils';
 import OrderLinesFiltersContainer from './OrderLinesFiltersContainer';
+import { EXPORT_DATE_INDEX } from './constants';
 import Details from './Details';
 import OrderLinesListActionMenu from './OrderLinesListActionMenu';
 import LineExportSettingsModalContainer from './LineExportSettingModalContainer';
@@ -58,7 +59,7 @@ import LineExportSettingsModalContainer from './LineExportSettingModalContainer'
 const VENDOR_REF_NUMBER = 'vendorDetail.refNumber';
 const UPDATED_DATE = 'metadata.updatedDate';
 const title = <FormattedMessage id="ui-orders.navigation.orderLines" />;
-const sortableColumns = ['poLineNumber', UPDATED_DATE, 'titleOrPackage'];
+const sortableColumns = ['poLineNumber', UPDATED_DATE, 'titleOrPackage', EXPORT_DATE_INDEX];
 
 export const getResultsFormatter = ({ search }) => ({
   poLineNumber: line => {
@@ -93,6 +94,7 @@ export const getResultsFormatter = ({ search }) => ({
   ),
   funCodes: line => line.fundDistribution?.map(({ code }) => code).filter(Boolean).join(', '),
   orderWorkflow: line => ORDER_STATUS_LABEL[line.orderWorkflow],
+  [EXPORT_DATE_INDEX]: line => <FolioFormattedDate value={line[EXPORT_DATE_INDEX]} />,
 });
 
 export const columnMapping = {
@@ -104,6 +106,9 @@ export const columnMapping = {
   funCodes: <FormattedMessage id="ui-orders.orderLineList.funCodes" />,
   orderWorkflow: <FormattedMessage id="ui-orders.orderLineList.orderWorkflow" />,
   acqUnit: <FormattedMessage id="ui-orders.order.acquisitionsUnit" />,
+  // Same label as the matching filter, deliberately sharing the key so the two
+  // can never drift apart.
+  [EXPORT_DATE_INDEX]: <FormattedMessage id="ui-orders.export.exportDate" />,
 };
 
 const DEFAULT_CUSTOM_FIELDS = [];

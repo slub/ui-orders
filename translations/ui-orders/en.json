@@ -284,6 +284,7 @@
   "filter.claimSent": "Claim sent",
   "filter.collection": "Collection",
   "filter.expenseClass": "Expense class",
+  "filter.exported": "Exported",
   "filter.false": "No",
   "filter.fundCode": "Fund code",
   "filter.materialType.electronic": "Material type, electronic",
