@@ -44,6 +44,7 @@ const EmailTemplateForm = ({
   onCancel,
   pristine,
   submitting,
+  values,
 }) => {
   const [editAsHtml, setEditAsHtml] = useState(false);
 
@@ -172,6 +173,7 @@ const EmailTemplateForm = ({
                       previewModalHeader={<FormattedMessage id="ui-orders.settings.emailTemplates.preview" />}
                       previewRenderer="backend"
                       previewContext={SAMPLE_PREVIEW_CONTEXT}
+                      previewSubject={values?.localizedTemplates?.en?.header ?? ''}
                       required
                     />
                   </Col>
@@ -197,6 +199,9 @@ EmailTemplateForm.propTypes = {
   onCancel: PropTypes.func.isRequired,
   pristine: PropTypes.bool,
   submitting: PropTypes.bool,
+  values: PropTypes.shape({
+    localizedTemplates: PropTypes.object,
+  }),
 };
 
 export default stripesFinalForm({
