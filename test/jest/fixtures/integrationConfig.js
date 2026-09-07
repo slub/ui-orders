@@ -1,5 +1,6 @@
 export const integrationConfig = {
   id: 'e9b57fab-1850-44d4-8499-71fd15c845a0',
+  type: 'EDIFACT_ORDERS_EXPORT',
   exportTypeSpecificParameters: {
     vendorEdiOrdersExportConfig: {
       vendorId: 'f0b57fab-1850-44d4-8499-71fd15c845tb',
