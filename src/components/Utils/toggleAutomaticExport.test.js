@@ -1,5 +1,8 @@
 import { integrationConfig } from '../../../test/jest/fixtures';
-import { toggleAutomaticExport } from './toggleAutomaticExport';
+import {
+  getApplicableOrderingIntegrations,
+  toggleAutomaticExport,
+} from './toggleAutomaticExport';
 
 const change = jest.fn();
 const acquisitionMethod = integrationConfig
@@ -18,6 +21,13 @@ const args = {
   integrationConfigs: [integrationConfig],
   change,
 };
+
+const buildConfig = (type, vendorEdiOrdersExportConfig) => ({
+  type,
+  exportTypeSpecificParameters: { vendorEdiOrdersExportConfig },
+});
+const orderingConfig = (config) => buildConfig('EDIFACT_ORDERS_EXPORT', config);
+const claimingConfig = (config) => buildConfig('CLAIMS', { integrationType: 'Claiming', ...config });
 
 describe('toggleAutomaticExport', () => {
   beforeEach(() => {
@@ -43,16 +53,12 @@ describe('toggleAutomaticExport', () => {
     toggleAutomaticExport({
       ...args,
       vendorAccount: null,
-      integrationConfigs: [{
-        exportTypeSpecificParameters: {
-          vendorEdiOrdersExportConfig: {
-            isDefaultConfig: true,
-            ediConfig: {
-              defaultAcquisitionMethods: [acquisitionMethod],
-            },
-          },
+      integrationConfigs: [orderingConfig({
+        isDefaultConfig: true,
+        ediConfig: {
+          defaultAcquisitionMethods: [acquisitionMethod],
         },
-      }],
+      })],
     });
 
     expect(change).toBeCalledWith('automaticExport', true);
@@ -62,13 +68,9 @@ describe('toggleAutomaticExport', () => {
     toggleAutomaticExport({
       ...args,
       vendorAccount: null,
-      integrationConfigs: [{
-        exportTypeSpecificParameters: {
-          vendorEdiOrdersExportConfig: {
-            isDefaultConfig: true,
-          },
-        },
-      }],
+      integrationConfigs: [orderingConfig({
+        isDefaultConfig: true,
+      })],
     });
 
     expect(change).toBeCalledWith('automaticExport', false);
@@ -78,16 +80,12 @@ describe('toggleAutomaticExport', () => {
     toggleAutomaticExport({
       ...args,
       vendorAccount: 'anyAccount',
-      integrationConfigs: [{
-        exportTypeSpecificParameters: {
-          vendorEdiOrdersExportConfig: {
-            ediConfig: {
-              defaultAcquisitionMethods: [acquisitionMethod],
-              accountNoList: [],
-            },
-          },
+      integrationConfigs: [orderingConfig({
+        ediConfig: {
+          defaultAcquisitionMethods: [acquisitionMethod],
+          accountNoList: [],
         },
-      }],
+      })],
     });
 
     expect(change).toBeCalledWith('automaticExport', true);
@@ -100,5 +98,44 @@ describe('toggleAutomaticExport', () => {
     });
 
     expect(change).toBeCalledWith('automaticExport', false);
+  });
+
+  it('should ignore a claiming integration even if account and acquisition method match', () => {
+    toggleAutomaticExport({
+      ...args,
+      integrationConfigs: [claimingConfig({
+        ediConfig: {
+          defaultAcquisitionMethods: [acquisitionMethod],
+          accountNoList: [vendorAccount],
+        },
+      })],
+    });
+
+    expect(change).toBeCalledWith('automaticExport', false);
+  });
+});
+
+describe('getApplicableOrderingIntegrations', () => {
+  it('should not let a claiming integration narrow the default ordering integration', () => {
+    const defaultOrdering = orderingConfig({
+      isDefaultConfig: true,
+      ediConfig: {
+        defaultAcquisitionMethods: [acquisitionMethod],
+      },
+    });
+    const claiming = claimingConfig({
+      ediConfig: {
+        defaultAcquisitionMethods: [acquisitionMethod],
+        accountNoList: [vendorAccount],
+      },
+    });
+
+    const applicable = getApplicableOrderingIntegrations({
+      vendorAccount,
+      acquisitionMethod,
+      integrationConfigs: [claiming, defaultOrdering],
+    });
+
+    expect(applicable).toEqual([defaultOrdering]);
   });
 });
