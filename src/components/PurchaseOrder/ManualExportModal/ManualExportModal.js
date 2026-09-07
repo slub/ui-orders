@@ -33,7 +33,7 @@ import {
   useManualExport,
   useManualExportJobs,
 } from '../../../common/hooks';
-import { getApplicableIntegrations } from '../../Utils/toggleAutomaticExport';
+import { getApplicableOrderingIntegrations } from '../../Utils/toggleAutomaticExport';
 
 const VISIBLE_COLUMNS = ['selected', 'poLineNumber', 'title', 'status', 'integration'];
 
@@ -112,7 +112,7 @@ const truncate = (value, maxLength = MAX_TITLE_LENGTH) => (
 // Same matching simulation as the AutomaticExportInfo hint, but for every line
 // regardless of the automaticExport flag - that is the point of a manual export.
 const buildRow = (line, integrationConfigs, isManualOrder) => {
-  const applicable = getApplicableIntegrations({
+  const applicable = getApplicableOrderingIntegrations({
     vendorAccount: line.vendorDetail?.vendorAccount,
     acquisitionMethod: line.acquisitionMethod,
     integrationConfigs,
