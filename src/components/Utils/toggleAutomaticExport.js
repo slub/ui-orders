@@ -1,3 +1,5 @@
+import { FOLIO_EXPORT_TYPE } from '@folio/stripes-acq-components';
+
 const AUTOMATIC_EXPORT_FIELD = 'automaticExport';
 
 const getOrderingConfig = (config) => config?.exportTypeSpecificParameters?.vendorEdiOrdersExportConfig;
@@ -26,12 +28,13 @@ const isAcqMethodIncluded = (orderingConfig, acquisitionMethod) => (
  * Note: this only matches the SLUB backend fork (empty-account-list rule) until
  * that change reaches folio-org master.
  */
-export const getApplicableIntegrations = ({ vendorAccount, acquisitionMethod, integrationConfigs = [] }) => {
+export const getApplicableOrderingIntegrations = ({ vendorAccount, acquisitionMethod, integrationConfigs = [] }) => {
   if (!acquisitionMethod) return [];
 
-  // Only ordering integrations (EDIFACT_ORDERS_EXPORT) participate in routing.
-  // useIntegrationConfigs also loads CLAIMS configs, which lack vendorEdiOrdersExportConfig.
-  const orderingConfigs = integrationConfigs.filter(config => getOrderingConfig(config));
+  // Claiming configs share the vendorEdiOrdersExportConfig shape but never export PO lines.
+  const orderingConfigs = integrationConfigs.filter(config => (
+    config?.type === FOLIO_EXPORT_TYPE.EDIFACT_ORDERS_EXPORT && getOrderingConfig(config)
+  ));
 
   const hasMultipleConfigs = orderingConfigs.length > 1;
   const accountAntiList = hasMultipleConfigs
@@ -54,7 +57,11 @@ export const getApplicableIntegrations = ({ vendorAccount, acquisitionMethod, in
 };
 
 export const toggleAutomaticExport = ({ vendorAccount, acquisitionMethod, integrationConfigs, change }) => {
-  const applicableIntegrations = getApplicableIntegrations({ vendorAccount, acquisitionMethod, integrationConfigs });
+  const applicableIntegrations = getApplicableOrderingIntegrations({
+    vendorAccount,
+    acquisitionMethod,
+    integrationConfigs,
+  });
 
   change(AUTOMATIC_EXPORT_FIELD, applicableIntegrations.length > 0);
 };

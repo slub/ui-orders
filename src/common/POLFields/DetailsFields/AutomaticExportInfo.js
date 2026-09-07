@@ -6,7 +6,7 @@ import {
   InfoPopover,
 } from '@folio/stripes/components';
 
-import { getApplicableIntegrations } from '../../../components/Utils/toggleAutomaticExport';
+import { getApplicableOrderingIntegrations } from '../../../components/Utils/toggleAutomaticExport';
 import css from './AutomaticExportInfo.css';
 
 const MAX_NAME_LENGTH = 20;
@@ -26,7 +26,7 @@ const truncate = (value) => (
 );
 
 // Read-only hint for the "Automatic export" checkbox showing which
-// integration(s) would pick up this PO line. Reuses getApplicableIntegrations
+// integration(s) would pick up this PO line. Reuses getApplicableOrderingIntegrations
 // so the hint stays consistent with the checkbox value. Only shown while
 // automatic export is enabled: with the checkbox off the order is handled
 // manually (e.g. placed by phone), so there is nothing to surface.
@@ -50,7 +50,11 @@ const AutomaticExportInfo = ({
   // export hint. Likewise nothing to surface while the checkbox is off.
   if (manualOrder || !automaticExport) return null;
 
-  const applicableIntegrations = getApplicableIntegrations({ vendorAccount, acquisitionMethod, integrationConfigs });
+  const applicableIntegrations = getApplicableOrderingIntegrations({
+    vendorAccount,
+    acquisitionMethod,
+    integrationConfigs,
+  });
 
   // No matching integration while automatic export is on: warning icon next to
   // the label (the order will not be exported automatically).
