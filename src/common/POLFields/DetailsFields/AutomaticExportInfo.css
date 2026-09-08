@@ -1,5 +1,10 @@
+/* Truncation is left to the column width: integration names are long and often
+   share their first words, so a fixed character limit cut off too much. */
 .exportVia {
   margin-bottom: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .warningButton {
