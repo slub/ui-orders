@@ -9,8 +9,6 @@ import {
 import { getApplicableOrderingIntegrations } from '../../../components/Utils/toggleAutomaticExport';
 import css from './AutomaticExportInfo.css';
 
-const MAX_NAME_LENGTH = 20;
-
 const getOrderingConfig = (config) => config?.exportTypeSpecificParameters?.vendorEdiOrdersExportConfig;
 
 const formatConfigLabel = (config) => {
@@ -20,10 +18,6 @@ const formatConfigLabel = (config) => {
 
   return method ? `${name} (${method})` : name;
 };
-
-const truncate = (value) => (
-  value && value.length > MAX_NAME_LENGTH ? `${value.slice(0, MAX_NAME_LENGTH)}…` : value
-);
 
 // Read-only hint for the "Automatic export" checkbox showing which
 // integration(s) would pick up this PO line. Reuses getApplicableOrderingIntegrations
@@ -103,8 +97,8 @@ const AutomaticExportInfo = ({
     );
   }
 
-  // Single match: show the integration name inline beneath the checkbox
-  // (truncated, full name on hover).
+  // Single match: show the integration name inline beneath the checkbox. The CSS
+  // ellipsis keeps it on one line, the title carries the full name.
   if (placement !== 'below') return null;
 
   const fullLabel = formatConfigLabel(applicableIntegrations[0]);
@@ -113,7 +107,7 @@ const AutomaticExportInfo = ({
     <div className={css.exportVia} title={fullLabel}>
       <FormattedMessage
         id="ui-orders.poLine.automaticExport.sentVia"
-        values={{ name: truncate(fullLabel) }}
+        values={{ name: fullLabel }}
       />
     </div>
   );
