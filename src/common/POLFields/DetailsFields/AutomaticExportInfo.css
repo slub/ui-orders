@@ -1,10 +1,15 @@
 /* Truncation is left to the column width: integration names are long and often
-   share their first words, so a fixed character limit cut off too much. */
+   share their first words, so a fixed character limit cut off too much. Two
+   lines, then an ellipsis; `anywhere` keeps a single very long word from being
+   clipped mid-word instead of wrapping. */
 .exportVia {
-  margin-bottom: 1rem;
+  display: -webkit-box;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  margin-bottom: 1rem;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow-wrap: anywhere;
 }
 
 .warningButton {
