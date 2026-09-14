@@ -174,6 +174,7 @@ const EmailTemplateForm = ({
                       previewRenderer="backend"
                       previewContext={SAMPLE_PREVIEW_CONTEXT}
                       previewSubject={values?.localizedTemplates?.en?.header ?? ''}
+                      previewTemplateResolver={values?.templateResolver}
                       required
                     />
                   </Col>
@@ -201,6 +202,7 @@ EmailTemplateForm.propTypes = {
   submitting: PropTypes.bool,
   values: PropTypes.shape({
     localizedTemplates: PropTypes.object,
+    templateResolver: PropTypes.string,
   }),
 };
 
