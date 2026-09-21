@@ -739,7 +739,10 @@ function POLineForm({
                           </Accordion>
                         )}
 
-                        <IfFieldVisible visible={!hiddenFields?.customPOLineFields}>
+                        <IfFieldVisible
+                          /* TODO: `name` is required prop  */
+                          visible={!hiddenFields?.customPOLineFields}
+                        >
                           <EditCustomFieldsRecord
                             accordionId="customFieldsPOLine"
                             backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}

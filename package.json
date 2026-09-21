@@ -355,6 +355,7 @@
           "configuration.entries.collection.get",
           "finance.exchange-rate.item.get",
           "finance.fiscal-years.collection.get",
+          "finance.fiscal-years.item.get",
           "finance.funds.expense-classes.collection.get",
           "inventory.instances.collection.get",
           "orders.acquisition-methods.collection.get",

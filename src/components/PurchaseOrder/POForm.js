@@ -432,7 +432,10 @@ const POForm = ({
                           />
                         </Accordion>
 
-                        <IfFieldVisible visible={!hiddenFields?.customPOFields}>
+                        <IfFieldVisible
+                          /* TODO: `name` is required prop  */
+                          visible={!hiddenFields?.customPOFields}
+                        >
                           <EditCustomFieldsRecord
                             accordionId="customFieldsPO"
                             backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
