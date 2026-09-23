@@ -866,6 +866,7 @@ const PO = ({
 
             <IfVisible visible={!hiddenFields?.customPOFields}>
               <ViewCustomFieldsRecord
+                hasCustomFieldSections
                 accordionId="customFieldsPO"
                 backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
                 customFieldsValues={customFieldsValues}

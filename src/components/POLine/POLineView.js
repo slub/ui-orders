@@ -609,6 +609,7 @@ const POLineView = ({
 
                 <IfVisible visible={!hiddenFields?.customPOLineFields}>
                   <ViewCustomFieldsRecord
+                    hasCustomFieldSections
                     accordionId="customFieldsPOLine"
                     backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
                     customFieldsValues={customFieldsValues}

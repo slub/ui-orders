@@ -744,6 +744,7 @@ function POLineForm({
                           visible={!hiddenFields?.customPOLineFields}
                         >
                           <EditCustomFieldsRecord
+                            hasCustomFieldSections
                             accordionId="customFieldsPOLine"
                             backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
                             changeFinalFormField={change}

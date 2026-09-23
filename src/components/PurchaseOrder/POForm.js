@@ -437,6 +437,7 @@ const POForm = ({
                           visible={!hiddenFields?.customPOFields}
                         >
                           <EditCustomFieldsRecord
+                            hasCustomFieldSections
                             accordionId="customFieldsPO"
                             backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
                             changeFinalFormField={change}
