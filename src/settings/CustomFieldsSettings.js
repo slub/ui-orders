@@ -46,6 +46,7 @@ const CustomFieldsSettings = () => {
             permissions={permissions}
             scope={SCOPE_CUSTOM_FIELDS_MANAGE}
             configNamePrefix={PO_CONFIG_NAME_PREFIX}
+            hasCustomFieldSections
           />
         </TitleManager>
       </Route>
@@ -58,6 +59,7 @@ const CustomFieldsSettings = () => {
             permissions={permissions}
             scope={SCOPE_CUSTOM_FIELDS_MANAGE}
             configNamePrefix={PO_CONFIG_NAME_PREFIX}
+            hasCustomFieldSections
           />
         </TitleManager>
       </Route>
@@ -71,6 +73,7 @@ const CustomFieldsSettings = () => {
             permissions={permissions}
             scope={SCOPE_CUSTOM_FIELDS_MANAGE}
             configNamePrefix={PO_LINE_CONFIG_NAME_PREFIX}
+            hasCustomFieldSections
           />
         </TitleManager>
       </Route>
@@ -83,6 +86,7 @@ const CustomFieldsSettings = () => {
             permissions={permissions}
             scope={SCOPE_CUSTOM_FIELDS_MANAGE}
             configNamePrefix={PO_LINE_CONFIG_NAME_PREFIX}
+            hasCustomFieldSections
           />
         </TitleManager>
       </Route>
