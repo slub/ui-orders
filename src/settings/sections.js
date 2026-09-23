@@ -6,6 +6,7 @@ import ClosingReasons from './ClosingReasons';
 import { SECTION_KEYS } from './constants';
 import { CreateInventory } from './CreateInventory';
 import CustomFieldsSettings from './CustomFieldsSettings';
+import CustomFieldSectionsSettings from './CustomFieldSectionsSettings';
 import { SETTINGS_SECTION_KEY_FIELD_NAME } from './hooks';
 import InstanceMatching from './InstanceMatching';
 import InstanceStatus from './InstanceStatus';
@@ -100,6 +101,18 @@ export const SECTIONS = [
         component: CustomFieldsSettings,
         label: <FormattedMessage id="ui-orders.settings.customFields.purchaseOrderLines.label" />,
         route: 'custom-fields-pol',
+        perm: 'ui-orders.settings.custom-fields.view',
+      },
+      {
+        component: CustomFieldSectionsSettings,
+        label: <FormattedMessage id="ui-orders.settings.customFieldSections.purchaseOrders.label" />,
+        route: 'custom-field-sections-po',
+        perm: 'ui-orders.settings.custom-fields.view',
+      },
+      {
+        component: CustomFieldSectionsSettings,
+        label: <FormattedMessage id="ui-orders.settings.customFieldSections.purchaseOrderLines.label" />,
+        route: 'custom-field-sections-pol',
         perm: 'ui-orders.settings.custom-fields.view',
       },
       {

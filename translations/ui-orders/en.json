@@ -767,6 +767,8 @@
   "settings.createInventory.recordType.none": "None",
   "settings.customFields.purchaseOrders.label": "Custom fields - purchase orders",
   "settings.customFields.purchaseOrderLines.label": "Custom fields - purchase order lines",
+  "settings.customFieldSections.purchaseOrders.label": "Custom field sections - purchase orders",
+  "settings.customFieldSections.purchaseOrderLines.label": "Custom field sections - purchase order lines",
   "settings.general.label": "General",
   "settings.index.paneTitle": "Orders",
   "settings.inventoryInteraction.label": "Inventory interaction",

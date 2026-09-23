@@ -161,7 +161,8 @@
         "visible": false,
         "subPermissions": [
           "mod-settings.global.read.ui-orders.custom-fields.manage",
-          "orders-storage.custom-fields.collection.get"
+          "orders-storage.custom-fields.collection.get",
+          "orders-storage.custom-fields.sections.collection.get"
         ]
       },
       {
@@ -422,6 +423,8 @@
           "orders-storage.custom-fields.item.get",
           "orders-storage.custom-fields.item.stats.get",
           "orders-storage.custom-fields.item.option.stats.get",
+          "orders-storage.custom-fields.sections.collection.get",
+          "orders-storage.custom-fields.sections.item.get",
           "orders-storage.settings.collection.get"
         ]
       },
@@ -437,7 +440,9 @@
           "mod-settings.entries.item.put",
           "orders-storage.custom-fields.collection.put",
           "orders-storage.custom-fields.item.post",
-          "orders-storage.custom-fields.item.put"
+          "orders-storage.custom-fields.item.put",
+          "orders-storage.custom-fields.sections.item.post",
+          "orders-storage.custom-fields.sections.item.put"
         ]
       },
       {
@@ -447,7 +452,8 @@
         "visible": true,
         "subPermissions": [
           "ui-orders.settings.custom-fields.edit",
-          "orders-storage.custom-fields.item.delete"
+          "orders-storage.custom-fields.item.delete",
+          "orders-storage.custom-fields.sections.item.delete"
         ]
       },
       {
