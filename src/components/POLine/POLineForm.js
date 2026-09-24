@@ -61,14 +61,12 @@ import {
 
 import { AccordionInfoPopover } from '../../common';
 import {
-  CUSTOM_FIELD_GROUPS_POL,
   ENTITY_TYPE_PO_LINE,
   PO_LINE_CONFIG_NAME_PREFIX,
   POL_FORM_FIELDS,
   SCOPE_CUSTOM_FIELDS_MANAGE,
   SUBMIT_ACTION_FIELD,
 } from '../../common/constants';
-import { CustomFieldGroupAccordion } from '../../common';
 import {
   useErrorAccordionStatus,
   useFundDistributionValidation,
@@ -732,29 +730,7 @@ function POLineForm({
                               finalFormCustomFieldsValues={customFieldsValues}
                               configNamePrefix={PO_LINE_CONFIG_NAME_PREFIX}
                               scope={SCOPE_CUSTOM_FIELDS_MANAGE}
-                              sectionId="default"
                             />
-                            {CUSTOM_FIELD_GROUPS_POL.map(({ id, label }) => (
-                              <CustomFieldGroupAccordion
-                                key={id}
-                                sectionId={id}
-                                label={label}
-                                backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
-                                entityType={ENTITY_TYPE_PO_LINE}
-                              >
-                                <EditCustomFieldsRecord
-                                  accordionId={`customFieldsPOLine-${id}`}
-                                  backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
-                                  changeFinalFormField={change}
-                                  entityType={ENTITY_TYPE_PO_LINE}
-                                  fieldComponent={Field}
-                                  finalFormCustomFieldsValues={customFieldsValues}
-                                  configNamePrefix={PO_LINE_CONFIG_NAME_PREFIX}
-                                  scope={SCOPE_CUSTOM_FIELDS_MANAGE}
-                                  sectionId={id}
-                                />
-                              </CustomFieldGroupAccordion>
-                            ))}
                           </IfFieldVisible>
                         </AccordionSet>
                       </Col>
