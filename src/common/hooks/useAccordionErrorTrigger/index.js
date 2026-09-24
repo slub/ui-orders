@@ -1,0 +1,1 @@
+export { useAccordionErrorTrigger } from './useAccordionErrorTrigger';

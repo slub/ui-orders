@@ -2,8 +2,6 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import ReactRouterPropTypes from 'react-router-prop-types';
 
-import { baseManifest } from '@folio/stripes-acq-components';
-
 import {
   reasonsForClosureResource,
   updateEncumbrancesResource,
@@ -63,11 +61,6 @@ export const PO_MANIFEST = Object.freeze({
   closingReasons: reasonsForClosureResource,
   fund: FUND,
   approvalsSetting: APPROVALS_SETTING,
-  expenseClass: {
-    ...baseManifest,
-    accumulate: true,
-    fetch: false,
-  },
   generatedOrderNumber: ORDER_NUMBER,
   updateEncumbrances: updateEncumbrancesResource,
 });

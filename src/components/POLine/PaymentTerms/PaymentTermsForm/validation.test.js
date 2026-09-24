@@ -92,17 +92,14 @@ describe('validateFundDistributionUniqueFunds', () => {
 });
 
 describe('validateFundDistributionRequired', () => {
-  it('should return undefined when value is falsy', async () => {
-    expect(await validateFundDistributionRequired(null)).toBeUndefined();
-    expect(await validateFundDistributionRequired(undefined)).toBeUndefined();
-  });
-
   it('should return undefined when 2 or more distributions are present', async () => {
     expect(await validateFundDistributionRequired([{}, {}])).toBeUndefined();
     expect(await validateFundDistributionRequired([{}, {}, {}])).toBeUndefined();
   });
 
   it('should return error when fewer than 2 distributions are present', async () => {
+    expect((await validateFundDistributionRequired(null))?.props?.id).toBe('ui-orders.poLine.paymentTerms.FYDistributions.validation.required');
+    expect((await validateFundDistributionRequired(undefined))?.props?.id).toBe('ui-orders.poLine.paymentTerms.FYDistributions.validation.required');
     expect((await validateFundDistributionRequired([]))?.props?.id).toBe('ui-orders.poLine.paymentTerms.FYDistributions.validation.required');
     expect((await validateFundDistributionRequired([{}]))?.props?.id).toBe('ui-orders.poLine.paymentTerms.FYDistributions.validation.required');
   });

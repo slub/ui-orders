@@ -14,6 +14,8 @@ import {
   VersionHistoryButton,
 } from '@folio/stripes-acq-components';
 
+import { ConnectedTasksJobsButton } from '../../components/ConnectedTasksJobs';
+
 const VersionView = ({
   children,
   id,
@@ -32,6 +34,7 @@ const VersionView = ({
         disabled
         tagsQuantity={tags?.length}
       />
+      <ConnectedTasksJobsButton />
       <VersionHistoryButton disabled />
     </PaneMenu>
   ), [tags?.length]);

@@ -161,14 +161,4 @@ describe('LayerPO', () => {
       }));
     });
   });
-
-  it('should throw an error if the order update was failed ', async () => {
-    defaultProps.mutator.order.POST.mockRejectedValueOnce({});
-
-    renderLayerPO();
-
-    await waitFor(() => expect(POForm.mock.calls[0][0].onSubmit({
-      orderType: ORDER_TYPES.ongoing,
-    })).rejects.toBeTruthy());
-  });
 });

@@ -28,6 +28,7 @@ const FieldVendorAccountNumber = ({
           label={<FormattedMessage id="ui-orders.vendor.accountNumber" />}
           name={POL_FORM_FIELDS.vendorDetailVendorAccount}
           isNonInteractive={disabled}
+          validateFields={[]}
           {...props}
         />
       )
@@ -38,6 +39,7 @@ const FieldVendorAccountNumber = ({
           isNonInteractive={disabled}
           label={<FormattedMessage id="ui-orders.vendor.accountNumber" />}
           name={POL_FORM_FIELDS.vendorDetailVendorAccount}
+          validateFields={[]}
         />
       )
   );

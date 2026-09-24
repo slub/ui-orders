@@ -177,7 +177,7 @@ describe('getFyAmounts (offset computation)', () => {
 
     expect(validateFieldsMap.fundId).toEqual([]);
     expect(validateFieldsMap.expenseClassId).toEqual([]);
-    expect(validateFieldsMap.distributionType).toEqual([FIELD_NAME]);
+    expect(validateFieldsMap.distributionType('arrayField')).toEqual([FIELD_NAME, 'arrayField.value']);
     expect(validateFieldsMap.value).toEqual([FIELD_NAME]);
   });
 });

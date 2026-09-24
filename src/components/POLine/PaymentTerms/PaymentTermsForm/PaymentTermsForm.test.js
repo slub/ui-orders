@@ -159,12 +159,6 @@ describe('PaymentTermsForm', () => {
     expect(getDistributionProps().validate).toBeUndefined();
   });
 
-  it('should not pass a validate function to FiscalYearsDistribution when multiYearPayment is false', () => {
-    renderComponent({}, { multiYearPayment: false });
-
-    expect(getDistributionProps().validate).toBeUndefined();
-  });
-
   it('should pass isLoading=true to FiscalYearsDistribution', () => {
     renderComponent({ isLoading: true });
 

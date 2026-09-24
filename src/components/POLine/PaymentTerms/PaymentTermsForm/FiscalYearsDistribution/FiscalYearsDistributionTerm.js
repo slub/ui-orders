@@ -28,6 +28,7 @@ export const FiscalYearsDistributionTerm = ({
   fiscalYearId,
   fundDistributions,
   funds,
+  isRequired,
   label,
   name,
   onExpenseClassChange,
@@ -78,6 +79,7 @@ export const FiscalYearsDistributionTerm = ({
           onRemove={onRemoveFundDistribution || onRemoveFund}
           onSelectFund={onSelectFund}
           onExpenseClassChange={onExpenseClassChange}
+          required={isRequired}
           totalAmount={totalAmount}
           validateFieldsMap={validateFieldsMap}
         />
@@ -103,6 +105,7 @@ FiscalYearsDistributionTerm.propTypes = {
   fiscalYearId: PropTypes.string,
   fundDistributions: PropTypes.arrayOf(PropTypes.object).isRequired,
   funds: PropTypes.arrayOf(PropTypes.object).isRequired,
+  isRequired: PropTypes.bool,
   label: PropTypes.node.isRequired,
   name: PropTypes.string.isRequired,
   onExpenseClassChange: PropTypes.func.isRequired,

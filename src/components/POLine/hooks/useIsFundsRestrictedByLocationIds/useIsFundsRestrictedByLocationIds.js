@@ -9,6 +9,7 @@ import {
   useInstanceHoldingsQuery,
 } from '@folio/stripes-acq-components';
 
+import { getPaymentTermsFundIds } from '../../../../common/utils';
 import { useFundsById } from '../useFundsById';
 
 export const useIsFundsRestrictedByLocationIds = (line) => {
@@ -20,7 +21,10 @@ export const useIsFundsRestrictedByLocationIds = (line) => {
     locationIds: locationIdsProp,
   } = useMemo(() => {
     return {
-      fundIds: get(line, 'fundDistribution', []).map(({ fundId }) => fundId),
+      fundIds: Array.from(new Set([
+        ...get(line, 'fundDistribution', []).map(({ fundId }) => fundId).filter(Boolean),
+        ...getPaymentTermsFundIds(get(line, 'paymentTerms')),
+      ])),
       holdingIds: get(line, 'locations', []).map(({ holdingId }) => holdingId).filter(Boolean),
       locationIds: get(line, 'locations', []).map(({ locationId }) => locationId).filter(Boolean),
     };

@@ -26,12 +26,16 @@ import {
   location,
   match,
 } from 'fixtures/routerMocks';
-import { SUBMIT_ACTION_FIELD } from '../../common/constants';
+import {
+  SUBMIT_ACTION_FIELD,
+  WORKFLOW_STATUS,
+} from '../../common/constants';
 import {
   useOrder,
   useOrderLine,
   useOrderTemplate,
 } from '../../common/hooks';
+import { fetchOrderById } from '../../common/utils';
 import ModalDeletePieces from '../ModalDeletePieces';
 import { SUBMIT_ACTION } from '../POLine/const';
 import POLineForm from '../POLine/POLineForm';
@@ -45,9 +49,12 @@ jest.mock('@folio/stripes/smart-components', () => ({
 jest.mock('@folio/stripes-acq-components', () => ({
   ...jest.requireActual('@folio/stripes-acq-components'),
   useCentralOrderingContext: jest.fn(() => ({ isCentralOrderingEnabled: false })),
+  useContributorNameTypes: jest.fn().mockReturnValue({ contributorNameTypes: [], isLoading: false }),
   useFunds: jest.fn(() => ({ funds: [] })),
+  useIdentifierTypes: jest.fn().mockReturnValue({ identifierTypes: [], isLoading: false }),
   useIntegrationConfigs: jest.fn().mockReturnValue({ integrationConfigs: [], isLoading: false }),
   useLocationsQuery: jest.fn(),
+  useMaterialTypes: jest.fn().mockReturnValue({ materialTypes: [], isLoading: false }),
   useOrganization: jest.fn(),
   useShowCallout: jest.fn(),
 }));
@@ -64,6 +71,7 @@ jest.mock('../POLine/POLineForm', () => jest.fn().mockReturnValue('POLineForm'))
 jest.mock('../ModalDeletePieces', () => jest.fn().mockReturnValue('ModalDeletePieces'));
 jest.mock('../../common/utils', () => ({
   ...jest.requireActual('../../common/utils'),
+  fetchOrderById: jest.fn(),
   validateDuplicateLines: jest.fn().mockReturnValue(Promise.resolve()),
 }));
 jest.mock('../Utils/orderResource', () => ({
@@ -82,21 +90,12 @@ const defaultProps = {
     approvalsSetting: {
       GET: jest.fn().mockResolvedValue(),
     },
-    contributorNameTypes: {
-      GET: jest.fn().mockResolvedValue(),
-    },
     poLines: {
       GET: jest.fn().mockResolvedValue([orderLine]),
       PUT: jest.fn().mockResolvedValue(orderLine),
       POST: jest.fn().mockResolvedValue(orderLine),
     },
     createInventory: {
-      GET: jest.fn().mockResolvedValue(),
-    },
-    materialTypes: {
-      GET: jest.fn().mockResolvedValue(),
-    },
-    identifierTypes: {
       GET: jest.fn().mockResolvedValue(),
     },
     orderNumber: {
@@ -108,15 +107,6 @@ const defaultProps = {
       hasLoaded: true,
     },
     approvalsSetting: {
-      hasLoaded: true,
-    },
-    contributorNameTypes: {
-      hasLoaded: true,
-    },
-    identifierTypes: {
-      hasLoaded: true,
-    },
-    materialTypes: {
       hasLoaded: true,
     },
   },
@@ -150,8 +140,17 @@ const renderLayerPOLine = (props = {}) => render(
 const mockShowCallout = jest.fn();
 const refetchOrderLine = jest.fn();
 
+// The order as it exists on the back-end at the moment of opening it - it is expected to be re-fetched before updating.
+const latestOrderVersion = {
+  ...order,
+  _version: 42,
+  poLines: [orderLine],
+};
+const mockFetchOrderById = jest.fn(() => Promise.resolve(latestOrderVersion));
+
 describe('LayerPOLine', () => {
   beforeEach(() => {
+    fetchOrderById.mockReturnValue(mockFetchOrderById);
     useOrder.mockReturnValue({
       isLoading: false,
       order: { ...order, poLines: [] },
@@ -257,6 +256,26 @@ describe('LayerPOLine', () => {
         expect(defaultProps.mutator.poLines.POST).toHaveBeenCalled();
         expect(updateOrderResource).toHaveBeenCalled();
       });
+
+      it('should re-fetch the order before updating it when opening the order', async () => {
+        renderLayerPOLine({
+          match: {
+            ...match,
+            params: { id: order.id },
+          },
+        });
+
+        await waitFor(submitWithType(SUBMIT_ACTION.saveAndOpen));
+
+        expect(mockFetchOrderById).toHaveBeenCalledWith(order.id);
+        expect(mockFetchOrderById.mock.invocationCallOrder[0])
+          .toBeLessThan(updateOrderResource.mock.invocationCallOrder[0]);
+        expect(updateOrderResource).toHaveBeenCalledWith(
+          latestOrderVersion,
+          defaultProps.mutator.lineOrder,
+          { workflowStatus: WORKFLOW_STATUS.open },
+        );
+      });
     });
 
     describe('Update PO Line', () => {
@@ -276,6 +295,21 @@ describe('LayerPOLine', () => {
 
         expect(defaultProps.mutator.poLines.PUT).toHaveBeenCalled();
         expect(updateOrderResource).toHaveBeenCalled();
+      });
+
+      it('should re-fetch the order before updating it when opening the order', async () => {
+        renderLayerPOLine();
+
+        await waitFor(submitWithType(SUBMIT_ACTION.saveAndOpen));
+
+        expect(mockFetchOrderById).toHaveBeenCalledWith(order.id);
+        expect(mockFetchOrderById.mock.invocationCallOrder[0])
+          .toBeLessThan(updateOrderResource.mock.invocationCallOrder[0]);
+        expect(updateOrderResource).toHaveBeenCalledWith(
+          latestOrderVersion,
+          defaultProps.mutator.lineOrder,
+          { workflowStatus: WORKFLOW_STATUS.open },
+        );
       });
     });
   });

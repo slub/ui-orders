@@ -82,6 +82,7 @@ function buildInitialValuesWithoutTemplate({
       currency: vendorPreferredCurrency || stripes.currency,
       discountType: DISCOUNT_TYPE.percentage,
     },
+    donorOrganizationIds: [],
     vendorDetail: {
       instructions: '',
       vendorAccount: get(vendor, 'accounts[0].accountNo', ''),

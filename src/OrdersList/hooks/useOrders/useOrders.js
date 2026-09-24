@@ -1,4 +1,3 @@
-import queryString from 'query-string';
 import { useQuery } from 'react-query';
 import { useLocation } from 'react-router';
 
@@ -14,6 +13,7 @@ import {
 } from '@folio/stripes-acq-components';
 
 import { useBuildQuery } from '../useBuildQuery';
+import { getQueryParams } from '../../../utils';
 
 export const useOrders = (
   {
@@ -31,7 +31,7 @@ export const useOrders = (
   const { search } = useLocation();
   const buildQuery = useBuildQuery(customFields);
 
-  const queryParams = queryString.parse(search);
+  const queryParams = getQueryParams(search);
   const query = buildQuery(queryParams, { timezone });
   const filtersCount = getFiltersCount(queryParams);
 

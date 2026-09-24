@@ -1,7 +1,9 @@
 import { useQuery } from 'react-query';
 
 import { useOkapiKy } from '@folio/stripes/core';
-import { ORDERS_API } from '@folio/stripes-acq-components';
+import { fetchOrders } from '@folio/stripes-acq-components';
+
+import { fetchOrderById } from '../../utils';
 
 // tries to fetch order by get, if error comes from back-end - fetch from collection api
 export const useOrder = (orderId, options = {}) => {
@@ -20,14 +22,14 @@ export const useOrder = (orderId, options = {}) => {
       try {
         const searchParams = fiscalYearId ? { fiscalYearId } : undefined;
 
-        return ky.get(`${ORDERS_API}/${orderId}`, { searchParams, signal }).json();
+        return fetchOrderById(ky)(orderId, { searchParams, signal });
       } catch {
         const searchParams = {
           query: `id==${orderId}`,
           ...(fiscalYearId ? { fiscalYearId } : {}),
         };
 
-        const { purchaseOrders } = await ky.get(ORDERS_API, { searchParams, signal }).json();
+        const { purchaseOrders } = await fetchOrders(ky)({ searchParams, signal });
 
         return purchaseOrders[0] || {};
       }

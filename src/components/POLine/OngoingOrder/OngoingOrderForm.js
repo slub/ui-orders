@@ -1,10 +1,6 @@
-import { useCallback } from 'react';
-import {
-  Field,
-  useForm,
-} from 'react-final-form';
-import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
+import { Field } from 'react-final-form';
+import { FormattedMessage } from 'react-intl';
 
 import {
   Checkbox,
@@ -20,32 +16,13 @@ import {
 
 import { POL_FORM_FIELDS } from '../../../common/constants';
 import { isWorkflowStatusNotPending } from '../../PurchaseOrder/util';
-import calculateEstimatedPrice from '../calculateEstimatedPrice';
 
 const OngoingOrderForm = ({
   hiddenFields = {},
+  onMultiYearPaymentChange,
   order,
 }) => {
   const isPostPendingOrder = order && isWorkflowStatusNotPending(order);
-
-  const {
-    change,
-    getState,
-  } = useForm();
-
-  const onMultiYearPaymentChange = useCallback((e) => {
-    const value = Boolean(e.target.checked);
-
-    change(POL_FORM_FIELDS.multiYearPayment, value);
-
-    if (value) {
-      const poLineEstimatedPrice = calculateEstimatedPrice(getState().values);
-
-      change(`${POL_FORM_FIELDS.paymentTerms}.totalPrice`, poLineEstimatedPrice);
-    } else {
-      change(POL_FORM_FIELDS.paymentTerms, undefined);
-    }
-  }, [change, getState]);
 
   return (
     <Row>
@@ -102,6 +79,7 @@ const OngoingOrderForm = ({
 
 OngoingOrderForm.propTypes = {
   hiddenFields: PropTypes.object,
+  onMultiYearPaymentChange: PropTypes.func.isRequired,
   order: PropTypes.shape({
     workflowStatus: PropTypes.string.isRequired,
   }),

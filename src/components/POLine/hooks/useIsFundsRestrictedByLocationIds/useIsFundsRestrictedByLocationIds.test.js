@@ -120,4 +120,28 @@ describe('useIsFundsRestrictedByLocationIds', () => {
 
     expect(result.current.hasLocationRestrictedFund).toBe(true);
   });
+
+  it('should include fundIds from paymentTerms', async () => {
+    const paymentFundId = 'payment-fund-id';
+
+    const line = {
+      fundDistribution,
+      paymentTerms: {
+        fiscalYearDistributions: [
+          { fundDistributions: [{ fundId: paymentFundId }] },
+        ],
+      },
+      locations: [{ locationId: 'testId' }],
+    };
+
+    const { result } = renderHook(() => useIsFundsRestrictedByLocationIds(line), { wrapper });
+
+    await waitFor(() => expect(result.current.isLoading).toBeFalsy());
+
+    // first arg to useFundsById is fundIds array — ensure it contains both sources
+    expect(useFundsById).toHaveBeenCalled();
+    const calledFundIds = useFundsById.mock.calls[0][0];
+
+    expect(calledFundIds).toEqual(expect.arrayContaining([restrictedFund.id, paymentFundId]));
+  });
 });

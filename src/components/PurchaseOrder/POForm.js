@@ -23,7 +23,6 @@ import {
   Button,
   checkScope,
   Col,
-  collapseAllSections,
   ExpandAllButton,
   expandAllSections,
   HasCommand,
@@ -51,7 +50,7 @@ import {
   SCOPE_CUSTOM_FIELDS_MANAGE,
   SUBMIT_ACTION_FIELD,
 } from '../../common/constants';
-import { useErrorAccordionStatus } from '../../common/hooks';
+import { useAccordionErrorTrigger } from '../../common/hooks';
 import { isOngoing } from '../../common/POFields';
 import getOrderNumberSetting from '../../common/utils/getOrderNumberSetting';
 import getOrderTemplatesForSelect from '../Utils/getOrderTemplatesForSelect';
@@ -104,7 +103,11 @@ const POForm = ({
   const accordionStatusRef = useRef();
 
   const errors = getState()?.errors;
-  const errorAccordionStatus = useErrorAccordionStatus({ errors, fieldsMap: MAP_FIELD_ACCORDION });
+  const {
+    onToggle: onToggleWithErrorGuard,
+    onExpandAllToggle,
+    collapseAll,
+  } = useAccordionErrorTrigger({ errors, fieldsMap: MAP_FIELD_ACCORDION, accordionStatusRef });
 
   const { validate: validateNumber } = usePONumberFieldValidator();
 
@@ -324,7 +327,7 @@ const POForm = ({
     },
     {
       name: 'collapseAllSections',
-      handler: (e) => collapseAllSections(e, accordionStatusRef),
+      handler: collapseAll,
     },
     {
       name: 'search',
@@ -364,91 +367,93 @@ const POForm = ({
           paneTitle={paneTitle}
         >
           <AccordionStatus ref={accordionStatusRef}>
-            {({ status }) => (
-              <form
-                id="form-po"
-                data-test-form-page
-              >
-                <Row>
-                  <Col xs={12}>
-                    <Row center="xs">
-                      <Col xs={12} md={8}>
-                        <Row end="xs">
-                          <Col xs={12}>
-                            <ExpandAllButton />
-                          </Col>
-                        </Row>
-                      </Col>
+            <form
+              id="form-po"
+              data-test-form-page
+            >
+              <Row>
+                <Col xs={12}>
+                  <Row center="xs">
+                    <Col xs={12} md={8}>
+                      <Row end="xs">
+                        <Col xs={12}>
+                          <ExpandAllButton onToggle={onExpandAllToggle} />
+                        </Col>
+                      </Row>
+                    </Col>
 
-                      <Col xs={12} md={8}>
-                        <Row>
-                          <Col xs={4}>
-                            <FieldSelection
-                              dataOptions={orderTemplates}
-                              onChange={onChangeTemplate}
-                              labelId="ui-orders.settings.orderTemplates.editor.template.name"
-                              name={PO_FORM_FIELDS.template}
-                              id="order-template"
-                              disabled={Boolean(poLinesLength)}
-                            />
-                          </Col>
-                        </Row>
-                      </Col>
+                    <Col xs={12} md={8}>
+                      <Row>
+                        <Col xs={4}>
+                          <FieldSelection
+                            dataOptions={orderTemplates}
+                            onChange={onChangeTemplate}
+                            labelId="ui-orders.settings.orderTemplates.editor.template.name"
+                            name={PO_FORM_FIELDS.template}
+                            id="order-template"
+                            disabled={Boolean(poLinesLength)}
+                          />
+                        </Col>
+                      </Row>
+                    </Col>
 
-                      <Col xs={12} md={8} style={{ textAlign: 'left' }}>
-                        <AccordionSet
-                          initialStatus={INITIAL_SECTIONS}
-                          accordionStatus={{ ...status, ...errorAccordionStatus }}
+                    <Col xs={12} md={8} style={{ textAlign: 'left' }}>
+                      <AccordionSet
+                        initialStatus={INITIAL_SECTIONS}
+                        onToggle={onToggleWithErrorGuard}
+                      >
+                        <Accordion
+                          id={ACCORDION_ID.purchaseOrder}
+                          label={<FormattedMessage id="ui-orders.paneBlock.purchaseOrder" />}
                         >
-                          <Accordion
-                            id={ACCORDION_ID.purchaseOrder}
-                            label={<FormattedMessage id="ui-orders.paneBlock.purchaseOrder" />}
-                          >
-                            <PODetailsForm
-                              addresses={addresses}
-                              change={change}
-                              formValues={formValues}
-                              generatedNumber={generatedNumber}
-                              order={initialValues}
-                              orderNumberSetting={orderNumberSetting}
-                              prefixesSetting={prefixesSetting}
-                              suffixesSetting={suffixesSetting}
-                              validateNumber={validateNumber}
-                              hiddenFields={hiddenFields}
-                            />
-                          </Accordion>
-                          {isOngoing(formValues.orderType) && (
-                            <OngoingInfoForm hiddenFields={hiddenFields} />
-                          )}
-                          <Accordion
-                            id={ACCORDION_ID.poSummary}
-                            label={<FormattedMessage id="ui-orders.paneBlock.POSummary" />}
-                          >
-                            <SummaryForm
-                              initialValues={initialValues}
-                              hiddenFields={hiddenFields}
-                            />
-                          </Accordion>
+                          <PODetailsForm
+                            addresses={addresses}
+                            change={change}
+                            formValues={formValues}
+                            generatedNumber={generatedNumber}
+                            order={initialValues}
+                            orderNumberSetting={orderNumberSetting}
+                            prefixesSetting={prefixesSetting}
+                            suffixesSetting={suffixesSetting}
+                            validateNumber={validateNumber}
+                            hiddenFields={hiddenFields}
+                          />
+                        </Accordion>
+                        {isOngoing(formValues.orderType) && (
+                        <OngoingInfoForm hiddenFields={hiddenFields} />
+                        )}
+                        <Accordion
+                          id={ACCORDION_ID.poSummary}
+                          label={<FormattedMessage id="ui-orders.paneBlock.POSummary" />}
+                        >
+                          <SummaryForm
+                            initialValues={initialValues}
+                            hiddenFields={hiddenFields}
+                          />
+                        </Accordion>
 
-                          <IfFieldVisible visible={!hiddenFields?.customPOFields}>
-                            <EditCustomFieldsRecord
-                              accordionId="customFieldsPO"
-                              backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
-                              changeFinalFormField={change}
-                              entityType={ENTITY_TYPE_ORDER}
-                              fieldComponent={Field}
-                              finalFormCustomFieldsValues={customFieldsValues}
-                              configNamePrefix={PO_CONFIG_NAME_PREFIX}
-                              scope={SCOPE_CUSTOM_FIELDS_MANAGE}
-                            />
-                          </IfFieldVisible>
-                        </AccordionSet>
-                      </Col>
-                    </Row>
-                  </Col>
-                </Row>
-              </form>
-            )}
+                        <IfFieldVisible
+                          /* TODO: `name` is required prop  */
+                          visible={!hiddenFields?.customPOFields}
+                        >
+                          <EditCustomFieldsRecord
+                            hasCustomFieldSections
+                            accordionId="customFieldsPO"
+                            backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
+                            changeFinalFormField={change}
+                            entityType={ENTITY_TYPE_ORDER}
+                            fieldComponent={Field}
+                            finalFormCustomFieldsValues={customFieldsValues}
+                            configNamePrefix={PO_CONFIG_NAME_PREFIX}
+                            scope={SCOPE_CUSTOM_FIELDS_MANAGE}
+                          />
+                        </IfFieldVisible>
+                      </AccordionSet>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+            </form>
           </AccordionStatus>
         </Pane>
       </Paneset>

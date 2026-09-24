@@ -6,3 +6,4 @@ export { ExportDetailsList } from './ExportDetailsList';
 export { ReexportActionButton } from './ReexportActionButton';
 export { ReexportModal } from './ReexportModal';
 export { VersionView } from './VersionView';
+export * from '../components/ConnectedTasksJobs';

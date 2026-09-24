@@ -57,10 +57,10 @@ import {
 } from '@folio/stripes/smart-components';
 
 import {
-  ExportDetailsAccordion,
-  ReexportModal,
+  ConnectedTasksJobsButton, ConnectedTasksJobsPane, ExportDetailsAccordion, ReexportModal, useConnectedTasksJobsProps,
 } from '../../common';
 import {
+  CONNECTED_RECORD_TYPES,
   ENTITY_TYPE_ORDER,
   ERROR_CODES,
   INVOICES_ROUTE,
@@ -121,7 +121,7 @@ const PO = ({
   const intl = useIntl();
   const sendCallout = useShowCallout();
   const accordionStatusRef = useRef();
-  const [handleErrorResponse] = useHandleOrderUpdateError(mutator.expenseClass);
+  const [handleErrorResponse] = useHandleOrderUpdateError();
   const { visibleColumns, toggleColumn } = useColumnManager('line-listing-column-manager', LINE_LISTING_COLUMN_MAPPING);
   const { updateOrder } = useOrderMutation();
 
@@ -182,9 +182,9 @@ const PO = ({
       setSelectedFiscalYear(fiscalYearsGrouped.current[0].id);
     }
   }, [fiscalYearsGrouped, selectedFiscalYear]);
-
   const reasonsForClosure = get(resources, 'closingReasons.records');
   const orderNumber = get(order, 'poNumber', '');
+  const connectedTasksJobsProps = useConnectedTasksJobsProps(order, CONNECTED_RECORD_TYPES.ORDER);
   const poLinesCount = orderLines?.length || 0;
   const workflowStatus = get(order, 'workflowStatus');
   const isAbleToAddLines = workflowStatus === WORKFLOW_STATUS.pending;
@@ -219,6 +219,7 @@ const PO = ({
         tagsToggle={toggleTagsPane}
         tagsQuantity={tags.length}
       />
+      <ConnectedTasksJobsButton {...connectedTasksJobsProps} />
       <VersionHistoryButton onClick={openVersionHistory} />
     </PaneMenu>
   );
@@ -868,6 +869,7 @@ const PO = ({
 
             <IfVisible visible={!hiddenFields?.customPOFields}>
               <ViewCustomFieldsRecord
+                hasCustomFieldSections
                 accordionId="customFieldsPO"
                 backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
                 customFieldsValues={customFieldsValues}
@@ -986,6 +988,7 @@ const PO = ({
   return (
     <>
       {POPane}
+      <ConnectedTasksJobsPane {...connectedTasksJobsProps} />
       {isTagsPaneOpened && (
         <Tags
           putMutator={updateOrderCB}

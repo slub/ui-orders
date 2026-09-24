@@ -29,9 +29,9 @@ export const validateFundDistributionUniqueFunds = async (values) => {
 };
 
 export const validateFundDistributionRequired = async (v) => {
-  return v && v.length < 2
-    ? <FormattedMessage id="ui-orders.poLine.paymentTerms.FYDistributions.validation.required" />
-    : undefined;
+  return v?.length >= 2
+    ? undefined
+    : <FormattedMessage id="ui-orders.poLine.paymentTerms.FYDistributions.validation.required" />;
 };
 
 export const getFundDistributionTotalValidator = (validateFundDistributionTotal, setRemainingAmount) => {

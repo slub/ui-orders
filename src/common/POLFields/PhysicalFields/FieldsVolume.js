@@ -51,6 +51,7 @@ class FieldsVolume extends Component {
                   label={<FormattedMessage id="ui-orders.physical.volume" />}
                   name={elem}
                   isNonInteractive={disabled}
+                  validateFields={[]}
                 />
               </Col>
               {!disabled && (

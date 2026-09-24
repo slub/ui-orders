@@ -11,7 +11,6 @@ import { FormattedMessage } from 'react-intl';
 import { LoadingView } from '@folio/stripes/components';
 import { stripesConnect } from '@folio/stripes/core';
 import {
-  baseManifest,
   ORDER_STATUSES,
   prefixesResource,
   suffixesResource,
@@ -50,7 +49,7 @@ function LayerPO({
   resources,
 }) {
   const sendCallout = useShowCallout();
-  const [handleErrorResponse] = useHandleOrderUpdateError(mutator.expenseClass);
+  const [handleErrorResponse] = useHandleOrderUpdateError();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoizedMutator = useMemo(() => mutator, []);
@@ -227,11 +226,6 @@ LayerPO.manifest = Object.freeze({
   orderTemplates: {
     ...ORDER_TEMPLATES,
     shouldRefresh: () => false,
-  },
-  expenseClass: {
-    ...baseManifest,
-    accumulate: true,
-    fetch: false,
   },
 });
 

@@ -1,4 +1,3 @@
-import queryString from 'query-string';
 import { useQuery } from 'react-query';
 import { useLocation } from 'react-router';
 
@@ -14,6 +13,8 @@ import {
 } from '@folio/stripes-acq-components';
 
 import { getLinesQuery } from '@folio/plugin-find-po-line';
+
+import { getQueryParams } from '../../../utils';
 
 export const useOrderLinesList = (
   {
@@ -31,7 +32,7 @@ export const useOrderLinesList = (
 
   const { search } = useLocation();
   const localeDateFormat = useLocaleDateFormat();
-  const queryParams = queryString.parse(search);
+  const queryParams = getQueryParams(search);
   const buildQuery = getLinesQuery(queryParams, ky, localeDateFormat, customFields);
   const filtersCount = getFiltersCount(queryParams);
 

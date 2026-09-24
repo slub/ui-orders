@@ -10,7 +10,6 @@ import {
 import { render, screen, waitFor } from '@folio/jest-config-stripes/testing-library/react';
 import user from '@folio/jest-config-stripes/testing-library/user-event';
 import {
-  collapseAllSections,
   expandAllSections,
   HasCommand,
 } from '@folio/stripes/components';
@@ -35,11 +34,21 @@ jest.mock('@folio/stripes-acq-components', () => ({
   useFunds: jest.fn(),
   useInstanceHoldingsQuery: jest.fn(),
 }));
+const mockCollapseAll = jest.fn();
+
 jest.mock('@folio/stripes/components', () => ({
   ...jest.requireActual('@folio/stripes/components'),
   collapseAllSections: jest.fn(),
   expandAllSections: jest.fn(),
   HasCommand: jest.fn(({ children }) => <div>{children}</div>),
+}));
+jest.mock('../../common/hooks', () => ({
+  ...jest.requireActual('../../common/hooks'),
+  useAccordionErrorTrigger: jest.fn(() => ({
+    onToggle: jest.fn(),
+    onExpandAllToggle: jest.fn(),
+    collapseAll: mockCollapseAll,
+  })),
 }));
 jest.mock('@folio/stripes/smart-components', () => ({
   ...jest.requireActual('@folio/stripes/smart-components'),
@@ -194,12 +203,12 @@ describe('POLineForm shortcuts', () => {
     expect(expandAllSections).toHaveBeenCalled();
   });
 
-  it('should call collapseAllSections when collapseAllSections shortcut is called', () => {
+  it('should call collapseAll when collapseAllSections shortcut is called', () => {
     renderPOLineForm();
 
     HasCommand.mock.calls[0][0].commands.find(c => c.name === 'collapseAllSections').handler();
 
-    expect(collapseAllSections).toHaveBeenCalled();
+    expect(mockCollapseAll).toHaveBeenCalled();
   });
 
   it('should cancel form when cancel shortcut is called', () => {

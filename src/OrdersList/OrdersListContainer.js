@@ -13,6 +13,7 @@ import {
 import { useCustomFields } from '@folio/stripes/smart-components';
 
 import { ENTITY_TYPE_ORDER } from '../common/constants';
+import { LIST_IGNORED_QUERY_PARAMS } from '../utils';
 import {
   ACQUISITIONS_UNITS,
   ORDERS,
@@ -64,7 +65,10 @@ const OrdersListContainer = ({ mutator }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const { pagination, changePage, refreshPage } = usePagination({ limit: RESULT_COUNT_INCREMENT, offset: 0 });
+  const { pagination, changePage, refreshPage } = usePagination(
+    { limit: RESULT_COUNT_INCREMENT, offset: 0 },
+    { ignoredSearchParams: LIST_IGNORED_QUERY_PARAMS },
+  );
   const [customFields, isLoadingCustomFields] = useCustomFields(CUSTOM_FIELDS_ORDERS_BACKEND_NAME, ENTITY_TYPE_ORDER);
 
   const {

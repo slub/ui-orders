@@ -8,7 +8,6 @@ import {
 import user from '@folio/jest-config-stripes/testing-library/user-event';
 import {
   HasCommand,
-  collapseAllSections,
   expandAllSections,
 } from '@folio/stripes/components';
 
@@ -17,11 +16,21 @@ import { ORDER_TYPE } from '../../common/constants';
 import POForm from './POForm';
 import { usePONumberFieldValidator } from './hooks';
 
+const mockCollapseAll = jest.fn();
+
 jest.mock('@folio/stripes/components', () => ({
   ...jest.requireActual('@folio/stripes/components'),
   collapseAllSections: jest.fn(),
   expandAllSections: jest.fn(),
   HasCommand: jest.fn(({ children }) => <div>{children}</div>),
+}));
+jest.mock('../../common/hooks', () => ({
+  ...jest.requireActual('../../common/hooks'),
+  useAccordionErrorTrigger: jest.fn(() => ({
+    onToggle: jest.fn(),
+    onExpandAllToggle: jest.fn(),
+    collapseAll: mockCollapseAll,
+  })),
 }));
 jest.mock('@folio/stripes/smart-components', () => ({
   ...jest.requireActual('@folio/stripes/smart-components'),
@@ -191,12 +200,12 @@ describe('POForm shortcuts', () => {
     expect(expandAllSections).toHaveBeenCalled();
   });
 
-  it('should call collapseAllSections when collapseAllSections shortcut is called', () => {
+  it('should call collapseAll when collapseAllSections shortcut is called', () => {
     renderPOForm();
 
     act(() => HasCommand.mock.calls[0][0].commands.find(c => c.name === 'collapseAllSections').handler());
 
-    expect(collapseAllSections).toHaveBeenCalled();
+    expect(mockCollapseAll).toHaveBeenCalled();
   });
 
   it('should clear fields after template change', async () => {

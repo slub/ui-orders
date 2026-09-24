@@ -36,6 +36,11 @@ export const ORDER_TYPE = {
 
 export const ORDERS_DOMAIN = 'orders';
 
+export const CONNECTED_RECORD_TYPES = {
+  ORDER: 'order',
+  ORDER_LINE: 'orderLine',
+};
+
 export const NOTE_TYPES = {
   poLine: 'poLine',
 };

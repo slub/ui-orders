@@ -19,7 +19,11 @@ import {
   expandAllSections,
   collapseAllSections,
 } from '@folio/stripes/components';
-import { ORDER_STATUSES } from '@folio/stripes-acq-components';
+import {
+  ORDER_STATUSES,
+  useOrganization,
+} from '@folio/stripes-acq-components';
+import { Pluggable } from '@folio/stripes/core';
 
 import { history } from 'fixtures/routerMocks';
 import {
@@ -36,6 +40,10 @@ import PO from './PO';
 
 const mockHandleOrderUpdateError = jest.fn();
 
+jest.mock('@folio/stripes-acq-components', () => ({
+  ...jest.requireActual('@folio/stripes-acq-components'),
+  useOrganization: jest.fn(),
+}));
 jest.mock('@folio/stripes-acq-components/lib/AcqUnits/hooks/useAcqRestrictions', () => ({
   useAcqRestrictions: jest.fn().mockReturnValue({ restrictions: {} }),
 }));
@@ -152,6 +160,8 @@ const setOrderResources = ({
 describe('PO', () => {
   beforeEach(() => {
     setOrderResources();
+    Pluggable.mockClear();
+    useOrganization.mockReturnValue({ organization: { name: 'Amazon' } });
   });
 
   afterEach(() => {
@@ -169,6 +179,50 @@ describe('PO', () => {
     renderComponent();
 
     expect(screen.queryByText('ViewCustomFieldsRecord')).toBeInTheDocument();
+  });
+
+  it('should provide the connected Tasks and Jobs button plugin', () => {
+    setOrderResources({ order: { poNumber: '10001' } });
+    renderComponent();
+
+    const pluginProps = Pluggable.mock.calls.find(([props]) => (
+      props.componentType === 'ConnectedTasksJobsButton'
+    ))[0];
+
+    expect(pluginProps).toEqual(expect.objectContaining({
+      componentType: 'ConnectedTasksJobsButton',
+      recordId: ORDER.id,
+      recordObject: {
+        poNumber: '10001',
+        vendorName: 'Amazon',
+        workflowStatus: ORDER_STATUSES.open,
+      },
+      recordType: 'order',
+      recordUrl: `/orders/view/${ORDER.id}`,
+      type: 'task-list',
+    }));
+  });
+
+  it('should provide the connected Tasks and Jobs pane plugin', () => {
+    setOrderResources({ order: { poNumber: '10001' } });
+    renderComponent();
+
+    const pluginProps = Pluggable.mock.calls.find(([props]) => (
+      props.componentType === 'ConnectedTasksJobsPane'
+    ))[0];
+
+    expect(pluginProps).toEqual(expect.objectContaining({
+      componentType: 'ConnectedTasksJobsPane',
+      recordId: ORDER.id,
+      recordObject: {
+        poNumber: '10001',
+        vendorName: 'Amazon',
+        workflowStatus: ORDER_STATUSES.open,
+      },
+      recordType: 'order',
+      recordUrl: `/orders/view/${ORDER.id}`,
+      type: 'task-list',
+    }));
   });
 });
 

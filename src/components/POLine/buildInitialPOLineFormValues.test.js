@@ -55,6 +55,7 @@ describe('buildInitialPOLineFormValues', () => {
       details: {
         subscriptionInterval: 'P1M',
       },
+      donorOrganizationIds: [],
       eresource: {
         accessProvider: 'vendor-1',
         createInventory: 'Instance, Holding',
@@ -137,6 +138,7 @@ describe('buildInitialPOLineFormValues', () => {
         ],
         subscriptionInterval: undefined,
       },
+      donorOrganizationIds: [],
       edition: 'ed-1',
       eresource: {
         createInventory: undefined,

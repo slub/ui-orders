@@ -38,6 +38,7 @@ export const FiscalYearsDistribution = ({
   isAddFYButtonHidden,
   isLoading,
   isNonInteractive,
+  isRequired,
   legend,
   name,
   onAddFiscalYear,
@@ -76,7 +77,7 @@ export const FiscalYearsDistribution = ({
     const validateFieldsMap = {
       fundId: [],
       expenseClassId: [],
-      distributionType: [name],
+      distributionType: (arrayFieldName) => [name, `${arrayFieldName}.value`],
       value: [name],
     };
 
@@ -95,6 +96,7 @@ export const FiscalYearsDistribution = ({
         onExpenseClassChange={onExpenseClassChange}
         onRemoveFiscalYear={handleRemoveFiscalYear}
         onRemoveFundDistribution={onRemoveFundDistribution}
+        isRequired={isRequired}
         showRemoveButton={showRemoveButton}
         totalAmount={totalAmount}
         validateFieldsMap={validateFieldsMap}
@@ -107,6 +109,7 @@ export const FiscalYearsDistribution = ({
     funds,
     intl,
     isNonInteractive,
+    isRequired,
     name,
     onExpenseClassChange,
     onRemoveFiscalYear,
@@ -155,6 +158,7 @@ FiscalYearsDistribution.propTypes = {
   isAddFYButtonHidden: PropTypes.bool,
   isLoading: PropTypes.bool,
   isNonInteractive: PropTypes.bool,
+  isRequired: PropTypes.bool,
   name: PropTypes.string.isRequired,
   onAddFiscalYear: PropTypes.func.isRequired,
   onExpenseClassChange: PropTypes.func.isRequired,

@@ -123,6 +123,27 @@ describe('useOrders', () => {
     });
   });
 
+  it('should not include the connected Tasks and Jobs pane layer in the CQL query', async () => {
+    useLocation.mockReturnValue({
+      search: queryString.stringify({
+        layer: 'connected-tasks-jobs',
+        [FILTERS.STATUS]: ['Open', 'Pending'],
+      }),
+    });
+
+    const fetchReferences = jest.fn().mockReturnValue(Promise.resolve({}));
+    const { result } = renderTestHook({
+      fetchReferences,
+      pagination: { limit: 5, offset: 0, timestamp: 43 },
+    });
+
+    await waitFor(() => expect(result.current.isLoading).toBeFalsy());
+
+    expect(getMock.mock.calls[0][1].searchParams.query).toBe(
+      '(workflowStatus==("Open" or "Pending")) sortby metadata.updatedDate/sort.descending',
+    );
+  });
+
   describe('Datetime filters', () => {
     const dateTimeConfig = {
       from: '2000-01-01',

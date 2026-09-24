@@ -19,6 +19,7 @@ const FieldVendorInstructions = ({ disabled }) => {
       name={POL_FORM_FIELDS.vendorDetailInstructions}
       style={styles}
       isNonInteractive={disabled}
+      validateFields={[]}
     />
   );
 };

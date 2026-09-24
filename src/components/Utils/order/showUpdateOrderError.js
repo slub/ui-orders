@@ -6,6 +6,7 @@ import { ResponseErrorsContainer } from '@folio/stripes-acq-components';
 
 import { ERROR_CODES } from '../../../common/constants';
 import {
+  inactiveExpenseClassStrategy,
   noBudgetForFiscalYearStrategy,
   noExpenseClassesStrategy,
   restrictedLocationViolationStrategy,
@@ -106,6 +107,10 @@ const showUpdateOrderError = async (response, options = {}) => {
     }
     case ERROR_CODES.budgetNotFoundForFiscalYear: {
       handler.handle(noBudgetForFiscalYearStrategy({ callout, ...strategyOptions }));
+      break;
+    }
+    case ERROR_CODES.inactiveExpenseClass: {
+      handler.handle(inactiveExpenseClassStrategy({ callout, ...strategyOptions }));
       break;
     }
     default: {

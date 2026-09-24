@@ -161,7 +161,8 @@
         "visible": false,
         "subPermissions": [
           "mod-settings.global.read.ui-orders.custom-fields.manage",
-          "orders-storage.custom-fields.collection.get"
+          "orders-storage.custom-fields.collection.get",
+          "orders-storage.custom-fields.sections.collection.get"
         ]
       },
       {
@@ -356,6 +357,8 @@
           "settings.orders.enabled",
           "configuration.entries.collection.get",
           "finance.exchange-rate.item.get",
+          "finance.fiscal-years.collection.get",
+          "finance.fiscal-years.item.get",
           "finance.funds.expense-classes.collection.get",
           "inventory.instances.collection.get",
           "orders.acquisition-methods.collection.get",
@@ -464,6 +467,8 @@
           "orders-storage.custom-fields.item.get",
           "orders-storage.custom-fields.item.stats.get",
           "orders-storage.custom-fields.item.option.stats.get",
+          "orders-storage.custom-fields.sections.collection.get",
+          "orders-storage.custom-fields.sections.item.get",
           "orders-storage.settings.collection.get"
         ]
       },
@@ -479,7 +484,9 @@
           "mod-settings.entries.item.put",
           "orders-storage.custom-fields.collection.put",
           "orders-storage.custom-fields.item.post",
-          "orders-storage.custom-fields.item.put"
+          "orders-storage.custom-fields.item.put",
+          "orders-storage.custom-fields.sections.item.post",
+          "orders-storage.custom-fields.sections.item.put"
         ]
       },
       {
@@ -489,7 +496,8 @@
         "visible": true,
         "subPermissions": [
           "ui-orders.settings.custom-fields.edit",
-          "orders-storage.custom-fields.item.delete"
+          "orders-storage.custom-fields.item.delete",
+          "orders-storage.custom-fields.sections.item.delete"
         ]
       },
       {
@@ -607,7 +615,7 @@
     "@bigtest/mocha": "^0.5.1",
     "@bigtest/react": "^0.1.2",
     "@folio/eslint-config-stripes": "^9.0.0",
-    "@folio/jest-config-stripes": "^3.1.0",
+    "@folio/jest-config-stripes": "^4.0.0",
     "@folio/stripes": "^10.0.0",
     "@folio/stripes-cli": "^5.0.0",
     "chai": "^4.2.0",

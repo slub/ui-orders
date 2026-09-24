@@ -17,7 +17,6 @@ import {
   Button,
   checkScope,
   Col,
-  collapseAllSections,
   ExpandAllButton,
   expandAllSections,
   HasCommand,
@@ -37,6 +36,7 @@ import {
   VisibilityControl,
 } from '@folio/stripes-acq-components';
 
+import { AccordionInfoPopover } from '../../../common';
 import {
   ENTITY_TYPE_ORDER,
   ENTITY_TYPE_PO_LINE,
@@ -60,7 +60,7 @@ import {
   isOtherResource,
 } from '../../../common/POLFields';
 import {
-  useErrorAccordionStatus,
+  useAccordionErrorTrigger,
   useFundDistributionValidation,
 } from '../../../common/hooks';
 import {
@@ -69,6 +69,7 @@ import {
 } from '../../../common/utils';
 import { ItemForm } from '../../../components/POLine/Item';
 import { CostForm } from '../../../components/POLine/Cost';
+import { useMultiYearPaymentChange } from '../../../components/POLine/hooks';
 import { OngoingOrderForm } from '../../../components/POLine/OngoingOrder';
 import { PaymentTermsFormContainer } from '../../../components/POLine/PaymentTerms';
 import TemplateInformationForm from './TemplateInformationForm';
@@ -130,7 +131,11 @@ const OrderTemplatesEditor = ({
 
   const formErrors = getState()?.errors;
   const errors = useMemo(() => omitFieldArraysAsyncErrors(formErrors, ['fundDistribution']), [formErrors]);
-  const errorAccordionStatus = useErrorAccordionStatus({ errors, fieldsMap: MAP_FIELD_ACCORDION });
+  const {
+    onToggle: onToggleWithErrorGuard,
+    onExpandAllToggle,
+    collapseAll,
+  } = useAccordionErrorTrigger({ errors, fieldsMap: MAP_FIELD_ACCORDION, accordionStatusRef });
 
   const changeLocation = useCallback((location, locationFieldName, holdingFieldName, holdingId) => {
     const locationId = holdingId ? undefined : location?.id || location;
@@ -141,6 +146,8 @@ const OrderTemplatesEditor = ({
       change(holdingFieldName, holdingId);
     }
   }, [change]);
+
+  const { onChange: onMultiYearPaymentChange } = useMultiYearPaymentChange(accordionStatusRef);
 
   const getLastMenu = () => {
     return (
@@ -193,7 +200,7 @@ const OrderTemplatesEditor = ({
     },
     {
       name: 'collapseAllSections',
-      handler: (e) => collapseAllSections(e, accordionStatusRef),
+      handler: collapseAll,
     },
   ];
 
@@ -221,290 +228,293 @@ const OrderTemplatesEditor = ({
         scope={document.body}
       >
         <AccordionStatus ref={accordionStatusRef}>
-          {({ status }) => (
-            <form
-              id="order-template-form"
-              onSubmit={handleSubmit}
-              className={css.orderTemplatesEditor}
+          <form
+            id="order-template-form"
+            onSubmit={handleSubmit}
+            className={css.orderTemplatesEditor}
+          >
+            <Pane
+              id="order-settings-order-templates-editor"
+              defaultWidth="fill"
+              paneTitle={title}
+              dismissible
+              onClose={close}
+              lastMenu={getLastMenu()}
             >
-              <Pane
-                id="order-settings-order-templates-editor"
-                defaultWidth="fill"
-                paneTitle={title}
-                dismissible
-                onClose={close}
-                lastMenu={getLastMenu()}
-              >
-                <Row center="xs">
-                  <Col xs={12} md={8}>
-                    <Row end="xs">
-                      <Col xs={12}>
-                        <ExpandAllButton />
-                      </Col>
-                    </Row>
-                  </Col>
-                </Row>
+              <Row center="xs">
+                <Col xs={12} md={8}>
+                  <Row end="xs">
+                    <Col xs={12}>
+                      <ExpandAllButton onToggle={onExpandAllToggle} />
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
 
-                <Row center="xs">
-                  <Col xs={12} md={8} style={{ textAlign: 'left' }}>
-                    <AccordionSet
-                      initialStatus={INITIAL_SECTIONS}
-                      accordionStatus={{ ...status, ...errorAccordionStatus }}
+              <Row center="xs">
+                <Col xs={12} md={8} style={{ textAlign: 'left' }}>
+                  <AccordionSet
+                    initialStatus={INITIAL_SECTIONS}
+                    onToggle={onToggleWithErrorGuard}
+                  >
+                    <Accordion
+                      label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.TEMPLATE_INFO]}
+                      id={ORDER_TEMPLATES_ACCORDION.TEMPLATE_INFO}
                     >
-                      <Accordion
-                        label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.TEMPLATE_INFO]}
-                        id={ORDER_TEMPLATES_ACCORDION.TEMPLATE_INFO}
-                      >
-                        <TemplateInformationForm orderTemplateCategories={orderTemplateCategories} />
-                      </Accordion>
+                      <TemplateInformationForm orderTemplateCategories={orderTemplateCategories} />
+                    </Accordion>
 
-                      <Accordion
-                        label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.PO_INFO]}
-                        id={ORDER_TEMPLATES_ACCORDION.PO_INFO}
-                      >
-                        <PurchaseOrderInformationForm
-                          acqUnitIds={initialValues.acqUnitIds || []}
-                          prefixesSetting={prefixesSetting}
-                          suffixesSetting={suffixesSetting}
-                          addresses={addresses}
-                          setVendor={setVendor}
-                        />
-                      </Accordion>
-
-                      {isOngoing(get(formValues, PO_FORM_FIELDS.orderType)) && <OngoingInfoForm />}
-
-                      <Accordion
-                        label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.PO_NOTES]}
-                        id={ORDER_TEMPLATES_ACCORDION.PO_NOTES}
-                        displayWhenClosed={notesVisibilityControl}
-                        displayWhenOpen={notesVisibilityControl}
-                      >
-                        <PurchaseOrderNotesForm />
-                      </Accordion>
-
-                      <Accordion
-                        label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.PO_TAGS]}
-                        id={ORDER_TEMPLATES_ACCORDION.PO_TAGS}
-                      >
-                        <Row>
-                          <Col xs={3}>
-                            <VisibilityControl name="hiddenFields.poTags">
-                              <FieldTags
-                                change={change}
-                                formValues={formValues}
-                                name="poTags.tagList"
-                              />
-                            </VisibilityControl>
-                          </Col>
-                        </Row>
-                      </Accordion>
-
-                      <Accordion
-                        label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.PO_SUMMARY]}
-                        id={ORDER_TEMPLATES_ACCORDION.PO_SUMMARY}
-                      >
-                        <PurchaseOrderSummaryForm />
-                      </Accordion>
-
-                      <Accordion
-                        label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_ITEM_DETAILS]}
-                        id={ORDER_TEMPLATES_ACCORDION.POL_ITEM_DETAILS}
-                      >
-                        <ItemForm
-                          identifierTypes={identifierTypes}
-                          contributorNameTypes={contributorNameTypes}
-                          order={ORDER}
-                          formValues={formValues}
-                          change={change}
-                          batch={batch}
-                          required={false}
-                          stripes={stripes}
-                        />
-                      </Accordion>
-
-                      <Accordion
-                        label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_DETAILS]}
-                        id={ORDER_TEMPLATES_ACCORDION.POL_DETAILS}
-                      >
-                        <POLineDetailsForm
-                          formValues={formValues}
-                          createInventorySetting={createInventorySetting}
-                        />
-                      </Accordion>
-
-                      <Accordion
-                        label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_DONORS_INFORMATION]}
-                        id={ORDER_TEMPLATES_ACCORDION.POL_DONORS_INFORMATION}
-                        displayWhenOpen={donorsVisibilityControl}
-                        displayWhenClosed={donorsVisibilityControl}
-                      >
-                        <DonorInformationForm />
-                      </Accordion>
-
-                      {isOngoing(orderType) && (
-                        <Accordion
-                          label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_ONGOING_ORDER]}
-                          id={ORDER_TEMPLATES_ACCORDION.POL_ONGOING_ORDER}
-                        >
-                          <OngoingOrderForm />
-                        </Accordion>
-                      )}
-
-                      <Accordion
-                        label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_VENDOR]}
-                        id={ORDER_TEMPLATES_ACCORDION.POL_VENDOR}
-                      >
-                        <POLineVendorForm accounts={accounts} />
-                      </Accordion>
-
-                      <Accordion
-                        label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_COST_DETAILS]}
-                        id={ORDER_TEMPLATES_ACCORDION.POL_COST_DETAILS}
-                      >
-                        <CostForm
-                          formValues={formValues}
-                          order={ORDER}
-                          required={false}
-                          initialValues={initialValues}
-                          change={change}
-                        />
-                      </Accordion>
-
-                      <Accordion
-                        label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_FUND_DISTIBUTION]}
-                        id={ORDER_TEMPLATES_ACCORDION.POL_FUND_DISTIBUTION}
-                        displayWhenClosed={fundDistributionVisibilityControl}
-                        displayWhenOpen={fundDistributionVisibilityControl}
-                      >
-                        <FundDistributionFieldsFinal
-                          change={change}
-                          currency={currency}
-                          fundDistribution={fundDistribution}
-                          name="fundDistribution"
-                          totalAmount={estimatedPrice}
-                          required={false}
-                          validateFundDistributionTotal={validateFundDistributionTotal}
-                        />
-                      </Accordion>
-
-                      {isOngoing(orderType) && (
-                        <Accordion
-                          label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_PAYMENT_TERMS]}
-                          id={ORDER_TEMPLATES_ACCORDION.POL_PAYMENT_TERMS}
-                          displayWhenClosed={paymentTermsVisibilityControl}
-                          displayWhenOpen={paymentTermsVisibilityControl}
-                        >
-                          <PaymentTermsFormContainer isTemplate />
-                        </Accordion>
-                      )}
-
-                      <Accordion
-                        label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_LOCATION]}
-                        id={ORDER_TEMPLATES_ACCORDION.POL_LOCATION}
-                        displayWhenClosed={locationsVisibilityControl}
-                        displayWhenOpen={locationsVisibilityControl}
-                      >
-                        <POLineLocationsForm
-                          centralOrdering={centralOrdering}
-                          changeLocation={changeLocation}
-                          locationIds={locationIds}
-                          locations={locations}
-                          formValues={formValues}
-                        />
-                      </Accordion>
-
-                      {
-                        isPhresource(orderFormat) && (
-                          <Accordion
-                            label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_FRESOURCES]}
-                            id={ORDER_TEMPLATES_ACCORDION.POL_FRESOURCES}
-                          >
-                            <POLinePhysicalForm
-                              materialTypes={materialTypes}
-                              change={change}
-                              formValues={formValues}
-                            />
-                          </Accordion>
-                        )
-                      }
-
-                      {
-                        isEresource(orderFormat) && (
-                          <Accordion
-                            label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_ERESOURCES]}
-                            id={ORDER_TEMPLATES_ACCORDION.POL_ERESOURCES}
-                          >
-                            <POLineEresourcesForm
-                              materialTypes={materialTypes}
-                              change={change}
-                              formValues={formValues}
-                            />
-                          </Accordion>
-                        )
-                      }
-
-                      {
-                        isOtherResource(orderFormat) && (
-                          <Accordion
-                            label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_OTHER_RESOURCES]}
-                            id={ORDER_TEMPLATES_ACCORDION.POL_OTHER_RESOURCES}
-                          >
-                            <POLineOtherResourcesForm
-                              materialTypes={materialTypes}
-                              change={change}
-                              formValues={formValues}
-                            />
-                          </Accordion>
-                        )
-                      }
-
-                      <Accordion
-                        label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_TAGS]}
-                        id={ORDER_TEMPLATES_ACCORDION.POL_TAGS}
-                      >
-                        <Row>
-                          <Col xs={3}>
-                            <VisibilityControl name="hiddenFields.polTags">
-                              <FieldTags
-                                change={change}
-                                formValues={formValues}
-                                name="polTags.tagList"
-                              />
-                            </VisibilityControl>
-                          </Col>
-                        </Row>
-                      </Accordion>
-
-                      <EditCustomFieldsRecord
-                        accordionId={ORDER_TEMPLATES_ACCORDION.PO_CUSTOM_FIELDS}
-                        backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
-                        changeFinalFormField={change}
-                        entityType={ENTITY_TYPE_ORDER}
-                        fieldComponent={Field}
-                        finalFormCustomFieldsValues={customFieldsValues}
-                        displayWhenClosed={customPOFieldsVisibilityControl}
-                        displayWhenOpen={customPOFieldsVisibilityControl}
-                        configNamePrefix={PO_CONFIG_NAME_PREFIX}
-                        scope={SCOPE_CUSTOM_FIELDS_MANAGE}
+                    <Accordion
+                      label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.PO_INFO]}
+                      id={ORDER_TEMPLATES_ACCORDION.PO_INFO}
+                    >
+                      <PurchaseOrderInformationForm
+                        acqUnitIds={initialValues.acqUnitIds || []}
+                        prefixesSetting={prefixesSetting}
+                        suffixesSetting={suffixesSetting}
+                        addresses={addresses}
+                        setVendor={setVendor}
                       />
-                      <EditCustomFieldsRecord
-                        accordionId={ORDER_TEMPLATES_ACCORDION.POL_CUSTOM_FIELDS}
-                        backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
-                        changeFinalFormField={change}
-                        entityType={ENTITY_TYPE_PO_LINE}
-                        fieldComponent={Field}
-                        finalFormCustomFieldsValues={customFieldsValues}
-                        displayWhenClosed={customPOLineFieldsVisibilityControl}
-                        displayWhenOpen={customPOLineFieldsVisibilityControl}
-                        configNamePrefix={PO_LINE_CONFIG_NAME_PREFIX}
-                        scope={SCOPE_CUSTOM_FIELDS_MANAGE}
+                    </Accordion>
+
+                    {isOngoing(get(formValues, PO_FORM_FIELDS.orderType)) && <OngoingInfoForm />}
+
+                    <Accordion
+                      label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.PO_NOTES]}
+                      id={ORDER_TEMPLATES_ACCORDION.PO_NOTES}
+                      displayWhenClosed={notesVisibilityControl}
+                      displayWhenOpen={notesVisibilityControl}
+                    >
+                      <PurchaseOrderNotesForm />
+                    </Accordion>
+
+                    <Accordion
+                      label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.PO_TAGS]}
+                      id={ORDER_TEMPLATES_ACCORDION.PO_TAGS}
+                    >
+                      <Row>
+                        <Col xs={3}>
+                          <VisibilityControl name="hiddenFields.poTags">
+                            <FieldTags
+                              change={change}
+                              formValues={formValues}
+                              name="poTags.tagList"
+                            />
+                          </VisibilityControl>
+                        </Col>
+                      </Row>
+                    </Accordion>
+
+                    <Accordion
+                      label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.PO_SUMMARY]}
+                      id={ORDER_TEMPLATES_ACCORDION.PO_SUMMARY}
+                    >
+                      <PurchaseOrderSummaryForm />
+                    </Accordion>
+
+                    <Accordion
+                      label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_ITEM_DETAILS]}
+                      id={ORDER_TEMPLATES_ACCORDION.POL_ITEM_DETAILS}
+                    >
+                      <ItemForm
+                        identifierTypes={identifierTypes}
+                        contributorNameTypes={contributorNameTypes}
+                        order={ORDER}
+                        formValues={formValues}
+                        change={change}
+                        batch={batch}
+                        required={false}
+                        stripes={stripes}
                       />
-                    </AccordionSet>
-                  </Col>
-                </Row>
-              </Pane>
-            </form>
-          )}
+                    </Accordion>
+
+                    <Accordion
+                      label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_DETAILS]}
+                      id={ORDER_TEMPLATES_ACCORDION.POL_DETAILS}
+                    >
+                      <POLineDetailsForm
+                        formValues={formValues}
+                        createInventorySetting={createInventorySetting}
+                      />
+                    </Accordion>
+
+                    <Accordion
+                      label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_DONORS_INFORMATION]}
+                      id={ORDER_TEMPLATES_ACCORDION.POL_DONORS_INFORMATION}
+                      displayWhenOpen={donorsVisibilityControl}
+                      displayWhenClosed={donorsVisibilityControl}
+                    >
+                      <DonorInformationForm />
+                    </Accordion>
+
+                    {isOngoing(orderType) && (
+                      <Accordion
+                        label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_ONGOING_ORDER]}
+                        id={ORDER_TEMPLATES_ACCORDION.POL_ONGOING_ORDER}
+                      >
+                        <OngoingOrderForm onMultiYearPaymentChange={onMultiYearPaymentChange} />
+                      </Accordion>
+                    )}
+
+                    <Accordion
+                      label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_VENDOR]}
+                      id={ORDER_TEMPLATES_ACCORDION.POL_VENDOR}
+                    >
+                      <POLineVendorForm accounts={accounts} />
+                    </Accordion>
+
+                    <Accordion
+                      label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_COST_DETAILS]}
+                      id={ORDER_TEMPLATES_ACCORDION.POL_COST_DETAILS}
+                    >
+                      <CostForm
+                        formValues={formValues}
+                        order={ORDER}
+                        required={false}
+                        initialValues={initialValues}
+                        change={change}
+                      />
+                    </Accordion>
+
+                    <Accordion
+                      label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_FUND_DISTIBUTION]}
+                      id={ORDER_TEMPLATES_ACCORDION.POL_FUND_DISTIBUTION}
+                      displayWhenClosed={fundDistributionVisibilityControl}
+                      displayWhenOpen={fundDistributionVisibilityControl}
+                    >
+                      <FundDistributionFieldsFinal
+                        change={change}
+                        currency={currency}
+                        fundDistribution={fundDistribution}
+                        name="fundDistribution"
+                        totalAmount={estimatedPrice}
+                        required={false}
+                        validateFundDistributionTotal={validateFundDistributionTotal}
+                      />
+                    </Accordion>
+
+                    {isOngoing(orderType) && (
+                      <Accordion
+                        label={(
+                          <>
+                            {ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_PAYMENT_TERMS]}
+                            <AccordionInfoPopover content={<FormattedMessage id="ui-orders.line.accordion.paymentTerms.infoPopover" />} />
+                          </>
+                        )}
+                        id={ORDER_TEMPLATES_ACCORDION.POL_PAYMENT_TERMS}
+                        displayWhenClosed={paymentTermsVisibilityControl}
+                        displayWhenOpen={paymentTermsVisibilityControl}
+                      >
+                        <PaymentTermsFormContainer isTemplate />
+                      </Accordion>
+                    )}
+
+                    <Accordion
+                      label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_LOCATION]}
+                      id={ORDER_TEMPLATES_ACCORDION.POL_LOCATION}
+                      displayWhenClosed={locationsVisibilityControl}
+                      displayWhenOpen={locationsVisibilityControl}
+                    >
+                      <POLineLocationsForm
+                        centralOrdering={centralOrdering}
+                        changeLocation={changeLocation}
+                        locationIds={locationIds}
+                        locations={locations}
+                        formValues={formValues}
+                      />
+                    </Accordion>
+
+                    {
+                      isPhresource(orderFormat) && (
+                        <Accordion
+                          label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_FRESOURCES]}
+                          id={ORDER_TEMPLATES_ACCORDION.POL_FRESOURCES}
+                        >
+                          <POLinePhysicalForm
+                            materialTypes={materialTypes}
+                            change={change}
+                            formValues={formValues}
+                          />
+                        </Accordion>
+                      )
+                    }
+
+                    {
+                      isEresource(orderFormat) && (
+                        <Accordion
+                          label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_ERESOURCES]}
+                          id={ORDER_TEMPLATES_ACCORDION.POL_ERESOURCES}
+                        >
+                          <POLineEresourcesForm
+                            materialTypes={materialTypes}
+                            change={change}
+                            formValues={formValues}
+                          />
+                        </Accordion>
+                      )
+                    }
+
+                    {
+                      isOtherResource(orderFormat) && (
+                        <Accordion
+                          label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_OTHER_RESOURCES]}
+                          id={ORDER_TEMPLATES_ACCORDION.POL_OTHER_RESOURCES}
+                        >
+                          <POLineOtherResourcesForm
+                            materialTypes={materialTypes}
+                            change={change}
+                            formValues={formValues}
+                          />
+                        </Accordion>
+                      )
+                    }
+
+                    <Accordion
+                      label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_TAGS]}
+                      id={ORDER_TEMPLATES_ACCORDION.POL_TAGS}
+                    >
+                      <Row>
+                        <Col xs={3}>
+                          <VisibilityControl name="hiddenFields.polTags">
+                            <FieldTags
+                              change={change}
+                              formValues={formValues}
+                              name="polTags.tagList"
+                            />
+                          </VisibilityControl>
+                        </Col>
+                      </Row>
+                    </Accordion>
+
+                    <EditCustomFieldsRecord
+                      accordionId={ORDER_TEMPLATES_ACCORDION.PO_CUSTOM_FIELDS}
+                      backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
+                      changeFinalFormField={change}
+                      entityType={ENTITY_TYPE_ORDER}
+                      fieldComponent={Field}
+                      finalFormCustomFieldsValues={customFieldsValues}
+                      displayWhenClosed={customPOFieldsVisibilityControl}
+                      displayWhenOpen={customPOFieldsVisibilityControl}
+                      configNamePrefix={PO_CONFIG_NAME_PREFIX}
+                      scope={SCOPE_CUSTOM_FIELDS_MANAGE}
+                    />
+                    <EditCustomFieldsRecord
+                      accordionId={ORDER_TEMPLATES_ACCORDION.POL_CUSTOM_FIELDS}
+                      backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
+                      changeFinalFormField={change}
+                      entityType={ENTITY_TYPE_PO_LINE}
+                      fieldComponent={Field}
+                      finalFormCustomFieldsValues={customFieldsValues}
+                      displayWhenClosed={customPOLineFieldsVisibilityControl}
+                      displayWhenOpen={customPOLineFieldsVisibilityControl}
+                      configNamePrefix={PO_LINE_CONFIG_NAME_PREFIX}
+                      scope={SCOPE_CUSTOM_FIELDS_MANAGE}
+                    />
+                  </AccordionSet>
+                </Col>
+              </Row>
+            </Pane>
+          </form>
         </AccordionStatus>
       </HasCommand>
     </Layer>

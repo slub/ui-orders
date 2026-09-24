@@ -17,6 +17,7 @@ import ReactRouterPropTypes from 'react-router-prop-types';
 import {
   stripesConnect,
   stripesShape,
+  useOkapiKy,
 } from '@folio/stripes/core';
 import {
   ErrorModal,
@@ -25,17 +26,17 @@ import {
 import { useCustomFields } from '@folio/stripes/smart-components';
 import {
   CUSTOM_FIELDS_ORDERS_BACKEND_NAME,
-  DICT_CONTRIBUTOR_NAME_TYPES,
-  DICT_IDENTIFIER_TYPES,
   getConfigSetting,
   LIMIT_MAX,
-  materialTypesManifest,
   ORDER_FORMATS,
   ResponseErrorsContainer,
   useCentralOrderingContext,
+  useContributorNameTypes,
   useFunds,
+  useIdentifierTypes,
   useIntegrationConfigs,
   useLocationsQuery,
+  useMaterialTypes,
   useModalToggle,
   useOrganization,
   useShowCallout,
@@ -59,6 +60,7 @@ import {
   useOrderTemplate,
 } from '../../common/hooks';
 import {
+  fetchOrderById,
   getCreateInventorySetting,
   getExportAccountNumbers,
   handleOrderLoadingError,
@@ -72,10 +74,8 @@ import {
 } from '../Utils/orderResource';
 import {
   APPROVALS_SETTING,
-  CONTRIBUTOR_NAME_TYPES,
   CONVERT_TO_ISBN13,
   CREATE_INVENTORY,
-  IDENTIFIER_TYPES,
   ORDER_LINES,
   ORDER_NUMBER,
   ORDERS,
@@ -138,6 +138,7 @@ function LayerPOLine({
   resources,
   stripes,
 }) {
+  const ky = useOkapiKy();
   const intl = useIntl();
   const sendCallout = useShowCallout();
   const { isCentralOrderingEnabled } = useCentralOrderingContext();
@@ -232,6 +233,21 @@ function LayerPOLine({
     isLoading: isAcqMethodsLoading,
   } = useAcqMethods();
 
+  const {
+    materialTypes,
+    isLoading: isMaterialTypesLoading,
+  } = useMaterialTypes();
+
+  const {
+    contributorNameTypes,
+    isLoading: isContributorNameTypesLoading,
+  } = useContributorNameTypes();
+
+  const {
+    identifierTypes,
+    isLoading: isIdentifierTypesLoading,
+  } = useIdentifierTypes();
+
   const { isOpenOrderEnabled, isDuplicateCheckDisabled } = openOrderSettings;
 
   /* Parse resources */
@@ -240,16 +256,16 @@ function LayerPOLine({
   const createInventorySetting = useMemo(() => getCreateInventorySetting(createInventory), [createInventory]);
 
   const identifierTypeOptions = useMemo(() => {
-    return getIdentifierTypesForSelect(resources?.identifierTypes?.records);
-  }, [resources?.identifierTypes?.records]);
+    return getIdentifierTypesForSelect(identifierTypes);
+  }, [identifierTypes]);
 
   const materialTypeOptions = useMemo(() => {
-    return getMaterialTypesForSelect(resources?.materialTypes?.records);
-  }, [resources?.materialTypes?.records]);
+    return getMaterialTypesForSelect(materialTypes);
+  }, [materialTypes]);
 
   const contributorNameTypeOptions = useMemo(() => {
-    return getContributorNameTypesForSelect(resources?.contributorNameTypes?.records);
-  }, [resources?.contributorNameTypes?.records]);
+    return getContributorNameTypesForSelect(contributorNameTypes);
+  }, [contributorNameTypes]);
   /*  */
 
   const isOrderApproved = isApprovalRequired ? order?.approved : true;
@@ -333,9 +349,12 @@ function LayerPOLine({
       return Promise.reject({ validationError: VALIDATION_ERRORS.differentAccount });
     }
 
-    return updateOrderResource(order, mutator.lineOrder, {
-      workflowStatus: WORKFLOW_STATUS.open,
-    })
+    return fetchOrderById(ky)(order.id)
+      .then((latestOrderVersion) => {
+        return updateOrderResource(latestOrderVersion, mutator.lineOrder, {
+          workflowStatus: WORKFLOW_STATUS.open,
+        });
+      })
       .then(() => {
         sendCallout({
           message: (
@@ -359,7 +378,7 @@ function LayerPOLine({
         });
         throw errorResponse;
       });
-  }, [mutator.lineOrder, order, sendCallout]);
+  }, [ky, mutator.lineOrder, order, sendCallout]);
 
   const submitPOLine = useCallback(async (lineValues) => {
     const {
@@ -588,26 +607,26 @@ function LayerPOLine({
   }, [locations, rawTemplate]);
 
   const isntLoaded = !(
-    get(resources, 'createInventory.hasLoaded') &&
-    !isOrderLoading &&
-    (!lineId || poLine) &&
-    get(resources, 'approvalsSetting.hasLoaded') &&
-    get(resources, `${DICT_CONTRIBUTOR_NAME_TYPES}.hasLoaded`) &&
-    vendor &&
-    get(resources, `${DICT_IDENTIFIER_TYPES}.hasLoaded`) &&
-    get(resources, 'materialTypes.hasLoaded') &&
-    get(order, 'id') === id &&
-    !isOrderTemplateFetching &&
-    !isLinesLimitLoading &&
-    !isConfigsFetching &&
-    !isOpenOrderSettingsFetching &&
-    !isInstanceLoading &&
-    !isLocationsLoading &&
-    !isOrderLineLoading &&
-    !isVendorLoading &&
-    !isCustomFieldsLoading &&
-    !isFundsLoading &&
-    !isAcqMethodsLoading
+    resources?.createInventory?.hasLoaded
+    && !isOrderLoading
+    && (!lineId || poLine)
+    && resources?.approvalsSetting.hasLoaded
+    && vendor
+    && order?.id === id
+    && !isOrderTemplateFetching
+    && !isLinesLimitLoading
+    && !isConfigsFetching
+    && !isOpenOrderSettingsFetching
+    && !isInstanceLoading
+    && !isLocationsLoading
+    && !isOrderLineLoading
+    && !isVendorLoading
+    && !isCustomFieldsLoading
+    && !isFundsLoading
+    && !isAcqMethodsLoading
+    && !isMaterialTypesLoading
+    && !isContributorNameTypesLoading
+    && !isIdentifierTypesLoading
   );
 
   const initialValues = useMemo(() => {
@@ -659,7 +678,7 @@ function LayerPOLine({
         centralOrdering={isCentralOrderingEnabled}
         contributorNameTypeOptions={contributorNameTypeOptions}
         createInventorySetting={createInventorySetting}
-        enableSaveBtn={Boolean(savingValues)}
+        enableSaveBtn={Boolean(savingValues || isCreateFromInstance)}
         fieldArraysToHydrate={PO_LINE_FORM_FIELD_ARRAYS_TO_HYDRATE}
         funds={funds}
         identifierTypeOptions={identifierTypeOptions}
@@ -730,16 +749,9 @@ LayerPOLine.manifest = Object.freeze({
     fetch: false,
   },
   approvalsSetting: APPROVALS_SETTING,
-  [DICT_CONTRIBUTOR_NAME_TYPES]: CONTRIBUTOR_NAME_TYPES,
   poLines: ORDER_LINES,
   createInventory: CREATE_INVENTORY,
-  materialTypes: {
-    ...materialTypesManifest,
-    accumulate: false,
-    fetch: true,
-  },
   convertToIsbn13: CONVERT_TO_ISBN13,
-  [DICT_IDENTIFIER_TYPES]: IDENTIFIER_TYPES,
   orderNumber: ORDER_NUMBER,
   orders: ORDERS,
 });

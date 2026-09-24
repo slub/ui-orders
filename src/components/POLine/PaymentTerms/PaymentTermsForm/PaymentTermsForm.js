@@ -14,6 +14,7 @@ import { FormattedMessage } from 'react-intl';
 import {
   Col,
   InfoPopover,
+  Layout,
   Loading,
   Row,
 } from '@folio/stripes/components';
@@ -100,17 +101,30 @@ export const PaymentTermsForm = ({
     && remainingAmount !== undefined
   );
   const remainingAmountNode = (
-    <FormattedMessage
-      id="stripes-acq-components.fundDistribution.remainingAmount"
-      values={{
-        remainingAmount: (
-          <AmountWithCurrencyField
-            currency={currency}
-            amount={displayCalculatedRemainingAmount ? remainingAmount : totalPrice}
-          />
-        ),
-      }}
-    />
+    <Layout
+      className="flex"
+      element="span"
+    >
+      <FormattedMessage
+        id="stripes-acq-components.fundDistribution.remainingAmount"
+        values={{
+          remainingAmount: (
+            <AmountWithCurrencyField
+              currency={currency}
+              amount={displayCalculatedRemainingAmount ? remainingAmount : totalPrice}
+            />
+          ),
+        }}
+      />
+      {isFundDistributionValidating && (
+        <Layout
+          className="indent"
+          element="span"
+        >
+          <Loading size="small" />
+        </Layout>
+      )}
+    </Layout>
   );
 
   const onAddFiscalYearDistribution = useCallback((fields) => {
@@ -158,7 +172,13 @@ export const PaymentTermsForm = ({
     [validateFundDistributionTotal],
   );
 
-  const validateFiscalYearsDistributions = useCallback(async (value) => {
+  const validateFiscalYearsDistributions = useCallback(async (value, allValues) => {
+    if (!allValues.multiYearPayment) {
+      setHasValidationError(false);
+
+      return undefined;
+    }
+
     setIsFundDistributionValidating(true);
 
     try {
@@ -234,14 +254,15 @@ export const PaymentTermsForm = ({
             isAddFYButtonDisabled={isAddFYButtonDisabled}
             isLoading={isLoading}
             isNonInteractive={isNonInteractive}
-            legend={isFundDistributionValidating ? <Loading /> : remainingAmountNode}
+            isRequired={isRequired}
+            legend={remainingAmountNode}
             name={`${rootFieldName}.fiscalYearDistributions`}
             onAddFiscalYear={onAddFiscalYearDistribution}
             onExpenseClassChange={onExpenseClassChange}
             onRemoveFiscalYear={onRemoveFiscalYearDistribution}
             onRemoveFundDistribution={onRemoveFundDistribution}
             totalAmount={totalPrice}
-            validate={isRequired ? validateFiscalYearsDistributions : undefined}
+            validate={isTemplate ? undefined : validateFiscalYearsDistributions}
           />
         </Col>
       </Row>

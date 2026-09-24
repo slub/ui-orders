@@ -72,7 +72,7 @@ export const EXPORT_LINE_FIELDS = {
   poLineEstimatedPrice: 'Estimated price',
   currency: 'Currency',
   fundDistribution: 'Fund code, Expense class, Value, Amount',
-  multiYearPayment: 'Multi-year payment',
+  multiYearPayment: 'Multi-year prepayment',
   prepaymentTerm: 'Prepayment term',
   prepaymentStartingFY: 'Prepayment starting fiscal year',
   prepaymentTotalPrice: 'Prepayment total price',

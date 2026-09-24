@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import user from '@folio/jest-config-stripes/testing-library/user-event';
 import { act, render, screen } from '@folio/jest-config-stripes/testing-library/react';
 import { ORDER_TYPES } from '@folio/stripes-acq-components';
+import { Pluggable } from '@folio/stripes/core';
 
 import {
   orderLine,
@@ -40,6 +41,7 @@ jest.mock('@folio/stripes-acq-components', () => ({
   DonorsListContainer: jest.fn().mockReturnValue('DonorsListContainer'),
   FundDistributionView: jest.fn(() => 'FundDistributionView'),
   RoutingListAccordion: jest.fn().mockReturnValue('RoutingListAccordion'),
+  useOrganization: jest.fn(() => ({ organization: undefined })),
 }));
 jest.mock('@folio/stripes/smart-components', () => ({
   ...jest.requireActual('@folio/stripes/smart-components'),
@@ -109,6 +111,7 @@ const renderPOLineView = (props = {}) => render(
 describe('POLineView', () => {
   beforeEach(() => {
     history.push.mockClear();
+    Pluggable.mockClear();
   });
 
   it('should render PO Line view', async () => {
@@ -126,6 +129,46 @@ describe('POLineView', () => {
     expect(screen.getByText(/ViewMetaData/i)).toBeInTheDocument();
     expect(screen.getByText(/ViewCustomFieldsRecord/i)).toBeInTheDocument();
     expect(screen.getByText(/RoutingListAccordion/i)).toBeInTheDocument();
+  });
+
+  it('should provide the connected Tasks and Jobs button plugin', () => {
+    renderPOLineView();
+
+    const pluginProps = Pluggable.mock.calls.find(([props]) => (
+      props.componentType === 'ConnectedTasksJobsButton'
+    ))[0];
+
+    expect(pluginProps).toEqual(expect.objectContaining({
+      componentType: 'ConnectedTasksJobsButton',
+      recordId: defaultProps.line.id,
+      recordObject: {
+        paymentStatus: defaultProps.line.paymentStatus,
+        poLineNumber: defaultProps.line.poLineNumber,
+        receiptStatus: defaultProps.line.receiptStatus,
+      },
+      recordType: 'orderLine',
+      type: 'task-list',
+    }));
+  });
+
+  it('should provide the connected Tasks and Jobs pane plugin', () => {
+    renderPOLineView();
+
+    const pluginProps = Pluggable.mock.calls.find(([props]) => (
+      props.componentType === 'ConnectedTasksJobsPane'
+    ))[0];
+
+    expect(pluginProps).toEqual(expect.objectContaining({
+      componentType: 'ConnectedTasksJobsPane',
+      recordId: defaultProps.line.id,
+      recordObject: {
+        paymentStatus: defaultProps.line.paymentStatus,
+        poLineNumber: defaultProps.line.poLineNumber,
+        receiptStatus: defaultProps.line.receiptStatus,
+      },
+      recordType: 'orderLine',
+      type: 'task-list',
+    }));
   });
 
   it('should render Ongoing order information accordion', async () => {
