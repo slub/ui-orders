@@ -485,8 +485,7 @@
           "orders-storage.custom-fields.collection.put",
           "orders-storage.custom-fields.item.post",
           "orders-storage.custom-fields.item.put",
-          "orders-storage.custom-fields.sections.item.post",
-          "orders-storage.custom-fields.sections.item.put"
+          "orders-storage.custom-fields.sections.collection.put"
         ]
       },
       {
@@ -496,8 +495,7 @@
         "visible": true,
         "subPermissions": [
           "ui-orders.settings.custom-fields.edit",
-          "orders-storage.custom-fields.item.delete",
-          "orders-storage.custom-fields.sections.item.delete"
+          "orders-storage.custom-fields.item.delete"
         ]
       },
       {
