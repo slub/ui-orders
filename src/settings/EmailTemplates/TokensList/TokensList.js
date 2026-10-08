@@ -16,7 +16,6 @@ import {
   TOKEN_SECTIONS,
 } from '../constants';
 
-const HANDLEBARS_DOCS_URL = 'https://handlebarsjs.com/guide/expressions.html';
 const DATA_SCHEMA_URL = 'https://github.com/folio-org/mod-data-export-worker';
 
 const TokensList = ({
@@ -51,20 +50,16 @@ const TokensList = ({
               <FormattedMessage
                 id="ui-orders.settings.emailTemplates.tokens.help.handlebars"
                 values={{
-                  handlebarsLink: (
-                    <a href={HANDLEBARS_DOCS_URL} target="_blank" rel="noopener noreferrer">Handlebars</a>
-                  ),
                   schemaLink: (
-                    <a href={DATA_SCHEMA_URL} target="_blank" rel="noopener noreferrer">README</a>
+                    <a href={DATA_SCHEMA_URL} target="_blank" rel="noopener noreferrer">
+                      <FormattedMessage id="ui-orders.settings.emailTemplates.tokens.help.schemaLink" />
+                    </a>
                   ),
                 }}
               />
             </li>
             <li>
-              <FormattedMessage
-                id="ui-orders.settings.emailTemplates.tokens.help.loops"
-                values={{ label: <em>Multiple</em> }}
-              />
+              <FormattedMessage id="ui-orders.settings.emailTemplates.tokens.help.loops" />
             </li>
             <li>
               <FormattedMessage

@@ -1,27 +1,16 @@
 /**
- * Sample data sent to mod-template-engine when rendering the preview.
+ * Sample context sent to mod-template-engine for the preview. It mirrors the
+ * payload mod-data-export-worker builds for the email export (MODEXPW-635),
+ * so the preview is only faithful as long as the two stay in sync.
  *
- * The shape mirrors the real context payload the backend builds for the
- * EDIFACT email export (see MODEXPW-635). The backend now renders with
- * Handlebars, so the preview is only faithful when this sample matches the
- * production payload exactly.
+ * Nesting: `orders[]` wraps each order in an `order` object plus an
+ * `orderLines[]` array, whose items wrap their fields in `orderLine`. Order
+ * lines carry their own loops (`contributors`, `details.productIds`,
+ * `fundDistribution`). There are deliberately no top-level `order` or
+ * `orderLine` fallbacks, because the real payload has none.
  *
- * Nesting (load-bearing):
- * - `orders[]` wraps each order in an `order` sub-object and an `orderLines`
- *   array; each order line wraps its fields in an `orderLine` sub-object.
- *   So `{{#orders}}{{order.poNumber}}{{#orderLines}}{{orderLine.poLineNumber}}…`.
- * - Order lines carry their own loops: `orderLine.contributors[]`,
- *   `orderLine.details.productIds[]`, `orderLine.fundDistribution[]`.
- *
- * There are deliberately no top-level `order` / `orderLine` fallbacks: the
- * real payload has none, so tokens placed outside their loop render empty -
- * which is the correct, faithful behaviour.
- *
- * `shipTo` / `billTo` are objects `{ id, address }`. The address is a
- * pre-formatted multi-line string separated by \n, verified against a real
- * export on 2026-08-06. Since the mail is always HTML, those \n collapse into
- * spaces unless the template converts them: {{nl2br order.shipTo.address}}.
- * Triple braces would silently produce a single-line address.
+ * Addresses are pre-formatted strings with \n between the lines, which an
+ * HTML mail collapses unless the template converts them with a helper.
  */
 
 const organization = {
@@ -30,7 +19,7 @@ const organization = {
     addressLine1: 'Hagenauer Straße 47',
     city: 'Wiesbaden',
     zipCode: '65203',
-    // The payload carries the raw ISO 3166-1 alpha-3 code, not a display name.
+    // ISO 3166-1 alpha-3 code, not a display name.
     country: 'DEU',
   },
 };
@@ -109,7 +98,7 @@ const issnType = {
 
 const lineA1Fields = {
   poLineNumber: '10037-1',
-  // Real titles carry the full statement of responsibility and run long.
+  // Titles carry the full statement of responsibility and run long.
   titleOrPackage: 'Introduction to library science : theory and practice / edited by Jane Roberts ; with contributions by the IFLA working group',
   publisher: 'De Gruyter Saur',
   publicationDate: '2024',
@@ -122,8 +111,8 @@ const lineA1Fields = {
   ],
   details: {
     productIds: [
-      // Qualifiers come straight from the catalogue record and often carry
-      // list prices; many product IDs have none at all (the key is absent).
+      // Qualifiers come from the catalogue record and often carry list
+      // prices; product IDs without one have no `qualifier` key at all.
       { productId: '978-3-11-069137-8', qualifier: 'paperback : EUR 45.00 (DE), EUR 46.30 (AT)', productIdType: isbnType },
       { productId: '10.1515/9783110692009', productIdType: doiType },
     ],
@@ -149,7 +138,7 @@ const lineA2Fields = {
   poLineNumber: '10037-2',
   titleOrPackage: 'Advanced cataloging techniques',
   publisher: 'Facet Publishing',
-  // Free-text field: brackets mark an inferred date, so it is not always a bare year.
+  // Free text, brackets mark an inferred date.
   publicationDate: '[2025]',
   edition: '1st ed.',
   rush: true,

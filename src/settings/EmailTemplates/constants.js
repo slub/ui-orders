@@ -1,18 +1,11 @@
 /**
- * Constants for Email Templates
- *
- * The backend (mod-template-engine) renders with Handlebars. Token strings
- * map onto the context payload documented in MODEXPW-635:
- * - Simple tokens:     {{organization.name}}
- * - Loops (sections):  {{#orders}}…{{/orders}}
- * - Nested loops:      {{#orderLines}}…{{#orderLine.contributors}}…
- *
+ * Tokens map onto the context payload mod-data-export-worker builds for the
+ * email export (MODEXPW-635) and mod-template-engine renders with Handlebars.
  * Tokens inside a loop section resolve relative to that section, so the
  * inner-loop sections (contributors, product IDs, funds) use short token
- * names (e.g. `contributor`) and must be placed inside the order-line loop.
+ * names (e.g. `contributor`) and only work inside the order-line loop.
  */
 
-export const EMAIL_TEMPLATE_CATEGORY = 'OrderEmail';
 export const TEMPLATE_SCOPE = 'orders';
 
 export const TOKEN_SECTIONS = {
@@ -75,9 +68,7 @@ export const ORDER_EMAIL_TOKENS = {
       previewValue: 'Max Mustermann',
     },
     {
-      // The payload separates address lines with \n, so the template has to
-      // pass them through {{nl2br …}} to keep them on separate lines in the
-      // HTML mail. Kept identical to samplePreviewContext.js.
+      // Address lines are separated with \n, see samplePreviewContext.js.
       token: 'order.shipTo.address',
       previewValue: 'Branch Library of Humanities\n10 Philosopher Lane\n01234 Booktown',
     },

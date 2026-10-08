@@ -1,29 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl } from 'react-intl';
+import ReactRouterPropTypes from 'react-router-prop-types';
 import { sortBy } from 'lodash';
 
 import { EntryManager } from '@folio/stripes/smart-components';
 import { stripesConnect, TitleManager } from '@folio/stripes/core';
+import { LIMIT_MAX } from '@folio/stripes-acq-components';
 
 import EmailTemplateDetail from './EmailTemplateDetail';
 import EmailTemplateForm from './EmailTemplateForm';
-import {
-  EMAIL_TEMPLATE_CATEGORY,
-  TEMPLATE_SCOPE,
-} from './constants';
+import { TEMPLATE_SCOPE } from './constants';
 
 /**
- * EmailTemplates - Settings page for managing email templates for purchase orders.
- *
- * Uses EntryManager from stripes-smart-components for CRUD operations.
- * Similar to PatronNotices in ui-circulation.
- *
- * API: GET /templates?query=module==orders OR category==OrderEmail
- *
- * Tickets: UIOR-1492, UIOR-1493, UIOR-1494, UIOR-1495
+ * Settings page for the order email templates stored in mod-template-engine,
+ * modelled on PatronNotices in ui-circulation. The templates are told apart
+ * from other apps' templates by their `scope`.
  */
-class EmailTemplates extends React.Component {
+export class EmailTemplates extends React.Component {
   static propTypes = {
     label: PropTypes.node.isRequired,
     resources: PropTypes.shape({
@@ -41,23 +35,18 @@ class EmailTemplates extends React.Component {
     intl: PropTypes.shape({
       formatMessage: PropTypes.func.isRequired,
     }).isRequired,
+    location: ReactRouterPropTypes.location,
   };
 
-  /**
-   * Stripes Connect manifest - defines API resources
-   *
-   * entries: Loads email templates from /templates API
-   * Filter by scope; OR category for backwards compatibility during migration
-   */
   static manifest = Object.freeze({
     entries: {
       type: 'okapi',
       path: 'templates',
       records: 'templates',
       params: {
-        query: `cql.allRecords=1 AND (scope=="${TEMPLATE_SCOPE}" OR category=="${EMAIL_TEMPLATE_CATEGORY}")`,
+        query: `cql.allRecords=1 AND scope=="${TEMPLATE_SCOPE}"`,
       },
-      perRequest: 100,
+      perRequest: LIMIT_MAX,
     },
   });
 
@@ -65,21 +54,21 @@ class EmailTemplates extends React.Component {
     const {
       intl: { formatMessage },
       label,
+      location,
       resources,
       mutator,
     } = this.props;
 
-    // Ensure scope is set on all entries (migration from category/module-based filtering)
-    const rawEntries = (resources.entries || {}).records || [];
-    const entryList = sortBy(rawEntries.map(entry => ({
-      ...entry,
-      scope: entry.scope || TEMPLATE_SCOPE,
-    })), ['name']);
+    const entryList = sortBy(resources.entries?.records || [], ['name']);
+    const sectionLabel = formatMessage({ id: 'ui-orders.settings.emailTemplates.label' });
+    // EntryManager routes the selected template as the last path segment.
+    const selectedId = location?.pathname.split('/').pop();
+    const selectedName = entryList.find(({ id }) => id === selectedId)?.name;
 
     return (
       <TitleManager
-        page={formatMessage({ id: 'ui-orders.settings.emailTemplates.label' })}
-        record={formatMessage({ id: 'ui-orders.settings.emailTemplates.label' })}
+        page={selectedName ? sectionLabel : undefined}
+        record={selectedName || sectionLabel}
       >
         <EntryManager
           {...this.props}
