@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl } from 'react-intl';
+import ReactRouterPropTypes from 'react-router-prop-types';
 import { sortBy } from 'lodash';
 
 import { EntryManager } from '@folio/stripes/smart-components';
 import { stripesConnect, TitleManager } from '@folio/stripes/core';
+import { LIMIT_MAX } from '@folio/stripes-acq-components';
 
 import EmailTemplateDetail from './EmailTemplateDetail';
 import EmailTemplateForm from './EmailTemplateForm';
@@ -33,6 +35,7 @@ export class EmailTemplates extends React.Component {
     intl: PropTypes.shape({
       formatMessage: PropTypes.func.isRequired,
     }).isRequired,
+    location: ReactRouterPropTypes.location,
   };
 
   static manifest = Object.freeze({
@@ -43,7 +46,7 @@ export class EmailTemplates extends React.Component {
       params: {
         query: `cql.allRecords=1 AND scope=="${TEMPLATE_SCOPE}"`,
       },
-      perRequest: 100,
+      perRequest: LIMIT_MAX,
     },
   });
 
@@ -51,16 +54,20 @@ export class EmailTemplates extends React.Component {
     const {
       intl: { formatMessage },
       label,
+      location,
       resources,
       mutator,
     } = this.props;
 
     const entryList = sortBy(resources.entries?.records || [], ['name']);
+    // EntryManager routes the selected template as the last path segment.
+    const selectedId = location?.pathname.split('/').pop();
+    const selectedName = entryList.find(({ id }) => id === selectedId)?.name;
 
     return (
       <TitleManager
         page={formatMessage({ id: 'ui-orders.settings.emailTemplates.label' })}
-        record={formatMessage({ id: 'ui-orders.settings.emailTemplates.label' })}
+        record={selectedName}
       >
         <EntryManager
           {...this.props}

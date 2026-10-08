@@ -51,16 +51,15 @@ const TokensList = ({
                 id="ui-orders.settings.emailTemplates.tokens.help.handlebars"
                 values={{
                   schemaLink: (
-                    <a href={DATA_SCHEMA_URL} target="_blank" rel="noopener noreferrer">README</a>
+                    <a href={DATA_SCHEMA_URL} target="_blank" rel="noopener noreferrer">
+                      <FormattedMessage id="ui-orders.settings.emailTemplates.tokens.help.schemaLink" />
+                    </a>
                   ),
                 }}
               />
             </li>
             <li>
-              <FormattedMessage
-                id="ui-orders.settings.emailTemplates.tokens.help.loops"
-                values={{ label: <em>Multiple</em> }}
-              />
+              <FormattedMessage id="ui-orders.settings.emailTemplates.tokens.help.loops" />
             </li>
             <li>
               <FormattedMessage

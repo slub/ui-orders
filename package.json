@@ -524,6 +524,7 @@
           "ui-orders.third-party-services.execute",
           "orders.acquisition-methods.collection.get",
           "ui-orders.settings.custom-fields.view",
+          "templates.item.get",
           "ui-orders.settings.email-templates.view"
         ]
       },
@@ -563,6 +564,8 @@
           "ui-orders.settings.custom-fields.view",
           "ui-orders.settings.custom-fields.edit",
           "ui-orders.settings.custom-fields.delete",
+          "templates.item.post",
+          "templates.item.put",
           "ui-orders.settings.email-templates.create",
           "ui-orders.settings.email-templates.delete"
         ]

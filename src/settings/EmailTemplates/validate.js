@@ -3,8 +3,13 @@ import { FormattedMessage } from 'react-intl';
 
 const isEmpty = (value) => !value || (typeof value === 'string' && value.trim() === '');
 
-// The editor stores HTML, so an "empty" body may still contain tags.
-const isEmptyEditor = (value = '') => isEmpty(value.replace(/<\/?[^>]+(>|$)/g, ''));
+// The editor stores HTML, so an "empty" body may still contain tags and
+// non-breaking spaces.
+const isEmptyEditor = (value) => isEmpty(
+  (value ?? '')
+    .replace(/<\/?[^>]+(>|$)/g, '')
+    .replace(/&nbsp;/g, ' '),
+);
 
 const validate = (values) => {
   const errors = {};

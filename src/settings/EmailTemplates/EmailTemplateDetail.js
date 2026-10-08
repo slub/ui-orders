@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import { Parser } from 'html-to-react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import DOMPurify from 'dompurify';
 
 import {
   Accordion,
@@ -14,11 +13,17 @@ import {
   KeyValue,
   Row,
 } from '@folio/stripes/components';
-import { PreviewModal } from '@folio/stripes-template-editor';
+import {
+  PreviewModal,
+  sanitize,
+  tokensReducer,
+} from '@folio/stripes-template-editor';
 
+import { ORDER_EMAIL_TOKENS } from './constants';
 import { SAMPLE_PREVIEW_CONTEXT } from './samplePreviewContext';
 
 const parser = new Parser();
+const PREVIEW_FORMAT = tokensReducer(ORDER_EMAIL_TOKENS);
 
 const EmailTemplateDetail = ({ initialValues = {} }) => {
   const [openPreview, setOpenPreview] = useState(false);
@@ -33,7 +38,8 @@ const EmailTemplateDetail = ({ initialValues = {} }) => {
 
   const { header: subject, body } = localizedTemplates?.en || {};
 
-  const parsedBody = useMemo(() => parser.parse(DOMPurify.sanitize(body || '')), [body]);
+  // Same sanitizer as the editor, so the stored template is shown as saved.
+  const parsedBody = useMemo(() => parser.parse(sanitize(body || '')), [body]);
 
   const togglePreviewDialog = () => {
     setOpenPreview(!openPreview);
@@ -101,8 +107,6 @@ const EmailTemplateDetail = ({ initialValues = {} }) => {
         </Accordion>
       </AccordionSet>
 
-      {/* previewFormat only feeds the regex renderer, which the backend
-          renderer uses as its fallback; there is no flat token map here. */}
       <PreviewModal
         open={openPreview}
         header={
@@ -112,7 +116,7 @@ const EmailTemplateDetail = ({ initialValues = {} }) => {
           />
         }
         previewTemplate={body}
-        previewFormat={{}}
+        previewFormat={PREVIEW_FORMAT}
         previewRenderer="backend"
         previewContext={SAMPLE_PREVIEW_CONTEXT}
         previewSubject={subject ?? ''}
