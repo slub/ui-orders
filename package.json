@@ -58,7 +58,7 @@
       "settings": "1.0",
       "search-inventory": "1.0",
       "tags": "1.0",
-      "template-engine": "2.0",
+      "template-engine": "2.3",
       "tenant-addresses": "1.0",
       "titles": "1.2",
       "users": "15.0 16.0"

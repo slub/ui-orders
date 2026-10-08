@@ -14,16 +14,9 @@ import {
   KeyValue,
   Row,
 } from '@folio/stripes/components';
-import { IfInterface } from '@folio/stripes/core';
 import { PreviewModal } from '@folio/stripes-template-editor';
 
 import { SAMPLE_PREVIEW_CONTEXT } from './samplePreviewContext';
-
-// The preview posts to /template-request/preview, which mod-template-engine
-// offers from interface 2.3 on (MODTEMPENG-135). Below that the button is
-// hidden rather than failing with a 404 on click.
-const TEMPLATE_ENGINE_INTERFACE = 'template-engine';
-const TEMPLATE_ENGINE_PREVIEW_VERSION = '2.3';
 
 const parser = new Parser();
 
@@ -92,14 +85,9 @@ const EmailTemplateDetail = ({ initialValues }) => {
               />
             </Col>
             <Col xs={4} style={{ textAlign: 'right' }}>
-              <IfInterface
-                name={TEMPLATE_ENGINE_INTERFACE}
-                version={TEMPLATE_ENGINE_PREVIEW_VERSION}
-              >
-                <Button onClick={togglePreviewDialog}>
-                  <FormattedMessage id="ui-orders.settings.emailTemplates.preview" />
-                </Button>
-              </IfInterface>
+              <Button onClick={togglePreviewDialog}>
+                <FormattedMessage id="ui-orders.settings.emailTemplates.preview" />
+              </Button>
             </Col>
           </Row>
           <Row>
