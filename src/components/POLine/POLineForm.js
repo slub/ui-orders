@@ -62,6 +62,7 @@ import {
 import { AccordionInfoPopover } from '../../common';
 import {
   ENTITY_TYPE_PO_LINE,
+  PO_LINE_CUSTOM_FIELD_ACCORDION_IDS,
   PO_LINE_CONFIG_NAME_PREFIX,
   POL_FORM_FIELDS,
   SCOPE_CUSTOM_FIELDS_MANAGE,
@@ -498,6 +499,22 @@ function POLineForm({
   const currency = get(formValues, 'cost.currency');
   const customFieldsValues = form.getState().values.customFields;
 
+  // custom fields assigned to a host accordion ("Display in accordion")
+  const renderEmbeddedCustomFields = (accordionId) => (
+    <IfFieldVisible visible={!hiddenFields?.customPOLineFields}>
+      <Row>
+        <EditCustomFieldsRecord
+          sectionId={accordionId}
+          backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
+          changeFinalFormField={change}
+          entityType={ENTITY_TYPE_PO_LINE}
+          fieldComponent={Field}
+          finalFormCustomFieldsValues={customFieldsValues}
+        />
+      </Row>
+    </IfFieldVisible>
+  );
+
   return (
     <HasCommand
       commands={shortcuts}
@@ -561,6 +578,7 @@ function POLineForm({
                             isCreateFromInstance={isCreateFromInstance}
                             lineId={lineId}
                           />
+                          {renderEmbeddedCustomFields('itemDetails')}
                         </Accordion>
                         <Accordion
                           label={<FormattedMessage id="ui-orders.line.accordion.details" />}
@@ -577,6 +595,7 @@ function POLineForm({
                             hiddenFields={hiddenFields}
                             integrationConfigs={integrationConfigs}
                           />
+                          {renderEmbeddedCustomFields('lineDetails')}
                         </Accordion>
                         <IfFieldVisible
                           name="donorOrganizationIds"
@@ -693,6 +712,7 @@ function POLineForm({
                               locations={locations}
                               order={order}
                             />
+                            {renderEmbeddedCustomFields('location')}
                           </Accordion>
                         </IfFieldVisible>
 
@@ -708,6 +728,7 @@ function POLineForm({
                               change={change}
                               hiddenFields={hiddenFields}
                             />
+                            {renderEmbeddedCustomFields('physical')}
                           </Accordion>
                         )}
                         {showEresources && (
@@ -745,6 +766,7 @@ function POLineForm({
                         >
                           <EditCustomFieldsRecord
                             hasCustomFieldSections
+                            displayInAccordionIds={PO_LINE_CUSTOM_FIELD_ACCORDION_IDS}
                             accordionId="customFieldsPOLine"
                             backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
                             changeFinalFormField={change}

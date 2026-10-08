@@ -62,6 +62,7 @@ import {
 import {
   CONNECTED_RECORD_TYPES,
   ENTITY_TYPE_ORDER,
+  PO_CUSTOM_FIELD_ACCORDION_IDS,
   ERROR_CODES,
   INVOICES_ROUTE,
   ORDERS_ROUTE,
@@ -193,6 +194,21 @@ const PO = ({
   const funds = get(resources, 'fund.records', []);
   const approvalsSetting = get(resources, 'approvalsSetting.records', {});
   const customFieldsValues = get(order, 'customFields', {});
+
+  // custom fields assigned to a host accordion ("Display in accordion")
+  const renderEmbeddedCustomFields = (accordionId) => (
+    <IfVisible visible={!hiddenFields?.customPOFields}>
+      <Row>
+        <ViewCustomFieldsRecord
+          sectionId={accordionId}
+          backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
+          customFieldsValues={customFieldsValues}
+          entityType={ENTITY_TYPE_ORDER}
+          isSectionTitleEnabled={false}
+        />
+      </Row>
+    </IfVisible>
+  );
 
   const deleteOrderModalLabel = intl.formatMessage(
     { id: 'ui-orders.order.delete.heading' },
@@ -818,6 +834,7 @@ const PO = ({
                 order={order}
                 hiddenFields={hiddenFields}
               />
+              {renderEmbeddedCustomFields('purchaseOrder')}
             </Accordion>
             {isOngoing(orderType) && (
               <Accordion
@@ -842,6 +859,7 @@ const PO = ({
                 orderLines={orderLines}
                 selectedFiscalYear={selectedFiscalYear}
               />
+              {renderEmbeddedCustomFields('poSummary')}
             </Accordion>
             <Accordion
               displayWhenOpen={lineListingActionMenu}
@@ -870,6 +888,7 @@ const PO = ({
             <IfVisible visible={!hiddenFields?.customPOFields}>
               <ViewCustomFieldsRecord
                 hasCustomFieldSections
+                displayInAccordionIds={PO_CUSTOM_FIELD_ACCORDION_IDS}
                 accordionId="customFieldsPO"
                 backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
                 customFieldsValues={customFieldsValues}
