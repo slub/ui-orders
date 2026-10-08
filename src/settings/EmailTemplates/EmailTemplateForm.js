@@ -16,6 +16,7 @@ import {
   ExpandAllButton,
   Pane,
   PaneFooter,
+  PaneHeader,
   Paneset,
   Row,
   TextArea,
@@ -31,12 +32,6 @@ import validate from './validate';
 
 import css from './EmailTemplateForm.css';
 
-/**
- * EmailTemplateForm - Create/Edit form for email templates.
- *
- * Similar structure to PatronNoticeForm in ui-circulation.
- * Uses Paneset/Pane wrapper for proper styling.
- */
 const EmailTemplateForm = ({
   handleSubmit,
   initialValues,
@@ -51,6 +46,15 @@ const EmailTemplateForm = ({
   const paneTitle = initialValues?.id
     ? initialValues?.name
     : formatMessage({ id: 'ui-orders.settings.emailTemplates.new' });
+
+  const renderHeader = (paneHeaderProps) => (
+    <PaneHeader
+      {...paneHeaderProps}
+      dismissible
+      onClose={onCancel}
+      paneTitle={paneTitle}
+    />
+  );
 
   const renderFooter = () => {
     const saveButton = (
@@ -92,10 +96,8 @@ const EmailTemplateForm = ({
       <Paneset isRoot>
         <Pane
           defaultWidth="100%"
-          dismissible
           footer={renderFooter()}
-          onClose={(e) => onCancel(e || { preventDefault: () => {} })}
-          paneTitle={paneTitle}
+          renderHeader={renderHeader}
         >
           <AccordionStatus>
             <Row end="xs">
@@ -103,8 +105,6 @@ const EmailTemplateForm = ({
                 <ExpandAllButton />
               </Col>
             </Row>
-            {/* Hidden field to ensure scope is always sent with form data */}
-            <Field name="scope" component="input" type="hidden" />
             <AccordionSet>
               <Accordion
                 label={<FormattedMessage id="ui-orders.settings.emailTemplates.generalInformation" />}

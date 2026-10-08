@@ -633,7 +633,7 @@
   "dependencies": {
     "@folio/plugin-find-po-line": "^7.0.0",
     "@folio/stripes-acq-components": "~7.2.0",
-    "@folio/stripes-template-editor": "^3.2.0",
+    "@folio/stripes-template-editor": "^3.6.0",
     "classnames": "^2.2.5",
     "dompurify": "^3.0.9",
     "final-form": "^4.19.1",

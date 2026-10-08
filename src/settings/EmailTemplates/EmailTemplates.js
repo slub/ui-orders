@@ -8,20 +8,12 @@ import { stripesConnect, TitleManager } from '@folio/stripes/core';
 
 import EmailTemplateDetail from './EmailTemplateDetail';
 import EmailTemplateForm from './EmailTemplateForm';
-import {
-  EMAIL_TEMPLATE_CATEGORY,
-  TEMPLATE_SCOPE,
-} from './constants';
+import { TEMPLATE_SCOPE } from './constants';
 
 /**
- * EmailTemplates - Settings page for managing email templates for purchase orders.
- *
- * Uses EntryManager from stripes-smart-components for CRUD operations.
- * Similar to PatronNotices in ui-circulation.
- *
- * API: GET /templates?query=module==orders OR category==OrderEmail
- *
- * Tickets: UIOR-1492, UIOR-1493, UIOR-1494, UIOR-1495
+ * Settings page for the order email templates stored in mod-template-engine,
+ * modelled on PatronNotices in ui-circulation. The templates are told apart
+ * from other apps' templates by their `scope`.
  */
 class EmailTemplates extends React.Component {
   static propTypes = {
@@ -43,19 +35,13 @@ class EmailTemplates extends React.Component {
     }).isRequired,
   };
 
-  /**
-   * Stripes Connect manifest - defines API resources
-   *
-   * entries: Loads email templates from /templates API
-   * Filter by scope; OR category for backwards compatibility during migration
-   */
   static manifest = Object.freeze({
     entries: {
       type: 'okapi',
       path: 'templates',
       records: 'templates',
       params: {
-        query: `cql.allRecords=1 AND (scope=="${TEMPLATE_SCOPE}" OR category=="${EMAIL_TEMPLATE_CATEGORY}")`,
+        query: `cql.allRecords=1 AND scope=="${TEMPLATE_SCOPE}"`,
       },
       perRequest: 100,
     },
@@ -69,12 +55,7 @@ class EmailTemplates extends React.Component {
       mutator,
     } = this.props;
 
-    // Ensure scope is set on all entries (migration from category/module-based filtering)
-    const rawEntries = (resources.entries || {}).records || [];
-    const entryList = sortBy(rawEntries.map(entry => ({
-      ...entry,
-      scope: entry.scope || TEMPLATE_SCOPE,
-    })), ['name']);
+    const entryList = sortBy(resources.entries?.records || [], ['name']);
 
     return (
       <TitleManager

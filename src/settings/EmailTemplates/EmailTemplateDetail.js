@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { Parser } from 'html-to-react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import DOMPurify from 'dompurify';
@@ -14,24 +15,18 @@ import {
   Row,
 } from '@folio/stripes/components';
 import { IfInterface } from '@folio/stripes/core';
+import { PreviewModal } from '@folio/stripes-template-editor';
 
-import BackendPreviewModal from './BackendPreviewModal';
+import { SAMPLE_PREVIEW_CONTEXT } from './samplePreviewContext';
 
 // The preview posts to /template-request/preview, which mod-template-engine
-// only offers from interface 2.3 on (MODTEMPENG-135). Below that the button is
-// hidden rather than failing with a 404 on click. The editor's own preview is
-// guarded by stripes-template-editor against the same version (STRIPES-1025).
-const TEMPLATE_ENGINE_PREVIEW_INTERFACE = 'template-engine';
+// offers from interface 2.3 on (MODTEMPENG-135). Below that the button is
+// hidden rather than failing with a 404 on click.
+const TEMPLATE_ENGINE_INTERFACE = 'template-engine';
 const TEMPLATE_ENGINE_PREVIEW_VERSION = '2.3';
 
-/**
- * EmailTemplateDetail - Read-only view of an email template.
- *
- * Displays:
- * - General information (name, description, active status)
- * - Template content (sender, recipient logic, category, subject, body with preview)
- * - Attachment settings
- */
+const parser = new Parser();
+
 const EmailTemplateDetail = ({ initialValues }) => {
   const [openPreview, setOpenPreview] = useState(false);
 
@@ -43,10 +38,9 @@ const EmailTemplateDetail = ({ initialValues }) => {
     templateResolver,
   } = initialValues;
 
-  const template = localizedTemplates?.en || {};
-  const { header: subject, body } = template;
+  const { header: subject, body } = localizedTemplates?.en || {};
 
-  const sanitizedBody = useMemo(() => DOMPurify.sanitize(body || ''), [body]);
+  const parsedBody = useMemo(() => parser.parse(DOMPurify.sanitize(body || '')), [body]);
 
   const togglePreviewDialog = () => {
     setOpenPreview(!openPreview);
@@ -99,7 +93,7 @@ const EmailTemplateDetail = ({ initialValues }) => {
             </Col>
             <Col xs={4} style={{ textAlign: 'right' }}>
               <IfInterface
-                name={TEMPLATE_ENGINE_PREVIEW_INTERFACE}
+                name={TEMPLATE_ENGINE_INTERFACE}
                 version={TEMPLATE_ENGINE_PREVIEW_VERSION}
               >
                 <Button onClick={togglePreviewDialog}>
@@ -112,26 +106,29 @@ const EmailTemplateDetail = ({ initialValues }) => {
             <Col xs={12}>
               <KeyValue
                 label={<FormattedMessage id="ui-orders.settings.emailTemplates.body" />}
-              >
-                {/* eslint-disable-next-line react/no-danger */}
-                <div dangerouslySetInnerHTML={{ __html: sanitizedBody }} />
-              </KeyValue>
+                value={parsedBody}
+              />
             </Col>
           </Row>
         </Accordion>
       </AccordionSet>
 
-      <BackendPreviewModal
+      {/* previewFormat only feeds the regex renderer, which the backend
+          renderer uses as its fallback; there is no flat token map here. */}
+      <PreviewModal
         open={openPreview}
-        bodyTemplate={body}
-        subjectTemplate={subject}
-        templateResolver={templateResolver}
         header={
           <FormattedMessage
             id="ui-orders.settings.emailTemplates.previewHeader"
             values={{ name }}
           />
         }
+        previewTemplate={body}
+        previewFormat={{}}
+        previewRenderer="backend"
+        previewContext={SAMPLE_PREVIEW_CONTEXT}
+        previewSubject={subject ?? ''}
+        previewTemplateResolver={templateResolver}
         onClose={togglePreviewDialog}
       />
     </AccordionStatus>
