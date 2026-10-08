@@ -60,14 +60,15 @@ export class EmailTemplates extends React.Component {
     } = this.props;
 
     const entryList = sortBy(resources.entries?.records || [], ['name']);
+    const sectionLabel = formatMessage({ id: 'ui-orders.settings.emailTemplates.label' });
     // EntryManager routes the selected template as the last path segment.
     const selectedId = location?.pathname.split('/').pop();
     const selectedName = entryList.find(({ id }) => id === selectedId)?.name;
 
     return (
       <TitleManager
-        page={formatMessage({ id: 'ui-orders.settings.emailTemplates.label' })}
-        record={selectedName}
+        page={selectedName ? sectionLabel : undefined}
+        record={selectedName || sectionLabel}
       >
         <EntryManager
           {...this.props}
