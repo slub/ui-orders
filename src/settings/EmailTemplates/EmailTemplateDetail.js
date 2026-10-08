@@ -20,7 +20,7 @@ import { SAMPLE_PREVIEW_CONTEXT } from './samplePreviewContext';
 
 const parser = new Parser();
 
-const EmailTemplateDetail = ({ initialValues }) => {
+const EmailTemplateDetail = ({ initialValues = {} }) => {
   const [openPreview, setOpenPreview] = useState(false);
 
   const {
@@ -137,10 +137,6 @@ EmailTemplateDetail.propTypes = {
     }),
     templateResolver: PropTypes.string,
   }),
-};
-
-EmailTemplateDetail.defaultProps = {
-  initialValues: {},
 };
 
 export default EmailTemplateDetail;
