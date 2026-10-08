@@ -45,6 +45,7 @@ import {
 
 import {
   ENTITY_TYPE_ORDER,
+  PO_CUSTOM_FIELD_ACCORDION_IDS,
   PO_CONFIG_NAME_PREFIX,
   PO_FORM_FIELDS,
   SCOPE_CUSTOM_FIELDS_MANAGE,
@@ -350,6 +351,22 @@ const POForm = ({
     );
   }
 
+  // custom fields assigned to a host accordion ("Display in accordion")
+  const renderEmbeddedCustomFields = (accordionId) => (
+    <IfFieldVisible visible={!hiddenFields?.customPOFields}>
+      <Row>
+        <EditCustomFieldsRecord
+          sectionId={accordionId}
+          backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
+          changeFinalFormField={change}
+          entityType={ENTITY_TYPE_ORDER}
+          fieldComponent={Field}
+          finalFormCustomFieldsValues={customFieldsValues}
+        />
+      </Row>
+    </IfFieldVisible>
+  );
+
   return (
     <HasCommand
       commands={shortcuts}
@@ -418,6 +435,7 @@ const POForm = ({
                             validateNumber={validateNumber}
                             hiddenFields={hiddenFields}
                           />
+                          {renderEmbeddedCustomFields('purchaseOrder')}
                         </Accordion>
                         {isOngoing(formValues.orderType) && (
                         <OngoingInfoForm hiddenFields={hiddenFields} />
@@ -430,6 +448,7 @@ const POForm = ({
                             initialValues={initialValues}
                             hiddenFields={hiddenFields}
                           />
+                          {renderEmbeddedCustomFields('poSummary')}
                         </Accordion>
 
                         <IfFieldVisible
@@ -438,6 +457,7 @@ const POForm = ({
                         >
                           <EditCustomFieldsRecord
                             hasCustomFieldSections
+                            displayInAccordionIds={PO_CUSTOM_FIELD_ACCORDION_IDS}
                             accordionId="customFieldsPO"
                             backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
                             changeFinalFormField={change}

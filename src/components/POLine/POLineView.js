@@ -72,6 +72,7 @@ import {
 import {
   CONNECTED_RECORD_TYPES,
   ENTITY_TYPE_PO_LINE,
+  PO_LINE_CUSTOM_FIELD_ACCORDION_IDS,
   NOTE_TYPES,
   NOTES_ROUTE,
   ORDERS_DOMAIN,
@@ -370,6 +371,21 @@ const POLineView = ({
     return line?.locations?.reduce((acc, { quantityPhysical = 0 }) => acc + quantityPhysical, 0);
   }, [line?.locations]);
 
+  // custom fields assigned to a host accordion ("Display in accordion")
+  const renderEmbeddedCustomFields = (accordionId) => (
+    <IfVisible visible={!hiddenFields?.customPOLineFields}>
+      <Row>
+        <ViewCustomFieldsRecord
+          sectionId={accordionId}
+          backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
+          customFieldsValues={customFieldsValues}
+          entityType={ENTITY_TYPE_PO_LINE}
+          isSectionTitleEnabled={false}
+        />
+      </Row>
+    </IfVisible>
+  );
+
   return (
     <HasCommand
       commands={shortcuts}
@@ -440,6 +456,8 @@ const POLineView = ({
                     line={line}
                     hiddenFields={hiddenFields}
                   />
+                  {renderEmbeddedCustomFields('itemDetails')}
+                  {renderEmbeddedCustomFields('lineDetails')}
                 </Accordion>
                 {isOngoing(order.orderType) && (
                   <Accordion
@@ -520,6 +538,7 @@ const POLineView = ({
                       lineLocations={line.locations}
                       locations={locations}
                     />
+                    {renderEmbeddedCustomFields('location')}
                   </Accordion>
                 </IfVisible>
 
@@ -533,6 +552,7 @@ const POLineView = ({
                       physical={get(line, 'physical', {})}
                       hiddenFields={hiddenFields}
                     />
+                    {renderEmbeddedCustomFields('physical')}
                   </Accordion>
                 )}
                 {showEresources && (
@@ -610,6 +630,7 @@ const POLineView = ({
                 <IfVisible visible={!hiddenFields?.customPOLineFields}>
                   <ViewCustomFieldsRecord
                     hasCustomFieldSections
+                    displayInAccordionIds={PO_LINE_CUSTOM_FIELD_ACCORDION_IDS}
                     accordionId="customFieldsPOLine"
                     backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
                     customFieldsValues={customFieldsValues}

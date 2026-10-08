@@ -18,6 +18,8 @@ import {
   ENTITY_TYPE_ORDER,
   ENTITY_TYPE_PO_LINE,
   PO_CONFIG_NAME_PREFIX,
+  PO_CUSTOM_FIELD_ACCORDIONS,
+  PO_LINE_CUSTOM_FIELD_ACCORDIONS,
   PO_LINE_CONFIG_NAME_PREFIX,
   SCOPE_CUSTOM_FIELDS_MANAGE,
 } from '../common/constants';
@@ -35,6 +37,13 @@ const CustomFieldsSettings = () => {
     canDelete: stripes.hasPerm('ui-orders.settings.custom-fields.delete'),
   };
 
+  const toAccordionOptions = (accordions) => accordions.map(({ value, labelId }) => ({
+    value,
+    label: intl.formatMessage({ id: labelId }),
+  }));
+  const poAccordionOptions = toAccordionOptions(PO_CUSTOM_FIELD_ACCORDIONS);
+  const poLineAccordionOptions = toAccordionOptions(PO_LINE_CUSTOM_FIELD_ACCORDIONS);
+
   return (
     <Switch>
       <Route exact path={basePO}>
@@ -47,6 +56,8 @@ const CustomFieldsSettings = () => {
             scope={SCOPE_CUSTOM_FIELDS_MANAGE}
             configNamePrefix={PO_CONFIG_NAME_PREFIX}
             hasCustomFieldSections
+            hasDisplayInAccordionField
+            displayInAccordionOptions={poAccordionOptions}
           />
         </TitleManager>
       </Route>
@@ -60,6 +71,8 @@ const CustomFieldsSettings = () => {
             scope={SCOPE_CUSTOM_FIELDS_MANAGE}
             configNamePrefix={PO_CONFIG_NAME_PREFIX}
             hasCustomFieldSections
+            hasDisplayInAccordionField
+            displayInAccordionOptions={poAccordionOptions}
           />
         </TitleManager>
       </Route>
@@ -74,6 +87,8 @@ const CustomFieldsSettings = () => {
             scope={SCOPE_CUSTOM_FIELDS_MANAGE}
             configNamePrefix={PO_LINE_CONFIG_NAME_PREFIX}
             hasCustomFieldSections
+            hasDisplayInAccordionField
+            displayInAccordionOptions={poLineAccordionOptions}
           />
         </TitleManager>
       </Route>
@@ -87,6 +102,8 @@ const CustomFieldsSettings = () => {
             scope={SCOPE_CUSTOM_FIELDS_MANAGE}
             configNamePrefix={PO_LINE_CONFIG_NAME_PREFIX}
             hasCustomFieldSections
+            hasDisplayInAccordionField
+            displayInAccordionOptions={poLineAccordionOptions}
           />
         </TitleManager>
       </Route>
