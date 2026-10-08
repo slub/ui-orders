@@ -4,12 +4,17 @@ import {
   screen,
 } from '@folio/jest-config-stripes/testing-library/react';
 import userEvent from '@folio/jest-config-stripes/testing-library/user-event';
-import { PreviewModal } from '@folio/stripes-template-editor';
+import {
+  PreviewModal,
+  tokensReducer,
+} from '@folio/stripes-template-editor';
 
+import { ORDER_EMAIL_TOKENS } from './constants';
 import EmailTemplateDetail from './EmailTemplateDetail';
 import { SAMPLE_PREVIEW_CONTEXT } from './samplePreviewContext';
 
 jest.mock('@folio/stripes-template-editor', () => ({
+  ...jest.requireActual('@folio/stripes-template-editor'),
   PreviewModal: jest.fn(() => null),
 }));
 
@@ -22,7 +27,7 @@ const initialValues = {
   localizedTemplates: {
     en: {
       header: 'Order {{order.poNumber}}',
-      body: '<div>Dear <strong>{{organization.name}}</strong></div><script>alert(1)</script>',
+      body: '<div>Dear <strong>{{organization.name}}</strong> <a href="https://example.org" target="_blank" rel="noopener noreferrer">terms</a></div><script>alert(1)</script>',
     },
   },
 };
@@ -61,8 +66,14 @@ describe('EmailTemplateDetail', () => {
     expect(document.querySelector('script')).toBeNull();
   });
 
+  it('should keep the link attributes the editor allows', () => {
+    renderDetail();
+
+    expect(screen.getByRole('link', { name: 'terms' })).toHaveAttribute('target', '_blank');
+  });
+
   it('should render without a template', () => {
-    renderDetail({ initialValues: {} });
+    render(<EmailTemplateDetail />);
 
     expect(screen.getByText('ui-orders.settings.emailTemplates.body')).toBeInTheDocument();
   });
@@ -81,6 +92,7 @@ describe('EmailTemplateDetail', () => {
       previewSubject: 'Order {{order.poNumber}}',
       previewTemplateResolver: 'handlebars',
       previewContext: SAMPLE_PREVIEW_CONTEXT,
+      previewFormat: tokensReducer(ORDER_EMAIL_TOKENS),
     }));
   });
 

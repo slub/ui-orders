@@ -1,5 +1,7 @@
 import { render } from '@folio/jest-config-stripes/testing-library/react';
+import { TitleManager } from '@folio/stripes/core';
 import { EntryManager } from '@folio/stripes/smart-components';
+import { LIMIT_MAX } from '@folio/stripes-acq-components';
 
 // eslint-disable-next-line import/no-named-as-default
 import EmailTemplates, { EmailTemplates as EmailTemplatesClass } from './EmailTemplates';
@@ -26,21 +28,43 @@ const mutator = {
   },
 };
 
-const renderEmailTemplates = (records = []) => render(
+const renderEmailTemplates = (records = [], pathname = '/settings/orders/email-templates') => render(
   <EmailTemplates
     label="Order email templates"
     resources={{ entries: { records } }}
     mutator={mutator}
+    location={{ pathname, search: '', hash: '' }}
   />,
 );
 
 describe('EmailTemplates', () => {
   beforeEach(() => {
     EntryManager.mockClear();
+    TitleManager.mockClear();
   });
 
-  it('should load only templates with the orders scope', () => {
-    expect(EmailTemplatesClass.manifest.entries.params.query).toBe('cql.allRecords=1 AND scope=="orders"');
+  it('should load all templates with the orders scope', () => {
+    expect(EmailTemplatesClass.manifest.entries).toEqual(expect.objectContaining({
+      params: { query: 'cql.allRecords=1 AND scope=="orders"' },
+      perRequest: LIMIT_MAX,
+    }));
+  });
+
+  it('should put the selected template into the document title', () => {
+    const records = [{ id: 'serials', name: 'Serials' }, { id: 'books', name: 'Books' }];
+
+    renderEmailTemplates(records, '/settings/orders/email-templates/books');
+
+    expect(TitleManager.mock.lastCall[0]).toEqual(expect.objectContaining({
+      page: 'ui-orders.settings.emailTemplates.label',
+      record: 'Books',
+    }));
+  });
+
+  it('should leave the record out of the document title while the list is shown', () => {
+    renderEmailTemplates([{ id: 'books', name: 'Books' }]);
+
+    expect(TitleManager.mock.lastCall[0].record).toBeUndefined();
   });
 
   it('should pass the templates sorted by name to EntryManager', () => {

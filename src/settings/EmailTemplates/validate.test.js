@@ -41,6 +41,24 @@ describe('validate', () => {
     expect(errors.localizedTemplates.en.body).toBeDefined();
   });
 
+  it('should treat a body made of non-breaking spaces as missing', () => {
+    const errors = validate({
+      ...validValues,
+      localizedTemplates: { en: { ...validValues.localizedTemplates.en, body: '<div>&nbsp;</div>' } },
+    });
+
+    expect(errors.localizedTemplates.en.body).toBeDefined();
+  });
+
+  it('should cope with a body of null', () => {
+    const errors = validate({
+      ...validValues,
+      localizedTemplates: { en: { ...validValues.localizedTemplates.en, body: null } },
+    });
+
+    expect(errors.localizedTemplates.en.body).toBeDefined();
+  });
+
   it('should report every missing field of an empty form', () => {
     const errors = validate({});
 
