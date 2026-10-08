@@ -15,7 +15,7 @@ import { TEMPLATE_SCOPE } from './constants';
  * modelled on PatronNotices in ui-circulation. The templates are told apart
  * from other apps' templates by their `scope`.
  */
-class EmailTemplates extends React.Component {
+export class EmailTemplates extends React.Component {
   static propTypes = {
     label: PropTypes.node.isRequired,
     resources: PropTypes.shape({
