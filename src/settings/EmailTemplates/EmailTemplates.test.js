@@ -61,10 +61,13 @@ describe('EmailTemplates', () => {
     }));
   });
 
-  it('should leave the record out of the document title while the list is shown', () => {
+  it('should title the document with the section while the list is shown', () => {
     renderEmailTemplates([{ id: 'books', name: 'Books' }]);
 
-    expect(TitleManager.mock.lastCall[0].record).toBeUndefined();
+    expect(TitleManager.mock.lastCall[0]).toEqual(expect.objectContaining({
+      page: undefined,
+      record: 'ui-orders.settings.emailTemplates.label',
+    }));
   });
 
   it('should pass the templates sorted by name to EntryManager', () => {
