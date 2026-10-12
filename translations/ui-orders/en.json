@@ -768,6 +768,7 @@
   "settings.customFields.purchaseOrders.label": "Custom fields - purchase orders",
   "settings.customFields.purchaseOrderLines.label": "Custom fields - purchase order lines",
   "settings.emailTemplates.label": "Order email templates",
+  "settings.emailTemplates.entryLabel": "Order email template",
   "settings.emailTemplates.new": "New email template",
   "settings.emailTemplates.generalInformation": "General information",
   "settings.emailTemplates.name": "Template name",

@@ -76,7 +76,7 @@ export class EmailTemplates extends React.Component {
           entryList={entryList}
           detailComponent={EmailTemplateDetail}
           paneTitle={label}
-          entryLabel={formatMessage({ id: 'ui-orders.settings.emailTemplates.label' })}
+          entryLabel={formatMessage({ id: 'ui-orders.settings.emailTemplates.entryLabel' })}
           entryFormComponent={EmailTemplateForm}
           defaultEntry={{
             active: true,
