@@ -13,6 +13,7 @@ import {
   KeyValue,
   Row,
 } from '@folio/stripes/components';
+import { ViewMetaData } from '@folio/stripes/smart-components';
 import {
   PreviewModal,
   sanitize,
@@ -33,6 +34,7 @@ const EmailTemplateDetail = ({ initialValues = {} }) => {
     description,
     active,
     localizedTemplates,
+    metadata,
     templateResolver,
   } = initialValues;
 
@@ -56,6 +58,9 @@ const EmailTemplateDetail = ({ initialValues = {} }) => {
         <Accordion
           label={<FormattedMessage id="ui-orders.settings.emailTemplates.generalInformation" />}
         >
+          <AccordionSet>
+            {metadata && <ViewMetaData metadata={metadata} />}
+          </AccordionSet>
           <Row>
             <Col xs={12} md={6}>
               <KeyValue
@@ -139,6 +144,7 @@ EmailTemplateDetail.propTypes = {
         body: PropTypes.string,
       }),
     }),
+    metadata: PropTypes.object,
     templateResolver: PropTypes.string,
   }),
 };

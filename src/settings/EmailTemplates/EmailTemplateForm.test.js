@@ -69,19 +69,37 @@ describe('EmailTemplateForm', () => {
     TemplateEditor.mockClear();
   });
 
-  it('should title the pane for a new template', () => {
+  it('should title the pane for a new template and hide the record metadata', () => {
     renderForm();
 
     expect(screen.getByText('ui-orders.settings.emailTemplates.new')).toBeInTheDocument();
     expect(screen.getByRole('checkbox', { name: 'ui-orders.settings.emailTemplates.active' })).toBeChecked();
+    expect(screen.queryByText('ViewMetaData')).not.toBeInTheDocument();
   });
 
-  it('should title the pane with the name of an existing template', () => {
-    renderForm(existingTemplate);
+  it('should title the pane with the name of an existing template and show its metadata', () => {
+    renderForm({ ...existingTemplate, metadata: { createdDate: '2026-10-08T13:22:38.215Z' } });
 
     expect(screen.getByText('Standing orders')).toBeInTheDocument();
+    expect(screen.getByText('ViewMetaData')).toBeInTheDocument();
     expect(getSubjectField()).toHaveValue('Order {{order.poNumber}}');
     expect(getBodyField()).toHaveValue('<div>Dear vendor</div>');
+  });
+
+  it('should title the preview with the template name', async () => {
+    renderForm(existingTemplate);
+
+    expect(TemplateEditor.mock.lastCall[0].previewModalHeader.props.values.name).toBe('Standing orders');
+
+    await userEvent.type(getNameField(), '!');
+
+    expect(TemplateEditor.mock.lastCall[0].previewModalHeader.props.values.name).toBe('Standing orders!');
+  });
+
+  it('should fall back to the pane title in the preview header of a new template', () => {
+    renderForm();
+
+    expect(TemplateEditor.mock.lastCall[0].previewModalHeader.props.values.name).toBe('ui-orders.settings.emailTemplates.new');
   });
 
   it('should keep the save button disabled until something changes', async () => {

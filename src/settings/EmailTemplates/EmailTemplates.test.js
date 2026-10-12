@@ -79,6 +79,7 @@ describe('EmailTemplates', () => {
       entryFormComponent: EmailTemplateForm,
       parentMutator: mutator,
       paneTitle: 'Order email templates',
+      entryLabel: 'ui-orders.settings.emailTemplates.entryLabel',
       nameKey: 'name',
       enableDetailsActionMenu: true,
     }));

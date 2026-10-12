@@ -23,6 +23,7 @@ import {
   TextField,
 } from '@folio/stripes/components';
 import stripesFinalForm from '@folio/stripes/final-form';
+import { ViewMetaData } from '@folio/stripes/smart-components';
 import { TemplateEditor } from '@folio/stripes-template-editor';
 
 import { ORDER_EMAIL_TOKENS } from './constants';
@@ -109,6 +110,9 @@ const EmailTemplateForm = ({
               <Accordion
                 label={<FormattedMessage id="ui-orders.settings.emailTemplates.generalInformation" />}
               >
+                <AccordionSet>
+                  {initialValues?.metadata && <ViewMetaData metadata={initialValues.metadata} />}
+                </AccordionSet>
                 <Row>
                   <Col xs={12} md={6}>
                     <Field
@@ -170,7 +174,12 @@ const EmailTemplateForm = ({
                       editAsHtml={editAsHtml}
                       tokens={ORDER_EMAIL_TOKENS}
                       tokensList={TokensList}
-                      previewModalHeader={<FormattedMessage id="ui-orders.settings.emailTemplates.preview" />}
+                      previewModalHeader={(
+                        <FormattedMessage
+                          id="ui-orders.settings.emailTemplates.previewHeader"
+                          values={{ name: values?.name || paneTitle }}
+                        />
+                      )}
                       previewRenderer="backend"
                       previewContext={SAMPLE_PREVIEW_CONTEXT}
                       previewSubject={values?.localizedTemplates?.en?.header ?? ''}
@@ -193,6 +202,7 @@ EmailTemplateForm.propTypes = {
   initialValues: PropTypes.shape({
     id: PropTypes.string,
     name: PropTypes.string,
+    metadata: PropTypes.object,
   }),
   intl: PropTypes.shape({
     formatMessage: PropTypes.func.isRequired,
@@ -201,6 +211,7 @@ EmailTemplateForm.propTypes = {
   pristine: PropTypes.bool,
   submitting: PropTypes.bool,
   values: PropTypes.shape({
+    name: PropTypes.string,
     localizedTemplates: PropTypes.object,
     templateResolver: PropTypes.string,
   }),

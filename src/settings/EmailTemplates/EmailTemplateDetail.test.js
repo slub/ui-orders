@@ -52,6 +52,18 @@ describe('EmailTemplateDetail', () => {
     expect(screen.getByText('ui-orders.settings.emailTemplates.active.yes')).toBeInTheDocument();
   });
 
+  it('should show the record metadata when the template has some', () => {
+    renderDetail({ initialValues: { ...initialValues, metadata: { createdDate: '2026-10-08T13:22:38.215Z' } } });
+
+    expect(screen.getByText('ViewMetaData')).toBeInTheDocument();
+  });
+
+  it('should not show record metadata for a template without any', () => {
+    renderDetail();
+
+    expect(screen.queryByText('ViewMetaData')).not.toBeInTheDocument();
+  });
+
   it('should display an inactive template as such', () => {
     renderDetail({ initialValues: { ...initialValues, active: false } });
 
