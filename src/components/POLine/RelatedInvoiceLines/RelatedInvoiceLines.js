@@ -16,6 +16,7 @@ import {
 import { ACCORDION_ID } from '../const';
 import { useConnectedInvoiceLines } from './useConnectedInvoiceLines';
 import {
+  COLUMN_INVOICE_DATE,
   COLUMN_MAPPING,
   RESULT_FORMATTER,
   SORTABLE_COLUMNS,
@@ -40,7 +41,7 @@ export const RelatedInvoiceLines = ({ lineId, label }) => {
             id="invoiceLines"
             interactive={false}
             sortDirection={DESC_DIRECTION}
-            sortedColumn={SORTABLE_COLUMNS}
+            sortedColumn={COLUMN_INVOICE_DATE}
             sorters={SORTABLE_COLUMNS}
             visibleColumns={VISIBLE_COLUMNS}
             columnIdPrefix="invoice-lines"
