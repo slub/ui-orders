@@ -14,13 +14,13 @@
  */
 
 const organization = {
-  name: 'Schweitzer Fachinformationen',
+  name: 'Libreria Esempio',
   primaryAddress: {
-    addressLine1: 'Hagenauer Straße 47',
-    city: 'Wiesbaden',
-    zipCode: '65203',
+    addressLine1: 'Largo dei Librari 1',
+    city: 'Roma',
+    zipCode: '00186',
     // ISO 3166-1 alpha-3 code, not a display name.
-    country: 'DEU',
+    country: 'ITA',
   },
 };
 
@@ -30,9 +30,9 @@ const orderAFields = {
   metadata: {
     createdByUser: {
       id: '6e3f5d2a-1c4b-4e8a-9f7d-2b1a0c8e4d11',
-      firstName: 'Max',
-      lastName: 'Mustermann',
-      fullName: 'Max Mustermann',
+      firstName: 'Sarah',
+      lastName: 'Miller',
+      fullName: 'Sarah Miller',
     },
   },
   shipTo: {
@@ -105,7 +105,7 @@ const lineA1Fields = {
   edition: '3rd ed.',
   rush: false,
   contributors: [
-    { contributor: 'Mustermann, Max', contributorNameType: personalNameType },
+    { contributor: 'Roberts, Jane', contributorNameType: personalNameType },
     { contributor: 'International Federation of Library Associations', contributorNameType: corporateNameType },
     { contributor: 'Schmidt, Anna', contributorNameType: personalNameType },
   ],

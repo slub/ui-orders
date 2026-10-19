@@ -1,3 +1,7 @@
+import { get } from 'lodash';
+
+import { SAMPLE_PREVIEW_CONTEXT } from './samplePreviewContext';
+
 /**
  * Tokens map onto the context payload mod-data-export-worker builds for the
  * email export (MODEXPW-635) and mod-template-engine renders with Handlebars.
@@ -25,55 +29,61 @@ export const CONTRIBUTORS_LOOP_TAG = 'orderLine.contributors';
 export const PRODUCT_IDS_LOOP_TAG = 'orderLine.details.productIds';
 export const FUND_DISTRIBUTION_LOOP_TAG = 'orderLine.fundDistribution';
 
-// The preview values only feed the regex preview of the editor, which is the
-// fallback of the backend-rendered preview.
-const buildTokens = (previewValues) => Object.entries(previewValues)
-  .map(([token, previewValue]) => ({ token, previewValue }));
+// The preview values feed the regex preview of the editor, which is the
+// fallback of the backend-rendered preview. They come from the first item
+// of each loop in the sample context, so both previews show the same data.
+// The regex preview only inserts strings and numbers, hence the String().
+const [firstOrder] = SAMPLE_PREVIEW_CONTEXT.orders;
+const [firstOrderLine] = firstOrder.orderLines;
+
+const buildTokens = (base, tokens) => tokens.map((token) => ({
+  token,
+  previewValue: String(get(base, token)),
+}));
 
 export const ORDER_EMAIL_TOKENS = {
-  [TOKEN_SECTIONS.GENERAL]: buildTokens({
-    createdAt: '2026-03-30T16:22:13.284Z',
-  }),
-  [TOKEN_SECTIONS.ORGANIZATION]: buildTokens({
-    'organization.name': 'Schweitzer Fachinformationen',
-    'organization.primaryAddress.addressLine1': 'Hagenauer Straße 47',
-    'organization.primaryAddress.city': 'Wiesbaden',
-    'organization.primaryAddress.zipCode': '65203',
-    'organization.primaryAddress.country': 'DEU',
-  }),
-  [TOKEN_SECTIONS.ORDER]: buildTokens({
-    'order.poNumber': '10037',
-    'order.orderType': 'One-Time',
-    'order.metadata.createdByUser.fullName': 'Max Mustermann',
-    // Address lines are separated with \n, see samplePreviewContext.js.
-    'order.shipTo.address': 'Branch Library of Humanities\n10 Philosopher Lane\n01234 Booktown',
-    'order.billTo.address': 'University Library - Acquisitions\n456 Campus Road\n01234 Booktown',
-  }),
-  [TOKEN_SECTIONS.ORDER_LINES]: buildTokens({
-    'orderLine.poLineNumber': '10037-1',
-    'orderLine.titleOrPackage': 'Introduction to Library Science',
-    'orderLine.publisher': 'De Gruyter Saur',
-    'orderLine.publicationDate': '2024',
-    'orderLine.edition': '3rd ed.',
-    'orderLine.rush': 'false',
-    'orderLine.cost.listUnitPrice': '45.00',
-    'orderLine.cost.listUnitPriceElectronic': '0.00',
-    'orderLine.cost.quantityPhysical': '2',
-    'orderLine.cost.quantityElectronic': '0',
-    'orderLine.cost.poLineEstimatedPrice': '90.00',
-    'orderLine.cost.currency': 'EUR',
-    'orderLine.vendorDetail.instructions': 'Please confirm the delivery date.',
-  }),
-  [TOKEN_SECTIONS.CONTRIBUTORS]: buildTokens({
-    contributor: 'Mustermann, Max',
-    'contributorNameType.name': 'Personal name',
-  }),
-  [TOKEN_SECTIONS.PRODUCT_IDS]: buildTokens({
-    productId: '978-3-11-069137-8',
-    qualifier: 'paperback',
-    'productIdType.name': 'ISBN',
-  }),
-  [TOKEN_SECTIONS.FUNDS]: buildTokens({
-    code: 'LIB-GEN',
-  }),
+  [TOKEN_SECTIONS.GENERAL]: buildTokens(SAMPLE_PREVIEW_CONTEXT, [
+    'createdAt',
+  ]),
+  [TOKEN_SECTIONS.ORGANIZATION]: buildTokens(SAMPLE_PREVIEW_CONTEXT, [
+    'organization.name',
+    'organization.primaryAddress.addressLine1',
+    'organization.primaryAddress.city',
+    'organization.primaryAddress.zipCode',
+    'organization.primaryAddress.country',
+  ]),
+  [TOKEN_SECTIONS.ORDER]: buildTokens(firstOrder, [
+    'order.poNumber',
+    'order.orderType',
+    'order.metadata.createdByUser.fullName',
+    'order.shipTo.address',
+    'order.billTo.address',
+  ]),
+  [TOKEN_SECTIONS.ORDER_LINES]: buildTokens(firstOrderLine, [
+    'orderLine.poLineNumber',
+    'orderLine.titleOrPackage',
+    'orderLine.publisher',
+    'orderLine.publicationDate',
+    'orderLine.edition',
+    'orderLine.rush',
+    'orderLine.cost.listUnitPrice',
+    'orderLine.cost.listUnitPriceElectronic',
+    'orderLine.cost.quantityPhysical',
+    'orderLine.cost.quantityElectronic',
+    'orderLine.cost.poLineEstimatedPrice',
+    'orderLine.cost.currency',
+    'orderLine.vendorDetail.instructions',
+  ]),
+  [TOKEN_SECTIONS.CONTRIBUTORS]: buildTokens(firstOrderLine.orderLine.contributors[0], [
+    'contributor',
+    'contributorNameType.name',
+  ]),
+  [TOKEN_SECTIONS.PRODUCT_IDS]: buildTokens(firstOrderLine.orderLine.details.productIds[0], [
+    'productId',
+    'qualifier',
+    'productIdType.name',
+  ]),
+  [TOKEN_SECTIONS.FUNDS]: buildTokens(firstOrderLine.orderLine.fundDistribution[0], [
+    'code',
+  ]),
 };

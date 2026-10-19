@@ -69,7 +69,7 @@ describe('TokensList', () => {
     expect(getSectionProps(TOKEN_SECTIONS.ORGANIZATION).loopConfig).toBeUndefined();
   });
 
-  it('should show the tips with a link to the data schema', () => {
+  it('should show the tips with a link to the documentation', () => {
     expect(screen.getByText('ui-orders.settings.emailTemplates.tokens.help.title')).toBeInTheDocument();
 
     // The react-intl mock renders message ids only, so the link is checked on the props.
@@ -77,6 +77,6 @@ describe('TokensList', () => {
       .map(([props]) => props)
       .find((props) => props.id === 'ui-orders.settings.emailTemplates.tokens.help.handlebars');
 
-    expect(handlebarsTip.values.schemaLink.props.href).toBe('https://github.com/folio-org/mod-data-export-worker');
+    expect(handlebarsTip.values.documentationLink.props.href).toBe('https://folio-org.atlassian.net/wiki/x/CYD_kg');
   });
 });

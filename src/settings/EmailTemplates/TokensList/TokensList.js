@@ -16,7 +16,7 @@ import {
   TOKEN_SECTIONS,
 } from '../constants';
 
-const DATA_SCHEMA_URL = 'https://github.com/folio-org/mod-data-export-worker';
+const DOCUMENTATION_URL = 'https://folio-org.atlassian.net/wiki/x/CYD_kg';
 
 const TokensList = ({
   tokens,
@@ -50,9 +50,9 @@ const TokensList = ({
               <FormattedMessage
                 id="ui-orders.settings.emailTemplates.tokens.help.handlebars"
                 values={{
-                  schemaLink: (
-                    <a href={DATA_SCHEMA_URL} target="_blank" rel="noopener noreferrer">
-                      <FormattedMessage id="ui-orders.settings.emailTemplates.tokens.help.schemaLink" />
+                  documentationLink: (
+                    <a href={DOCUMENTATION_URL} target="_blank" rel="noopener noreferrer">
+                      <FormattedMessage id="ui-orders.settings.emailTemplates.tokens.help.documentationLink" />
                     </a>
                   ),
                 }}
