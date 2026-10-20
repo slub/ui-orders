@@ -10,7 +10,7 @@ import { SAMPLE_PREVIEW_CONTEXT } from './samplePreviewContext';
  * names (e.g. `contributor`) and only work inside the order-line loop.
  */
 
-export const TEMPLATE_SCOPE = 'orders';
+export const TEMPLATE_SCOPE = 'orders-email';
 
 export const TOKEN_SECTIONS = {
   GENERAL: 'general',

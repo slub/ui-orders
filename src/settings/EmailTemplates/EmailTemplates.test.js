@@ -45,7 +45,7 @@ describe('EmailTemplates', () => {
 
   it('should load all templates with the orders scope', () => {
     expect(EmailTemplatesClass.manifest.entries).toEqual(expect.objectContaining({
-      params: { query: 'cql.allRecords=1 AND scope=="orders"' },
+      params: { query: 'cql.allRecords=1 AND scope=="orders-email"' },
       perRequest: LIMIT_MAX,
     }));
   });
@@ -92,7 +92,7 @@ describe('EmailTemplates', () => {
       active: true,
       outputFormats: ['text/html'],
       templateResolver: 'handlebars',
-      scope: 'orders',
+      scope: 'orders-email',
     });
   });
 

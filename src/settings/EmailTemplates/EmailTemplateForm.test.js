@@ -28,7 +28,7 @@ const newTemplate = {
   active: true,
   outputFormats: ['text/html'],
   templateResolver: 'handlebars',
-  scope: 'orders',
+  scope: 'orders-email',
 };
 
 const existingTemplate = {
