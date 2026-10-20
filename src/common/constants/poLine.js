@@ -26,6 +26,7 @@ export const POL_FORM_FIELDS = {
   checkinItems: 'checkinItems',
   claimingActive: 'claimingActive',
   claimingInterval: 'claimingInterval',
+  claimSequenceId: 'claimSequenceId',
   collection: 'collection',
   donor_DEPRECATED: 'donor',
   isBinderyActive: 'details.isBinderyActive',

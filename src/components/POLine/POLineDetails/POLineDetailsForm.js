@@ -36,6 +36,7 @@ import {
   FieldPOLineDescription,
   FieldClaimingActive,
   FieldClaimingInterval,
+  FieldClaimSequence,
   FieldBinderyActive,
   handleBinderyActiveFieldChange,
   isBinderyActiveDisabled,
@@ -147,7 +148,10 @@ function POLineDetailsForm({
 
     change(POL_FORM_FIELDS.claimingActive, checked);
 
-    if (!checked) change(POL_FORM_FIELDS.claimingInterval, undefined);
+    if (!checked) {
+      change(POL_FORM_FIELDS.claimingInterval, undefined);
+      change(POL_FORM_FIELDS.claimSequenceId, undefined);
+    }
   }, [change]);
 
   const onCheckInItemsChange = useCallback(async (value) => {
@@ -339,6 +343,22 @@ function POLineDetailsForm({
             />
           </Col>
         </IfFieldVisible>
+
+        <IfFieldVisible
+          visible={!hiddenFields.claimSequenceId}
+          name={POL_FORM_FIELDS.claimSequenceId}
+        >
+          <Col
+            xs={6}
+            md={3}
+          >
+            <FieldClaimSequence
+              disabled={!isClaimingActive}
+              currentId={formValues?.claimSequenceId}
+            />
+          </Col>
+        </IfFieldVisible>
+
         <IfFieldVisible
           visible={!hiddenFields.details?.isBinderyActive}
           name={POL_FORM_FIELDS.isBinderyActive}
