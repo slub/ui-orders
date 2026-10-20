@@ -8,10 +8,10 @@ import { EntryManager } from '@folio/stripes/smart-components';
 import { stripesConnect, TitleManager } from '@folio/stripes/core';
 import { LIMIT_MAX } from '@folio/stripes-acq-components';
 
+import { CLAIM_SEQUENCES_API } from '../../common/constants';
 import ClaimSequenceDetail from './ClaimSequenceDetail';
 import ClaimSequenceForm from './ClaimSequenceForm';
 import {
-  CLAIM_SEQUENCES_API,
   DEFAULT_CLAIM_SEQUENCE,
   withDeliveryType,
 } from './constants';

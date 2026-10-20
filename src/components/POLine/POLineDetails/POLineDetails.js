@@ -25,9 +25,13 @@ import {
   PAYMENT_STATUS_TRANSLATED_VALUES,
   RECEIPT_STATUS_TRANSLATED_VALUES,
 } from '../../../common/constants';
-import { useAcqMethod } from '../../../common/hooks';
+import {
+  useAcqMethod,
+  useClaimSequences,
+} from '../../../common/hooks';
 
 const invalidAcqMethod = <FormattedMessage id="ui-orders.acquisitionMethod.invalid" />;
+const invalidClaimSequence = <FormattedMessage id="ui-orders.poLine.claimSequence.invalid" />;
 
 export const getReceivingWorkflowValue = (checkinItems) => {
   if (isNil(checkinItems)) return null;
@@ -46,6 +50,12 @@ export const getAcquisitionMethodValue = (acqMethodId, acqMethod, intl) => {
   return getAcqMethodLabel(acqMethod, { intl, withDeprecatedSuffix: true });
 };
 
+export const getClaimSequenceValue = (claimSequenceId, claimSequences) => {
+  if (!claimSequenceId) return null;
+
+  return claimSequences.find(({ id }) => id === claimSequenceId)?.name || invalidClaimSequence;
+};
+
 const DEFAULT_HIDDEN_FIELDS = {};
 const DEFAULT_LINE = {};
 
@@ -56,6 +66,10 @@ const POLineDetails = ({
   const intl = useIntl();
   const receiptDate = get(line, 'receiptDate');
   const { acqMethod, isLoading } = useAcqMethod(line.acquisitionMethod);
+  const {
+    claimSequences,
+    isLoading: isClaimSequencesLoading,
+  } = useClaimSequences({ enabled: Boolean(line?.claimSequenceId) });
 
   return (
     <>
@@ -240,6 +254,22 @@ const POLineDetails = ({
             <KeyValue
               label={<FormattedMessage id="ui-orders.poLine.claimingInterval" />}
               value={line?.claimingInterval}
+            />
+          </Col>
+        </IfVisible>
+
+        <IfVisible visible={!hiddenFields.claimSequenceId}>
+          <Col
+            xs={6}
+            lg={3}
+          >
+            <KeyValue
+              label={<FormattedMessage id="ui-orders.poLine.claimSequence" />}
+              value={
+                isClaimSequencesLoading
+                  ? <Loading />
+                  : getClaimSequenceValue(line?.claimSequenceId, claimSequences)
+              }
             />
           </Col>
         </IfVisible>

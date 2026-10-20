@@ -4,6 +4,7 @@ export * from './useAcqMethods';
 export * from './useDeprecatedAcqMethods';
 export * from './useAccordionErrorTrigger';
 export * from './useAccordionStatus';
+export * from './useClaimSequences';
 export * from './useErrorAccordionStatus';
 export { default as useCloseReasonOptions } from './useCloseReasonOptions';
 export * from './useExportHistory';

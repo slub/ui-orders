@@ -7,8 +7,6 @@
  * value is a transmission method, and `deliveryType` is derived on submit.
  */
 
-export const CLAIM_SEQUENCES_API = 'orders-storage/claim-sequences';
-
 export const DELIVERY_TYPE = {
   manual: 'MANUAL',
   integration: 'INTEGRATION',
