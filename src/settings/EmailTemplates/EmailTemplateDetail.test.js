@@ -9,7 +9,10 @@ import {
   tokensReducer,
 } from '@folio/stripes-template-editor';
 
-import { ORDER_EMAIL_TOKENS } from './constants';
+import {
+  ORDER_EMAIL_TEMPLATES_CONFIG,
+  ORDER_EMAIL_TOKENS,
+} from './constants';
 import EmailTemplateDetail from './EmailTemplateDetail';
 import { SAMPLE_PREVIEW_CONTEXT } from './samplePreviewContext';
 
@@ -32,8 +35,14 @@ const initialValues = {
   },
 };
 
+const configProps = {
+  tokens: ORDER_EMAIL_TEMPLATES_CONFIG.tokens,
+  previewContext: ORDER_EMAIL_TEMPLATES_CONFIG.previewContext,
+};
+
 const renderDetail = (props = {}) => render(
   <EmailTemplateDetail
+    {...configProps}
     initialValues={initialValues}
     {...props}
   />,
@@ -85,7 +94,7 @@ describe('EmailTemplateDetail', () => {
   });
 
   it('should render without a template', () => {
-    render(<EmailTemplateDetail />);
+    render(<EmailTemplateDetail {...configProps} />);
 
     expect(screen.getByText('ui-orders.settings.emailTemplates.body')).toBeInTheDocument();
   });

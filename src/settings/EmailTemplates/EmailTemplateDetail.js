@@ -20,14 +20,15 @@ import {
   tokensReducer,
 } from '@folio/stripes-template-editor';
 
-import { ORDER_EMAIL_TOKENS } from './constants';
-import { SAMPLE_PREVIEW_CONTEXT } from './samplePreviewContext';
-
 const parser = new Parser();
-const PREVIEW_FORMAT = tokensReducer(ORDER_EMAIL_TOKENS);
 
-const EmailTemplateDetail = ({ initialValues = {} }) => {
+const EmailTemplateDetail = ({
+  initialValues = {},
+  previewContext,
+  tokens,
+}) => {
   const [openPreview, setOpenPreview] = useState(false);
+  const previewFormat = useMemo(() => tokensReducer(tokens), [tokens]);
 
   const {
     name,
@@ -121,9 +122,9 @@ const EmailTemplateDetail = ({ initialValues = {} }) => {
           />
         }
         previewTemplate={body}
-        previewFormat={PREVIEW_FORMAT}
+        previewFormat={previewFormat}
         previewRenderer="backend"
-        previewContext={SAMPLE_PREVIEW_CONTEXT}
+        previewContext={previewContext}
         previewSubject={subject ?? ''}
         previewTemplateResolver={templateResolver}
         onClose={togglePreviewDialog}
@@ -147,6 +148,8 @@ EmailTemplateDetail.propTypes = {
     metadata: PropTypes.object,
     templateResolver: PropTypes.string,
   }),
+  previewContext: PropTypes.object.isRequired,
+  tokens: PropTypes.object.isRequired,
 };
 
 export default EmailTemplateDetail;

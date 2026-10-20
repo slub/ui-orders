@@ -10,12 +10,14 @@ import { LIMIT_MAX } from '@folio/stripes-acq-components';
 
 import EmailTemplateDetail from './EmailTemplateDetail';
 import EmailTemplateForm from './EmailTemplateForm';
-import { TEMPLATE_SCOPE } from './constants';
+import { ORDER_EMAIL_TEMPLATES_CONFIG } from './constants';
+import { tokenSectionsPropType } from './TokensList';
 
 /**
- * Settings page for the order email templates stored in mod-template-engine,
+ * Settings page for the email templates stored in mod-template-engine,
  * modelled on PatronNotices in ui-circulation. The templates are told apart
- * from other apps' templates by their `scope`.
+ * from other apps' templates by their `scope`. The page is instantiated once
+ * per scope (order and claim email templates), see `createEmailTemplatesPage`.
  */
 export class EmailTemplates extends React.Component {
   static propTypes = {
@@ -36,6 +38,21 @@ export class EmailTemplates extends React.Component {
       formatMessage: PropTypes.func.isRequired,
     }).isRequired,
     location: ReactRouterPropTypes.location,
+    // Page configuration, see ORDER_EMAIL_TEMPLATES_CONFIG. EntryManager
+    // passes it on to the detail and form components.
+    scope: PropTypes.string.isRequired,
+    labelId: PropTypes.string.isRequired,
+    entryLabelId: PropTypes.string.isRequired,
+    newLabelId: PropTypes.string.isRequired,
+    permissions: PropTypes.shape({
+      put: PropTypes.string.isRequired,
+      post: PropTypes.string.isRequired,
+      delete: PropTypes.string.isRequired,
+    }).isRequired,
+    tokens: PropTypes.object.isRequired,
+    tokenSections: tokenSectionsPropType.isRequired,
+    loopsHelpId: PropTypes.string.isRequired,
+    previewContext: PropTypes.object.isRequired,
   };
 
   static manifest = Object.freeze({
@@ -43,24 +60,28 @@ export class EmailTemplates extends React.Component {
       type: 'okapi',
       path: 'templates',
       records: 'templates',
-      params: {
-        query: `cql.allRecords=1 AND scope=="${TEMPLATE_SCOPE}"`,
-      },
+      params: (queryParams, pathComponents, resourceData, logger, props) => ({
+        query: `cql.allRecords=1 AND scope=="${props.scope}"`,
+      }),
       perRequest: LIMIT_MAX,
     },
   });
 
   render() {
     const {
+      entryLabelId,
       intl: { formatMessage },
       label,
+      labelId,
       location,
       resources,
       mutator,
+      permissions,
+      scope,
     } = this.props;
 
     const entryList = sortBy(resources.entries?.records || [], ['name']);
-    const sectionLabel = formatMessage({ id: 'ui-orders.settings.emailTemplates.label' });
+    const sectionLabel = formatMessage({ id: labelId });
     // EntryManager routes the selected template as the last path segment.
     const selectedId = location?.pathname.split('/').pop();
     const selectedName = entryList.find(({ id }) => id === selectedId)?.name;
@@ -76,20 +97,16 @@ export class EmailTemplates extends React.Component {
           entryList={entryList}
           detailComponent={EmailTemplateDetail}
           paneTitle={label}
-          entryLabel={formatMessage({ id: 'ui-orders.settings.emailTemplates.entryLabel' })}
+          entryLabel={formatMessage({ id: entryLabelId })}
           entryFormComponent={EmailTemplateForm}
           defaultEntry={{
             active: true,
             outputFormats: ['text/html'],
             templateResolver: 'handlebars',
-            scope: TEMPLATE_SCOPE,
+            scope,
           }}
           nameKey="name"
-          permissions={{
-            put: 'ui-orders.settings.email-templates.edit',
-            post: 'ui-orders.settings.email-templates.create',
-            delete: 'ui-orders.settings.email-templates.delete',
-          }}
+          permissions={permissions}
           enableDetailsActionMenu
         />
       </TitleManager>
@@ -97,4 +114,16 @@ export class EmailTemplates extends React.Component {
   }
 }
 
-export default stripesConnect(injectIntl(EmailTemplates));
+/**
+ * Binds the page to one configuration. The `dataKey` keeps the
+ * stripes-connect state of the instances apart; without it they would
+ * share the `entries` resource.
+ */
+export const createEmailTemplatesPage = (config, dataKey) => {
+  const ConnectedEmailTemplates = stripesConnect(injectIntl(EmailTemplates), { dataKey });
+  const EmailTemplatesPage = (props) => <ConnectedEmailTemplates {...config} {...props} />;
+
+  return EmailTemplatesPage;
+};
+
+export default createEmailTemplatesPage(ORDER_EMAIL_TEMPLATES_CONFIG);

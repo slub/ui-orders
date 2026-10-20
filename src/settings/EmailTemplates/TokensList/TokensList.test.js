@@ -11,6 +11,7 @@ import {
   FUND_DISTRIBUTION_LOOP_TAG,
   ORDER_EMAIL_TOKENS,
   ORDER_LINES_LOOP_TAG,
+  ORDER_TOKEN_SECTIONS,
   ORDERS_LOOP_TAG,
   PRODUCT_IDS_LOOP_TAG,
   TOKEN_SECTIONS,
@@ -22,6 +23,8 @@ jest.mock('@folio/stripes-template-editor', () => ({
 }));
 
 const defaultProps = {
+  loopsHelpId: 'ui-orders.settings.emailTemplates.tokens.help.loops',
+  sections: ORDER_TOKEN_SECTIONS,
   tokens: ORDER_EMAIL_TOKENS,
   onLoopSelect: jest.fn(),
   onSectionInit: jest.fn(),

@@ -7,6 +7,11 @@ import { LIMIT_MAX } from '@folio/stripes-acq-components';
 import EmailTemplates, { EmailTemplates as EmailTemplatesClass } from './EmailTemplates';
 import EmailTemplateDetail from './EmailTemplateDetail';
 import EmailTemplateForm from './EmailTemplateForm';
+import {
+  ORDER_EMAIL_TOKENS,
+  ORDER_TOKEN_SECTIONS,
+} from './constants';
+import { SAMPLE_PREVIEW_CONTEXT } from './samplePreviewContext';
 
 jest.mock('@folio/stripes/core', () => ({
   ...jest.requireActual('@folio/stripes/core'),
@@ -43,10 +48,24 @@ describe('EmailTemplates', () => {
     TitleManager.mockClear();
   });
 
-  it('should load all templates with the orders scope', () => {
-    expect(EmailTemplatesClass.manifest.entries).toEqual(expect.objectContaining({
-      params: { query: 'cql.allRecords=1 AND scope=="orders-email"' },
-      perRequest: LIMIT_MAX,
+  it('should load all templates of the configured scope', () => {
+    const { params, perRequest } = EmailTemplatesClass.manifest.entries;
+
+    expect(perRequest).toBe(LIMIT_MAX);
+    expect(params({}, {}, {}, {}, { scope: 'claims-email' })).toEqual({
+      query: 'cql.allRecords=1 AND scope=="claims-email"',
+    });
+  });
+
+  it('should configure the page for the order email templates', () => {
+    renderEmailTemplates();
+
+    expect(EntryManager.mock.lastCall[0]).toEqual(expect.objectContaining({
+      scope: 'orders-email',
+      tokens: ORDER_EMAIL_TOKENS,
+      tokenSections: ORDER_TOKEN_SECTIONS,
+      previewContext: SAMPLE_PREVIEW_CONTEXT,
+      newLabelId: 'ui-orders.settings.emailTemplates.new',
     }));
   });
 

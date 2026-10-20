@@ -7,6 +7,7 @@ import {
 import userEvent from '@folio/jest-config-stripes/testing-library/user-event';
 import { TemplateEditor } from '@folio/stripes-template-editor';
 
+import { ORDER_EMAIL_TEMPLATES_CONFIG } from './constants';
 import EmailTemplateForm from './EmailTemplateForm';
 import { SAMPLE_PREVIEW_CONTEXT } from './samplePreviewContext';
 
@@ -50,6 +51,7 @@ const onCancel = jest.fn();
 const renderForm = (initialValues = newTemplate) => render(
   <MemoryRouter>
     <EmailTemplateForm
+      {...ORDER_EMAIL_TEMPLATES_CONFIG}
       initialValues={initialValues}
       onSubmit={onSubmit}
       onCancel={onCancel}
