@@ -109,7 +109,7 @@ const ClaimSequenceForm = ({
 
   const renderStage = (field, index) => (
     <>
-      <Headline size="small" margin="small" tag="h4">
+      <Headline size="large" margin="small" tag="h4">
         <FormattedMessage
           id="ui-orders.settings.claimSequences.stage.number"
           values={{ number: index + 1 }}
