@@ -2,6 +2,8 @@ import { FormattedMessage } from 'react-intl';
 
 import AcquisitionMethods from './AcquisitionMethods';
 import { CentralOrdering } from './CentralOrdering';
+import { ClaimEmailTemplates } from './ClaimEmailTemplates';
+import { ClaimSequences } from './ClaimSequences';
 import ClosingReasons from './ClosingReasons';
 import { SECTION_KEYS } from './constants';
 import { CreateInventory } from './CreateInventory';
@@ -188,6 +190,24 @@ export const SECTIONS = [
         component: RoutingListConfiguration,
         label: <FormattedMessage id="ui-orders.settings.routing.listConfiguration" />,
         route: 'list-configuration',
+        perm: 'ui-orders.settings.view',
+      },
+    ],
+  },
+  {
+    label: <FormattedMessage id="ui-orders.settings.claiming.label" />,
+    pages: [
+      {
+        component: ClaimEmailTemplates,
+        label: <FormattedMessage id="ui-orders.settings.claimEmailTemplates.label" />,
+        route: 'claim-email-templates',
+        // TODO: dedicated claim-email-templates permissions, see ClaimEmailTemplates/constants.js.
+        perm: 'ui-orders.settings.email-templates.view',
+      },
+      {
+        component: ClaimSequences,
+        label: <FormattedMessage id="ui-orders.settings.claimSequences.label" />,
+        route: 'claim-sequences',
         perm: 'ui-orders.settings.view',
       },
     ],
