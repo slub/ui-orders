@@ -36,7 +36,7 @@ export const FUND_DISTRIBUTION_LOOP_TAG = 'orderLine.fundDistribution';
 const [firstOrder] = SAMPLE_PREVIEW_CONTEXT.orders;
 const [firstOrderLine] = firstOrder.orderLines;
 
-const buildTokens = (base, tokens) => tokens.map((token) => ({
+export const buildTokens = (base, tokens) => tokens.map((token) => ({
   token,
   previewValue: String(get(base, token)),
 }));
@@ -86,4 +86,59 @@ export const ORDER_EMAIL_TOKENS = {
   [TOKEN_SECTIONS.FUNDS]: buildTokens(firstOrderLine.orderLine.fundDistribution[0], [
     'code',
   ]),
+};
+
+// Sections of the token picker in display order; `loop` marks repeatable sections.
+export const ORDER_TOKEN_SECTIONS = [
+  {
+    key: TOKEN_SECTIONS.GENERAL,
+    headerId: 'ui-orders.settings.emailTemplates.tokens.general',
+  },
+  {
+    key: TOKEN_SECTIONS.ORGANIZATION,
+    headerId: 'ui-orders.settings.emailTemplates.tokens.organization',
+  },
+  {
+    key: TOKEN_SECTIONS.ORDER,
+    headerId: 'ui-orders.settings.emailTemplates.tokens.order',
+    loop: { labelId: 'ui-orders.settings.emailTemplates.tokens.multipleOrders', tag: ORDERS_LOOP_TAG },
+  },
+  {
+    key: TOKEN_SECTIONS.ORDER_LINES,
+    headerId: 'ui-orders.settings.emailTemplates.tokens.orderLines',
+    loop: { labelId: 'ui-orders.settings.emailTemplates.tokens.multipleOrderLines', tag: ORDER_LINES_LOOP_TAG },
+  },
+  {
+    key: TOKEN_SECTIONS.CONTRIBUTORS,
+    headerId: 'ui-orders.settings.emailTemplates.tokens.contributors',
+    loop: { labelId: 'ui-orders.settings.emailTemplates.tokens.multipleContributors', tag: CONTRIBUTORS_LOOP_TAG },
+  },
+  {
+    key: TOKEN_SECTIONS.PRODUCT_IDS,
+    headerId: 'ui-orders.settings.emailTemplates.tokens.productIds',
+    loop: { labelId: 'ui-orders.settings.emailTemplates.tokens.multipleProductIds', tag: PRODUCT_IDS_LOOP_TAG },
+  },
+  {
+    key: TOKEN_SECTIONS.FUNDS,
+    headerId: 'ui-orders.settings.emailTemplates.tokens.funds',
+    loop: { labelId: 'ui-orders.settings.emailTemplates.tokens.multipleFunds', tag: FUND_DISTRIBUTION_LOOP_TAG },
+  },
+];
+
+// Everything that tells one email templates page apart from another one
+// (the claim email templates reuse the page with their own configuration).
+export const ORDER_EMAIL_TEMPLATES_CONFIG = {
+  scope: TEMPLATE_SCOPE,
+  labelId: 'ui-orders.settings.emailTemplates.label',
+  entryLabelId: 'ui-orders.settings.emailTemplates.entryLabel',
+  newLabelId: 'ui-orders.settings.emailTemplates.new',
+  permissions: {
+    put: 'ui-orders.settings.email-templates.edit',
+    post: 'ui-orders.settings.email-templates.create',
+    delete: 'ui-orders.settings.email-templates.delete',
+  },
+  tokens: ORDER_EMAIL_TOKENS,
+  tokenSections: ORDER_TOKEN_SECTIONS,
+  loopsHelpId: 'ui-orders.settings.emailTemplates.tokens.help.loops',
+  previewContext: SAMPLE_PREVIEW_CONTEXT,
 };

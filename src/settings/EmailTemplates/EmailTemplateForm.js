@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import {
+  useMemo,
+  useState,
+} from 'react';
 import PropTypes from 'prop-types';
 import {
   FormattedMessage,
@@ -26,9 +29,10 @@ import stripesFinalForm from '@folio/stripes/final-form';
 import { ViewMetaData } from '@folio/stripes/smart-components';
 import { TemplateEditor } from '@folio/stripes-template-editor';
 
-import { ORDER_EMAIL_TOKENS } from './constants';
-import { SAMPLE_PREVIEW_CONTEXT } from './samplePreviewContext';
-import TokensList from './TokensList';
+import {
+  bindTokensList,
+  tokenSectionsPropType,
+} from './TokensList';
 import validate from './validate';
 
 import css from './EmailTemplateForm.css';
@@ -37,16 +41,22 @@ const EmailTemplateForm = ({
   handleSubmit,
   initialValues,
   intl: { formatMessage },
+  loopsHelpId,
+  newLabelId,
   onCancel,
+  previewContext,
   pristine,
   submitting,
+  tokens,
+  tokenSections,
   values,
 }) => {
   const [editAsHtml, setEditAsHtml] = useState(false);
+  const tokensList = useMemo(() => bindTokensList(tokenSections, loopsHelpId), [tokenSections, loopsHelpId]);
 
   const paneTitle = initialValues?.id
     ? initialValues?.name
-    : formatMessage({ id: 'ui-orders.settings.emailTemplates.new' });
+    : formatMessage({ id: newLabelId });
 
   const renderHeader = (paneHeaderProps) => (
     <PaneHeader
@@ -172,8 +182,8 @@ const EmailTemplateForm = ({
                       label={<FormattedMessage id="ui-orders.settings.emailTemplates.body" />}
                       component={TemplateEditor}
                       editAsHtml={editAsHtml}
-                      tokens={ORDER_EMAIL_TOKENS}
-                      tokensList={TokensList}
+                      tokens={tokens}
+                      tokensList={tokensList}
                       previewModalHeader={(
                         <FormattedMessage
                           id="ui-orders.settings.emailTemplates.previewHeader"
@@ -181,7 +191,7 @@ const EmailTemplateForm = ({
                         />
                       )}
                       previewRenderer="backend"
-                      previewContext={SAMPLE_PREVIEW_CONTEXT}
+                      previewContext={previewContext}
                       previewSubject={values?.localizedTemplates?.en?.header ?? ''}
                       previewTemplateResolver={values?.templateResolver}
                       required
@@ -207,9 +217,14 @@ EmailTemplateForm.propTypes = {
   intl: PropTypes.shape({
     formatMessage: PropTypes.func.isRequired,
   }).isRequired,
+  loopsHelpId: PropTypes.string.isRequired,
+  newLabelId: PropTypes.string.isRequired,
   onCancel: PropTypes.func.isRequired,
+  previewContext: PropTypes.object.isRequired,
   pristine: PropTypes.bool,
   submitting: PropTypes.bool,
+  tokens: PropTypes.object.isRequired,
+  tokenSections: tokenSectionsPropType.isRequired,
   values: PropTypes.shape({
     name: PropTypes.string,
     localizedTemplates: PropTypes.object,

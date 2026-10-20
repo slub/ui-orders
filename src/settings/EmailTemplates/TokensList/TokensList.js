@@ -7,36 +7,37 @@ import {
 } from '@folio/stripes/components';
 import { TokensSection } from '@folio/stripes-template-editor';
 
-import {
-  CONTRIBUTORS_LOOP_TAG,
-  FUND_DISTRIBUTION_LOOP_TAG,
-  ORDERS_LOOP_TAG,
-  ORDER_LINES_LOOP_TAG,
-  PRODUCT_IDS_LOOP_TAG,
-  TOKEN_SECTIONS,
-} from '../constants';
-
 const DOCUMENTATION_URL = 'https://folio-org.atlassian.net/wiki/x/CYD_kg';
 
-const TokensList = ({
+const TokensListBase = ({
+  loopsHelpId,
+  sections,
   tokens,
   onLoopSelect,
   onSectionInit,
   onTokenSelect,
   intl: { formatMessage },
 }) => {
-  const makeLoopConfig = (labelId, tag) => ({
-    enabled: true,
-    label: formatMessage({ id: labelId }),
-    tag,
-    isDisabledLoop: null,
-  });
+  const renderSection = ({ key, headerId, loop }) => (
+    <TokensSection
+      key={key}
+      section={key}
+      header={formatMessage({ id: headerId })}
+      tokens={tokens[key]}
+      loopConfig={loop && {
+        enabled: true,
+        label: formatMessage({ id: loop.labelId }),
+        tag: loop.tag,
+        isDisabledLoop: null,
+      }}
+      onLoopSelect={loop && onLoopSelect}
+      onSectionInit={onSectionInit}
+      onTokenSelect={onTokenSelect}
+    />
+  );
 
-  const ordersLoopConfig = makeLoopConfig('ui-orders.settings.emailTemplates.tokens.multipleOrders', ORDERS_LOOP_TAG);
-  const orderLinesLoopConfig = makeLoopConfig('ui-orders.settings.emailTemplates.tokens.multipleOrderLines', ORDER_LINES_LOOP_TAG);
-  const contributorsLoopConfig = makeLoopConfig('ui-orders.settings.emailTemplates.tokens.multipleContributors', CONTRIBUTORS_LOOP_TAG);
-  const productIdsLoopConfig = makeLoopConfig('ui-orders.settings.emailTemplates.tokens.multipleProductIds', PRODUCT_IDS_LOOP_TAG);
-  const fundsLoopConfig = makeLoopConfig('ui-orders.settings.emailTemplates.tokens.multipleFunds', FUND_DISTRIBUTION_LOOP_TAG);
+  // Two columns, the second one takes the odd section.
+  const leftColumnLength = Math.floor(sections.length / 2);
 
   return (
     <>
@@ -59,7 +60,7 @@ const TokensList = ({
               />
             </li>
             <li>
-              <FormattedMessage id="ui-orders.settings.emailTemplates.tokens.help.loops" />
+              <FormattedMessage id={loopsHelpId} />
             </li>
             <li>
               <FormattedMessage
@@ -81,74 +82,28 @@ const TokensList = ({
       </Row>
       <Row data-testid="emailTemplateTokenListWrapper">
         <Col xs={6}>
-          <TokensSection
-            section={TOKEN_SECTIONS.GENERAL}
-            header={formatMessage({ id: 'ui-orders.settings.emailTemplates.tokens.general' })}
-            tokens={tokens[TOKEN_SECTIONS.GENERAL]}
-            onSectionInit={onSectionInit}
-            onTokenSelect={onTokenSelect}
-          />
-          <TokensSection
-            section={TOKEN_SECTIONS.ORGANIZATION}
-            header={formatMessage({ id: 'ui-orders.settings.emailTemplates.tokens.organization' })}
-            tokens={tokens[TOKEN_SECTIONS.ORGANIZATION]}
-            onSectionInit={onSectionInit}
-            onTokenSelect={onTokenSelect}
-          />
-          <TokensSection
-            section={TOKEN_SECTIONS.ORDER}
-            header={formatMessage({ id: 'ui-orders.settings.emailTemplates.tokens.order' })}
-            tokens={tokens[TOKEN_SECTIONS.ORDER]}
-            loopConfig={ordersLoopConfig}
-            onLoopSelect={onLoopSelect}
-            onSectionInit={onSectionInit}
-            onTokenSelect={onTokenSelect}
-          />
+          {sections.slice(0, leftColumnLength).map(renderSection)}
         </Col>
         <Col xs={6}>
-          <TokensSection
-            section={TOKEN_SECTIONS.ORDER_LINES}
-            header={formatMessage({ id: 'ui-orders.settings.emailTemplates.tokens.orderLines' })}
-            tokens={tokens[TOKEN_SECTIONS.ORDER_LINES]}
-            loopConfig={orderLinesLoopConfig}
-            onLoopSelect={onLoopSelect}
-            onSectionInit={onSectionInit}
-            onTokenSelect={onTokenSelect}
-          />
-          <TokensSection
-            section={TOKEN_SECTIONS.CONTRIBUTORS}
-            header={formatMessage({ id: 'ui-orders.settings.emailTemplates.tokens.contributors' })}
-            tokens={tokens[TOKEN_SECTIONS.CONTRIBUTORS]}
-            loopConfig={contributorsLoopConfig}
-            onLoopSelect={onLoopSelect}
-            onSectionInit={onSectionInit}
-            onTokenSelect={onTokenSelect}
-          />
-          <TokensSection
-            section={TOKEN_SECTIONS.PRODUCT_IDS}
-            header={formatMessage({ id: 'ui-orders.settings.emailTemplates.tokens.productIds' })}
-            tokens={tokens[TOKEN_SECTIONS.PRODUCT_IDS]}
-            loopConfig={productIdsLoopConfig}
-            onLoopSelect={onLoopSelect}
-            onSectionInit={onSectionInit}
-            onTokenSelect={onTokenSelect}
-          />
-          <TokensSection
-            section={TOKEN_SECTIONS.FUNDS}
-            header={formatMessage({ id: 'ui-orders.settings.emailTemplates.tokens.funds' })}
-            tokens={tokens[TOKEN_SECTIONS.FUNDS]}
-            loopConfig={fundsLoopConfig}
-            onLoopSelect={onLoopSelect}
-            onSectionInit={onSectionInit}
-            onTokenSelect={onTokenSelect}
-          />
+          {sections.slice(leftColumnLength).map(renderSection)}
         </Col>
       </Row>
     </>
   );
 };
 
-TokensList.propTypes = {
+export const tokenSectionsPropType = PropTypes.arrayOf(PropTypes.shape({
+  key: PropTypes.string.isRequired,
+  headerId: PropTypes.string.isRequired,
+  loop: PropTypes.shape({
+    labelId: PropTypes.string.isRequired,
+    tag: PropTypes.string.isRequired,
+  }),
+}));
+
+TokensListBase.propTypes = {
+  loopsHelpId: PropTypes.string.isRequired,
+  sections: tokenSectionsPropType.isRequired,
   tokens: PropTypes.object.isRequired,
   onLoopSelect: PropTypes.func.isRequired,
   onSectionInit: PropTypes.func.isRequired,
@@ -156,4 +111,20 @@ TokensList.propTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default injectIntl(TokensList);
+const TokensList = injectIntl(TokensListBase);
+
+// TemplateEditor instantiates the list itself with the editor's props only,
+// so the sections are bound up front.
+export const bindTokensList = (sections, loopsHelpId) => {
+  const BoundTokensList = (props) => (
+    <TokensList
+      {...props}
+      sections={sections}
+      loopsHelpId={loopsHelpId}
+    />
+  );
+
+  return BoundTokensList;
+};
+
+export default TokensList;

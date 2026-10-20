@@ -1,1 +1,1 @@
-export { default } from './TokensList';
+export { default, bindTokensList, tokenSectionsPropType } from './TokensList';
