@@ -4,6 +4,7 @@ import {
 } from '@folio/stripes-acq-components';
 
 export const AUDIT_ACQ_EVENTS_API = 'audit-data/acquisition';
+export const CLAIM_SEQUENCES_API = 'orders-storage/claim-sequences';
 export const INSTANCE_STATUSES_API = 'instance-statuses';
 export const INSTANCE_TYPES_API = 'instance-types';
 export const INVOICES_API = 'invoice/invoices';

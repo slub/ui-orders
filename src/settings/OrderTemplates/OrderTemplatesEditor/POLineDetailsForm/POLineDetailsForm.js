@@ -22,6 +22,7 @@ import {
   FieldCheckInItems,
   FieldClaimingActive,
   FieldClaimingInterval,
+  FieldClaimSequence,
   FieldCollection,
   FieldDonor,
   FieldOrderFormat,
@@ -65,6 +66,7 @@ const POLineDetailsForm = ({ formValues, createInventorySetting }) => {
 
     if (!checked) {
       change(POL_FORM_FIELDS.claimingInterval, undefined);
+      change(POL_FORM_FIELDS.claimSequenceId, undefined);
     }
   }, [change]);
 
@@ -192,6 +194,19 @@ const POLineDetailsForm = ({ formValues, createInventorySetting }) => {
             <FieldClaimingInterval disabled={!isClaimingActive} />
           </VisibilityControl>
         </Col>
+
+        <Col
+          xs={3}
+          data-col-order-template-pol-claim-sequence
+        >
+          <VisibilityControl name="hiddenFields.claimSequenceId">
+            <FieldClaimSequence
+              disabled={!isClaimingActive}
+              currentId={get(formValues, POL_FORM_FIELDS.claimSequenceId)}
+            />
+          </VisibilityControl>
+        </Col>
+
         <Col
           xs={3}
           data-col-order-template-pol-is-bindary-active

@@ -8,6 +8,7 @@ export {
 } from './DetailsFields/FieldBinderyActive';
 export { FieldClaimingActive } from './DetailsFields/FieldClaimingActive';
 export { FieldClaimingInterval } from './DetailsFields/FieldClaimingInterval';
+export { FieldClaimSequence } from './DetailsFields/FieldClaimSequence';
 export { default as FieldPOLineNumber } from './DetailsFields/FieldPOLineNumber';
 export { default as FieldAcquisitionMethod } from './DetailsFields/FieldAcquisitionMethod';
 export { default as FieldOrderFormat } from './DetailsFields/FieldOrderFormat';

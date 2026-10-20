@@ -138,6 +138,7 @@ export const getPoLineFieldsLabelMap = ({
     'requester': 'ui-orders.poLine.requester',
     'claimingActive': 'ui-orders.poLine.claimingActive',
     'claimingInterval': 'ui-orders.poLine.claimingInterval',
+    'claimSequenceId': 'ui-orders.poLine.claimSequence',
     'donorOrganizationIds': 'ui-orders.poLine.donorOrganizationIds',
     'donorOrganizationIds[\\d]': 'ui-orders.poLine.donorOrganizationIds',
     'cancellationRestriction': 'ui-orders.poLine.cancellationRestriction',
