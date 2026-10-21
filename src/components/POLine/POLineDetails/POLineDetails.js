@@ -61,11 +61,10 @@ export const getClaimSequenceValue = (claimSequenceId, claimSequences) => {
 const DEFAULT_HIDDEN_FIELDS = {};
 const DEFAULT_LINE = {};
 
-const DEFAULT_INTEGRATION_CONFIGS = [];
-
 const POLineDetails = ({
   hiddenFields = DEFAULT_HIDDEN_FIELDS,
-  integrationConfigs = DEFAULT_INTEGRATION_CONFIGS,
+  integrationConfigs,
+  isIntegrationConfigsLoading = false,
   line = DEFAULT_LINE,
   manualOrder = false,
 }) => {
@@ -76,6 +75,15 @@ const POLineDetails = ({
     claimSequences,
     isLoading: isClaimSequencesLoading,
   } = useClaimSequences({ enabled: Boolean(line?.claimSequenceId) });
+
+  const exportInfoProps = {
+    acquisitionMethod: line.acquisitionMethod,
+    automaticExport: line.automaticExport,
+    integrationConfigs,
+    isLoading: isIntegrationConfigsLoading,
+    manualOrder,
+    vendorAccount: line.vendorDetail?.vendorAccount,
+  };
 
   return (
     <>
@@ -125,11 +133,7 @@ const POLineDetails = ({
                   {manualOrder && <InfoPopover content={<FormattedMessage id="ui-orders.poLine.manualPO.info" />} />}
                   <AutomaticExportInfo
                     placement="label"
-                    automaticExport={line.automaticExport}
-                    manualOrder={manualOrder}
-                    integrationConfigs={integrationConfigs}
-                    vendorAccount={line.vendorDetail?.vendorAccount}
-                    acquisitionMethod={line.acquisitionMethod}
+                    {...exportInfoProps}
                   />
                 </>
               )}
@@ -138,11 +142,7 @@ const POLineDetails = ({
 
             <AutomaticExportInfo
               placement="below"
-              automaticExport={line.automaticExport}
-              manualOrder={manualOrder}
-              integrationConfigs={integrationConfigs}
-              vendorAccount={line.vendorDetail?.vendorAccount}
-              acquisitionMethod={line.acquisitionMethod}
+              {...exportInfoProps}
             />
           </Col>
         </IfVisible>
@@ -401,6 +401,7 @@ const POLineDetails = ({
 POLineDetails.propTypes = {
   hiddenFields: PropTypes.object,
   integrationConfigs: PropTypes.arrayOf(PropTypes.object),
+  isIntegrationConfigsLoading: PropTypes.bool,
   line: PropTypes.object,
   manualOrder: PropTypes.bool,
 };

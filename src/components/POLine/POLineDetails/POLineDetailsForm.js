@@ -54,7 +54,6 @@ import { isReceiptNotRequired } from '../utils';
 
 const defaultProps = {
   hiddenFields: {},
-  integrationConfigs: [],
   order: {},
   vendor: {},
 };
@@ -66,7 +65,7 @@ function POLineDetailsForm({
   formValues,
   hiddenFields = defaultProps.hiddenFields,
   initialValues: poLine,
-  integrationConfigs = defaultProps.integrationConfigs,
+  integrationConfigs,
   order = defaultProps.order,
   vendor = defaultProps.vendor,
 }) {
@@ -99,8 +98,7 @@ function POLineDetailsForm({
     (value) => {
       change(POL_FORM_FIELDS.acquisitionMethod, value);
 
-      // A manual order is excluded from automated transmission, so do not
-      // auto-toggle the (disabled) automatic export checkbox for it.
+      // Manual orders are never exported, so leave the disabled checkbox alone.
       if (isManualOrder) return;
 
       const vendorAccount = formValues?.vendorDetail?.vendorAccount;
@@ -170,6 +168,14 @@ function POLineDetailsForm({
     }
   }, [change, initReceivingWorkflowChange, isPostPendingOrder]);
 
+  const exportInfoProps = {
+    acquisitionMethod: formValues?.acquisitionMethod,
+    automaticExport: formValues?.automaticExport,
+    integrationConfigs,
+    manualOrder: isManualOrder,
+    vendorAccount: formValues?.vendorDetail?.vendorAccount,
+  };
+
   return (
     <>
       <Row>
@@ -209,22 +215,14 @@ function POLineDetailsForm({
               exportInfo={(
                 <AutomaticExportInfo
                   placement="label"
-                  automaticExport={formValues?.automaticExport}
-                  manualOrder={isManualOrder}
-                  integrationConfigs={integrationConfigs}
-                  vendorAccount={formValues?.vendorDetail?.vendorAccount}
-                  acquisitionMethod={formValues?.acquisitionMethod}
+                  {...exportInfoProps}
                 />
               )}
             />
 
             <AutomaticExportInfo
               placement="below"
-              automaticExport={formValues?.automaticExport}
-              manualOrder={isManualOrder}
-              integrationConfigs={integrationConfigs}
-              vendorAccount={formValues?.vendorDetail?.vendorAccount}
-              acquisitionMethod={formValues?.acquisitionMethod}
+              {...exportInfoProps}
             />
           </Col>
         </IfFieldVisible>

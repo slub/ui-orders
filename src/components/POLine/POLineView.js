@@ -188,10 +188,11 @@ const POLineView = ({
 
   const isCancelable = isCancelableLine(line, order);
 
-  // Only fetch integration configs when automatic export is on and the order is
-  // not manual, to avoid an extra request on every PO line view. Feeds the
-  // read-only "Export via" hint.
-  const { integrationConfigs } = useIntegrationConfigs({
+  // Fetched only when the export hint can show something.
+  const {
+    integrationConfigs,
+    isFetching: isIntegrationConfigsFetching,
+  } = useIntegrationConfigs({
     organizationId: (line.automaticExport && !order?.manualPo) ? order?.vendor : undefined,
   });
 
@@ -464,6 +465,7 @@ const POLineView = ({
                     line={line}
                     hiddenFields={hiddenFields}
                     integrationConfigs={integrationConfigs}
+                    isIntegrationConfigsLoading={isIntegrationConfigsFetching}
                     manualOrder={order?.manualPo}
                   />
                   {renderEmbeddedCustomFields('itemDetails')}

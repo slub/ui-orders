@@ -12,7 +12,19 @@ import userEvent from '@folio/jest-config-stripes/testing-library/user-event';
 import { RECEIPT_STATUS } from '@folio/stripes-acq-components';
 
 import { WORKFLOW_STATUS } from '../../../common/constants';
+import { useAcqMethods } from '../../../common/hooks/useAcqMethods';
+import { toggleAutomaticExport } from '../../Utils/toggleAutomaticExport';
 import POLineDetailsForm from './POLineDetailsForm';
+
+jest.mock('../../../common/hooks/useAcqMethods', () => ({
+  useAcqMethods: jest.fn(() => ({ acqMethods: [], isLoading: false })),
+}));
+jest.mock('../../Utils/toggleAutomaticExport', () => ({
+  ...jest.requireActual('../../Utils/toggleAutomaticExport'),
+  toggleAutomaticExport: jest.fn(),
+}));
+
+const acqMethod = { id: 'acq-method-id', value: 'Purchase' };
 
 const defaultProps = {
   materialTypes: [{
@@ -294,6 +306,37 @@ describe('POLineDetailsForm', () => {
     await userEvent.type(claimingIntervalField, '42');
     expect(claimingIntervalField).toHaveValue(42);
     expect(claimingIntervalField).toBeValid();
+  });
+
+  describe('Acquisition method change', () => {
+    const selectAcqMethod = async () => {
+      await userEvent.click(screen.getByRole('button', { name: /ui-orders.poLine.acquisitionMethod/ }));
+      await userEvent.click(screen.getByRole('option', { name: /acquisition_method/ }));
+    };
+
+    beforeEach(() => {
+      toggleAutomaticExport.mockClear();
+      useAcqMethods.mockReturnValue({ acqMethods: [acqMethod], isLoading: false });
+    });
+
+    it('should recalculate automatic export', async () => {
+      renderPOLineDetailsForm({ integrationConfigs: [] });
+
+      await selectAcqMethod();
+
+      expect(toggleAutomaticExport).toHaveBeenCalled();
+    });
+
+    it('should not recalculate automatic export for a manual order', async () => {
+      renderPOLineDetailsForm({
+        integrationConfigs: [],
+        order: { workflowStatus: 'Pending', manualPo: true },
+      });
+
+      await selectAcqMethod();
+
+      expect(toggleAutomaticExport).not.toHaveBeenCalled();
+    });
   });
 
   it('should `Bindary Active` field be disabled if "orderFormat" is not `physicalResource` nor `PEMix`', async () => {

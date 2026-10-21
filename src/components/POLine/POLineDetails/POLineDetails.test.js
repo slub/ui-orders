@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { render, screen } from '@folio/jest-config-stripes/testing-library/react';
 import { ACQUISITION_METHOD } from '@folio/stripes-acq-components';
 
+import { integrationConfig } from 'fixtures';
 import POLineDetails, {
   getAcquisitionMethodValue,
   getReceivingWorkflowValue,
@@ -53,6 +54,47 @@ describe('POLineDetails', () => {
     expect(screen.getByText('ui-orders.poLine.receivingWorkflow')).toBeInTheDocument();
     expect(screen.getByText('ui-orders.poLine.cancellationRestrictionNote')).toBeInTheDocument();
     expect(screen.getByText('ui-orders.poLine.poLineDescription')).toBeInTheDocument();
+  });
+
+  describe('Automatic export hint', () => {
+    const { ediConfig } = integrationConfig.exportTypeSpecificParameters.vendorEdiOrdersExportConfig;
+    const line = {
+      automaticExport: true,
+      acquisitionMethod: ediConfig.defaultAcquisitionMethods[0],
+      vendorDetail: { vendorAccount: ediConfig.accountNoList[0] },
+    };
+
+    it('should show the matching integration', () => {
+      renderPOLineDetails({ line, integrationConfigs: [integrationConfig] });
+
+      expect(screen.getByText('ui-orders.poLine.automaticExport.exportVia')).toBeInTheDocument();
+    });
+
+    it('should show a warning when no integration matches', () => {
+      renderPOLineDetails({ line, integrationConfigs: [] });
+
+      expect(screen.getByRole('button', { name: 'ui-orders.poLine.automaticExport.noIntegration' })).toBeInTheDocument();
+    });
+
+    it('should not show a warning without integration configs (order template view)', () => {
+      renderPOLineDetails({ line });
+
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    });
+
+    it('should not show a warning while the integration configs are loading', () => {
+      renderPOLineDetails({ line, integrationConfigs: [], isIntegrationConfigsLoading: true });
+
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    });
+
+    it('should show the manual order info instead of the hint for a manual order', () => {
+      renderPOLineDetails({ line, integrationConfigs: [], manualOrder: true });
+
+      expect(screen.queryByText('ui-orders.poLine.automaticExport.exportVia')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'ui-orders.poLine.automaticExport.noIntegration' })).not.toBeInTheDocument();
+      expect(screen.getByRole('button')).toBeInTheDocument();
+    });
   });
 
   describe('getAcquisitionMethodValue', () => {

@@ -2,31 +2,31 @@ import { FOLIO_EXPORT_TYPE } from '@folio/stripes-acq-components';
 
 const AUTOMATIC_EXPORT_FIELD = 'automaticExport';
 
-const getOrderingConfig = (config) => config?.exportTypeSpecificParameters?.vendorEdiOrdersExportConfig;
+export const getOrderingConfig = (config) => config?.exportTypeSpecificParameters?.vendorEdiOrdersExportConfig;
+
+export const formatConfigLabel = (config) => {
+  const { configName, transmissionMethod } = getOrderingConfig(config) || {};
+
+  return transmissionMethod ? `${configName} (${transmissionMethod})` : configName;
+};
 
 const isAcqMethodIncluded = (orderingConfig, acquisitionMethod) => (
   Boolean(orderingConfig?.ediConfig?.defaultAcquisitionMethods?.includes(acquisitionMethod))
 );
 
 /**
- * Client-side simulation of the backend PO line matching used to give the
- * orderer feedback in the UI (the "Automatic export" checkbox and the
- * "Will be sent via" hint). The real routing happens in the export job.
+ * Mirrors the PO line matching of mod-data-export-worker
+ * (`MapToEdifactOrdersTasklet#getPoLineQuery`, `#getVendorAccountFilter`) so
+ * the UI can predict which ordering integration picks up a PO line. A config
+ * applies when the acquisition method is in its defaultAcquisitionMethods and:
+ *   - non-default, accountNoList not empty: vendorAccount is in the list
+ *   - non-default, accountNoList empty: every line
+ *   - default, vendor has several ordering configs: vendorAccount is in none
+ *     of their account lists
+ *   - default, single ordering config: every line
+ * Without an acquisition method the backend job fails, so nothing applies.
  *
- * Mirrors mod-data-export-worker `MapToEdifactOrdersTasklet#getPoLineQuery`
- * and `#getVendorAccountFilter`. A config applies to a PO line when:
- *   - the acquisition method is in the config's defaultAcquisitionMethods, AND
- *   - the account filter matches:
- *       - non-default, account list NOT empty -> vendorAccount in accountNoList
- *       - non-default, account list empty      -> matches every line (no restriction)
- *       - default, vendor has > 1 ordering config -> vendorAccount NOT in the
- *         anti-list (union of all account numbers across the vendor's configs)
- *       - default, single ordering config       -> matches every line
- * A missing acquisition method makes the backend job fail, so nothing applies.
- *
- * KEEP IN SYNC: if the backend matching rules change, update this function.
- * Note: this only matches the SLUB backend fork (empty-account-list rule) until
- * that change reaches folio-org master.
+ * KEEP IN SYNC with the backend rule.
  */
 export const getApplicableOrderingIntegrations = ({ vendorAccount, acquisitionMethod, integrationConfigs = [] }) => {
   if (!acquisitionMethod) return [];

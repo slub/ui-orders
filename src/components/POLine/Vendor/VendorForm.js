@@ -59,8 +59,7 @@ const VendorForm = ({
     ({ target: { value } }) => {
       change('vendorDetail.vendorAccount', value);
 
-      // A manual order is excluded from automated transmission, so do not
-      // auto-toggle the (disabled) automatic export checkbox for it.
+      // Manual orders are never exported, so leave the disabled checkbox alone.
       if (isManualOrder) return;
 
       const acquisitionMethod = getState().values?.acquisitionMethod;

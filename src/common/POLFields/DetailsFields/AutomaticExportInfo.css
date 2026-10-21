@@ -1,7 +1,5 @@
-/* Truncation is left to the column width: integration names are long and often
-   share their first words, so a fixed character limit cut off too much. Two
-   lines, then an ellipsis; `anywhere` keeps a single very long word from being
-   clipped mid-word instead of wrapping. */
+/* Two lines, then an ellipsis. `anywhere` lets a long name without spaces wrap
+   instead of being clipped mid-word. */
 .exportVia {
   display: -webkit-box;
   overflow: hidden;

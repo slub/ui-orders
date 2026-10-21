@@ -21,4 +21,17 @@ describe('FieldAutomaticExport', () => {
 
     expect(screen.getByText('ui-orders.poLine.automaticExport')).toBeInTheDocument();
   });
+
+  it('should render the manual order info for a manual order', () => {
+    renderFieldAutomaticExport({ isManualOrder: true });
+
+    expect(screen.getByRole('button')).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: /ui-orders.poLine.automaticExport/ })).toBeInTheDocument();
+  });
+
+  it('should render the export info inside the label', () => {
+    renderFieldAutomaticExport({ exportInfo: <span>export info</span> });
+
+    expect(screen.getByRole('checkbox', { name: /export info/ })).toBeInTheDocument();
+  });
 });
