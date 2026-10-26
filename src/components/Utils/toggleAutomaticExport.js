@@ -22,7 +22,8 @@ const isAcqMethodIncluded = (orderingConfig, acquisitionMethod) => (
  *   - non-default, accountNoList not empty: vendorAccount is in the list
  *   - non-default, accountNoList empty: every line
  *   - default, vendor has several ordering configs: vendorAccount is in none
- *     of their account lists
+ *     of the non-default configs' account lists (a default config may still
+ *     store a hidden list, MODEXPW-664); no such accounts at all: every line
  *   - default, single ordering config: every line
  * Without an acquisition method the backend job fails, so nothing applies.
  *
@@ -38,7 +39,10 @@ export const getApplicableOrderingIntegrations = ({ vendorAccount, acquisitionMe
 
   const hasMultipleConfigs = orderingConfigs.length > 1;
   const accountAntiList = hasMultipleConfigs
-    ? orderingConfigs.flatMap(config => getOrderingConfig(config)?.ediConfig?.accountNoList ?? [])
+    ? orderingConfigs
+      .map(getOrderingConfig)
+      .filter(orderingConfig => !orderingConfig.isDefaultConfig)
+      .flatMap(orderingConfig => orderingConfig.ediConfig?.accountNoList ?? [])
     : [];
 
   return orderingConfigs.filter((config) => {
