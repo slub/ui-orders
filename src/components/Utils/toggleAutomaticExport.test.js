@@ -138,4 +138,51 @@ describe('getApplicableOrderingIntegrations', () => {
 
     expect(applicable).toEqual([defaultOrdering]);
   });
+
+  it('should let the default integration apply when no integration has account numbers', () => {
+    const defaultOrdering = orderingConfig({
+      isDefaultConfig: true,
+      ediConfig: {
+        defaultAcquisitionMethods: [acquisitionMethod],
+      },
+    });
+    const emailOrdering = orderingConfig({
+      ediConfig: {
+        defaultAcquisitionMethods: ['other-acq-method'],
+        accountNoList: [],
+      },
+    });
+
+    const applicable = getApplicableOrderingIntegrations({
+      vendorAccount,
+      acquisitionMethod,
+      integrationConfigs: [defaultOrdering, emailOrdering],
+    });
+
+    expect(applicable).toEqual([defaultOrdering]);
+  });
+
+  it('should ignore account numbers left on the default integration', () => {
+    const defaultOrdering = orderingConfig({
+      isDefaultConfig: true,
+      ediConfig: {
+        defaultAcquisitionMethods: [acquisitionMethod],
+        accountNoList: [vendorAccount],
+      },
+    });
+    const otherOrdering = orderingConfig({
+      ediConfig: {
+        defaultAcquisitionMethods: ['other-acq-method'],
+        accountNoList: ['other-account'],
+      },
+    });
+
+    const applicable = getApplicableOrderingIntegrations({
+      vendorAccount,
+      acquisitionMethod,
+      integrationConfigs: [defaultOrdering, otherOrdering],
+    });
+
+    expect(applicable).toEqual([defaultOrdering]);
+  });
 });
