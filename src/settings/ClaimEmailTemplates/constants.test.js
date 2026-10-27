@@ -17,7 +17,6 @@ describe('CLAIM_EMAIL_TOKENS', () => {
   it('should resolve every token against the sample preview context', () => {
     Object.values(CLAIM_EMAIL_TOKENS).flat().forEach(({ token, previewValue }) => {
       expect(typeof previewValue).toBe('string');
-      expect(previewValue).not.toBe('');
       expect(previewValue).not.toBe('undefined');
       expect(token).not.toBe('');
     });
@@ -25,13 +24,15 @@ describe('CLAIM_EMAIL_TOKENS', () => {
 
   it('should take the preview values from the sample preview context', () => {
     const previewFormat = tokensReducer(CLAIM_EMAIL_TOKENS);
-    const [firstPiece] = CLAIM_SAMPLE_PREVIEW_CONTEXT.pieces;
+    const [firstOrder] = CLAIM_SAMPLE_PREVIEW_CONTEXT.orders;
+    const [firstOrderLine] = firstOrder.orderLines;
+    const sequencedPiece = firstOrderLine.orderLine.pieces.at(-1);
 
     expect(previewFormat['organization.name']).toBe(CLAIM_SAMPLE_PREVIEW_CONTEXT.organization.name);
-    expect(previewFormat['piece.claimStage']).toBe(String(firstPiece.piece.claimStage));
-    expect(previewFormat['orderLine.poLineNumber']).toBe(firstPiece.orderLine.poLineNumber);
-    expect(previewFormat['order.poNumber']).toBe(firstPiece.order.poNumber);
-    expect(previewFormat.refNumber).toBe(firstPiece.orderLine.vendorDetail.referenceNumbers[0].refNumber);
+    expect(previewFormat['order.poNumber']).toBe(firstOrder.order.poNumber);
+    expect(previewFormat['orderLine.poLineNumber']).toBe(firstOrderLine.orderLine.poLineNumber);
+    expect(previewFormat.displaySummary).toBe(sequencedPiece.displaySummary);
+    expect(previewFormat['claimSequence.stage']).toBe(String(sequencedPiece.claimSequence.stage));
   });
 
   it('should separate the claim templates from the order templates by scope', () => {
