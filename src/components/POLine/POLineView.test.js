@@ -7,7 +7,10 @@ import {
   ORDER_TYPES,
   useIntegrationConfigs,
 } from '@folio/stripes-acq-components';
-import { Pluggable } from '@folio/stripes/core';
+import {
+  Pluggable,
+  useStripes,
+} from '@folio/stripes/core';
 
 import {
   orderLine,
@@ -180,6 +183,10 @@ describe('POLineView', () => {
       useIntegrationConfigs.mockClear();
     });
 
+    afterEach(() => {
+      useStripes().hasPerm.mockImplementation(() => true);
+    });
+
     it('should fetch them when automatic export is on', () => {
       renderPOLineView({ line: { ...orderLine, automaticExport: true } });
 
@@ -199,6 +206,15 @@ describe('POLineView', () => {
       });
 
       expect(useIntegrationConfigs).toHaveBeenCalledWith({ organizationId: undefined });
+    });
+
+    it('should neither fetch them nor show a warning without the permission to read integrations', () => {
+      useStripes().hasPerm.mockImplementation((perm) => perm !== 'data-export.config.collection.get');
+
+      renderPOLineView({ line: { ...orderLine, automaticExport: true } });
+
+      expect(useIntegrationConfigs).toHaveBeenCalledWith({ organizationId: undefined });
+      expect(screen.queryByRole('button', { name: 'ui-orders.poLine.automaticExport.noIntegration' })).not.toBeInTheDocument();
     });
   });
 

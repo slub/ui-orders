@@ -187,12 +187,15 @@ const POLineView = ({
 
   const isCancelable = isCancelableLine(line, order);
 
+  // Without the permission the request fails and the hint would claim that no integration matches.
+  const canViewIntegrations = stripes.hasPerm('data-export.config.collection.get');
+
   // Fetched only when the export hint can show something.
   const {
     integrationConfigs,
     isFetching: isIntegrationConfigsFetching,
   } = useIntegrationConfigs({
-    organizationId: (line.automaticExport && !order?.manualPo) ? order?.vendor : undefined,
+    organizationId: (canViewIntegrations && line.automaticExport && !order?.manualPo) ? order?.vendor : undefined,
   });
 
   const { hasLocationRestrictedFund } = useIsFundsRestrictedByLocationIds(line);
@@ -448,7 +451,7 @@ const POLineView = ({
                   <POLineDetails
                     line={line}
                     hiddenFields={hiddenFields}
-                    integrationConfigs={integrationConfigs}
+                    integrationConfigs={canViewIntegrations ? integrationConfigs : undefined}
                     isIntegrationConfigsLoading={isIntegrationConfigsFetching}
                     manualOrder={order?.manualPo}
                   />

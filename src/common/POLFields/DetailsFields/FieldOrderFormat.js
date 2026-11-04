@@ -8,6 +8,7 @@ import {
   ORDER_FORMATS,
 } from '@folio/stripes-acq-components';
 
+import { OPTION_VALUE_WITH_BINDERY_ACTIVE } from '../../../components/POLine/const';
 import { POL_FORM_FIELDS } from '../../constants';
 
 const ORDER_FORMAT_OPTIONS = Object.keys(ORDER_FORMATS).map((key) => ({
@@ -35,8 +36,13 @@ const handleElectronic = (change, settings, formValues, vendor) => {
   }
 };
 
-const handlePhysical = (change, settings) => {
-  change(POL_FORM_FIELDS.physicalCreateInventory, settings.physical);
+const handlePhysical = (change, settings, formValues) => {
+  // Bindery's required inventory takes precedence over tenant defaults in both physical formats.
+  const createInventory = get(formValues, POL_FORM_FIELDS.isBinderyActive)
+    ? OPTION_VALUE_WITH_BINDERY_ACTIVE
+    : settings.physical;
+
+  change(POL_FORM_FIELDS.physicalCreateInventory, createInventory);
 };
 
 const handleOther = (change, settings) => {
@@ -48,17 +54,17 @@ export const formatHandlers = {
     change(POL_FORM_FIELDS.physical, undefined);
     handleElectronic(change, settings, formValues, vendor);
   },
-  [ORDER_FORMATS.physicalResource]: (change, settings) => {
+  [ORDER_FORMATS.physicalResource]: (change, settings, formValues, _vendor) => {
     change(POL_FORM_FIELDS.eresource, undefined);
-    handlePhysical(change, settings);
+    handlePhysical(change, settings, formValues);
   },
-  [ORDER_FORMATS.other]: (change, settings) => {
+  [ORDER_FORMATS.other]: (change, settings, _formValues, _vendor) => {
     change(POL_FORM_FIELDS.eresource, undefined);
     handleOther(change, settings);
   },
   [ORDER_FORMATS.PEMix]: (change, settings, formValues, vendor) => {
     handleElectronic(change, settings, formValues, vendor);
-    handlePhysical(change, settings);
+    handlePhysical(change, settings, formValues);
   },
 };
 

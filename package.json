@@ -58,7 +58,7 @@
       "settings": "1.0",
       "search-inventory": "1.0",
       "tags": "1.0",
-      "template-engine": "2.0",
+      "template-engine": "2.3",
       "tenant-addresses": "1.0",
       "titles": "1.2",
       "users": "15.0 16.0"
@@ -403,6 +403,48 @@
         ]
       },
       {
+        "permissionName": "ui-orders.settings.email-templates.view",
+        "displayName": "Settings (Orders): Can view Email Templates",
+        "description": "",
+        "visible": true,
+        "subPermissions": [
+          "settings.orders.enabled",
+          "templates.collection.get",
+          "templates.item.get",
+          "template-request.preview.post"
+        ]
+      },
+      {
+        "permissionName": "ui-orders.settings.email-templates.edit",
+        "displayName": "Settings (Orders): Can view and edit Email Templates",
+        "description": "",
+        "visible": true,
+        "subPermissions": [
+          "ui-orders.settings.email-templates.view",
+          "templates.item.put"
+        ]
+      },
+      {
+        "permissionName": "ui-orders.settings.email-templates.create",
+        "displayName": "Settings (Orders): Can create Email Templates",
+        "description": "",
+        "visible": true,
+        "subPermissions": [
+          "ui-orders.settings.email-templates.edit",
+          "templates.item.post"
+        ]
+      },
+      {
+        "permissionName": "ui-orders.settings.email-templates.delete",
+        "displayName": "Settings (Orders): Can delete Email Templates",
+        "description": "",
+        "visible": true,
+        "subPermissions": [
+          "ui-orders.settings.email-templates.edit",
+          "templates.item.delete"
+        ]
+      },
+      {
         "permissionName": "mod-settings.global.read.ui-orders.custom-fields.manage",
         "displayName": "Settings (Orders): Read the settings in the 'custom fields' section",
         "visible": false
@@ -484,7 +526,8 @@
           "ui-orders.third-party-services.execute",
           "orders.acquisition-methods.collection.get",
           "ui-orders.settings.custom-fields.view",
-          "templates.item.get"
+          "templates.item.get",
+          "ui-orders.settings.email-templates.view"
         ]
       },
       {
@@ -524,7 +567,9 @@
           "ui-orders.settings.custom-fields.edit",
           "ui-orders.settings.custom-fields.delete",
           "templates.item.post",
-          "templates.item.put"
+          "templates.item.put",
+          "ui-orders.settings.email-templates.create",
+          "ui-orders.settings.email-templates.delete"
         ]
       },
       {
@@ -593,7 +638,7 @@
   "dependencies": {
     "@folio/plugin-find-po-line": "^7.0.0",
     "@folio/stripes-acq-components": "~7.2.0",
-    "@folio/stripes-template-editor": "^3.2.0",
+    "@folio/stripes-template-editor": "^3.6.0",
     "classnames": "^2.2.5",
     "dompurify": "^3.0.9",
     "final-form": "^4.19.1",
