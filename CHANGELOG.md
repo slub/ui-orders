@@ -18,6 +18,8 @@
 * Add Order email templates settings with token picker and Handlebars backend-rendered preview. Refs UIOR-1492, UIOR-1493, UIOR-1495.
 * Add Claim email templates and Claim sequences settings under a new Claiming section. Refs UIOR-1584.
 * Add claim sequence selection to PO lines and order templates. Refs UIOR-1587.
+* Do not show metadata fields in "Version history" for PO and PO Lines. Refs UIOR-1585.
+* Preserve the "Create inventory" and "Receiving workflow" fields values according to the form value precedence rules. Refs UIOR-1582.
 * Show which export integration applies to a PO line. Refs UIOR-1556.
 
 ## [9.0.5](https://github.com/folio-org/ui-orders/tree/v9.0.5) (2026-07-20)

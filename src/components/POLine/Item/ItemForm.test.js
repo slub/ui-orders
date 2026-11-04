@@ -2,9 +2,10 @@ import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 
 import user from '@folio/jest-config-stripes/testing-library/user-event';
-import { act, render, screen } from '@folio/jest-config-stripes/testing-library/react';
+import { act, render, screen, waitFor } from '@folio/jest-config-stripes/testing-library/react';
 import { Pluggable } from '@folio/stripes/core';
 import stripesForm from '@folio/stripes/final-form';
+import { RECEIPT_STATUS } from '@folio/stripes-acq-components';
 
 import { instance, order, orderLine } from 'fixtures';
 import { PRODUCT_ID_TYPE } from '../../../common/constants';
@@ -47,11 +48,15 @@ const normalizeProps = (WrappedComponent) => {
   return class extends React.Component {
     render() {
       return (
-        <WrappedComponent
-          formValues={this.props.values}
-          {...this.props.form}
-          {...this.props}
-        />
+        <>
+          <WrappedComponent
+            formValues={this.props.values}
+            {...this.props.form}
+            {...this.props}
+          />
+          {/* Receiving is outside ItemForm; expose real form values to check its side effects. */}
+          <output data-testid="form-values">{JSON.stringify(this.props.values)}</output>
+        </>
       );
     }
   };
@@ -68,6 +73,8 @@ const renderItemForm = (props = {}, initialValues = {}) => render(
   />,
   { wrapper: MemoryRouter },
 );
+
+const getFormValues = () => JSON.parse(screen.getByTestId('form-values').textContent);
 
 describe('ItemForm', () => {
   const selectInstance = async (_instance) => act(async () => Pluggable.mock.calls[0][0].selectInstance(_instance));
@@ -101,6 +108,40 @@ describe('ItemForm', () => {
     await act(async () => user.click(screen.getByLabelText('ui-orders.poLine.package')));
 
     expect(screen.getByRole('checkbox', { name: 'ui-orders.poLine.package' })).toBeChecked();
+  });
+
+  it('should enable independent receiving and clear location quantities when enabling package', async () => {
+    renderItemForm({}, {
+      isPackage: false,
+      checkinItems: false,
+      locations: [{ quantityPhysical: 2, quantityElectronic: 3 }],
+    });
+
+    await act(async () => user.click(screen.getByLabelText('ui-orders.poLine.package')));
+
+    await waitFor(() => expect(getFormValues().checkinItems).toBe(true));
+    expect(getFormValues().locations[0]).toMatchObject({ quantityPhysical: null, quantityElectronic: null });
+  });
+
+  it.each([
+    ['independent receiving', {}],
+    ['Bindery active', { details: { isBinderyActive: true } }],
+    ['receipt not required', { receiptStatus: RECEIPT_STATUS.receiptNotRequired }],
+  ])('should preserve %s when disabling package', async (_description, values) => {
+    renderItemForm({}, {
+      isPackage: true,
+      checkinItems: true,
+      locations: [{ quantityPhysical: 2, quantityElectronic: 3 }],
+      ...values,
+    });
+
+    await act(async () => user.click(screen.getByLabelText('ui-orders.poLine.package')));
+
+    // Unlinking finishes asynchronously even without an instance; wait for that boundary.
+    await waitFor(() => expect(getFormValues().instanceId).toBeNull());
+    expect(getFormValues().isPackage).toBe(false);
+    expect(getFormValues().checkinItems).toBe(true);
+    expect(getFormValues().locations[0]).toMatchObject({ quantityPhysical: 2, quantityElectronic: 3 });
   });
 
   it('should handle \'TitleField\' change', async () => {
@@ -220,6 +261,7 @@ describe('ItemForm', () => {
         it('should intercept instance connection break on field change', async () => {
           expect(isPackageCheckbox).toBeChecked();
           expectConnectedTitle();
+          expect(getFormValues().checkinItems).toBeUndefined();
         });
 
         it('should break instance connection on confirm', async () => {
@@ -227,6 +269,7 @@ describe('ItemForm', () => {
 
           expect(isPackageCheckbox).toBeChecked();
           expectNotConnectedTitle();
+          expect(getFormValues().checkinItems).toBe(true);
         });
 
         it('should NOT break instance connection on cancel', async () => {
@@ -234,6 +277,7 @@ describe('ItemForm', () => {
 
           expect(isPackageCheckbox).not.toBeChecked();
           expectConnectedTitle();
+          expect(getFormValues().checkinItems).toBeUndefined();
         });
       });
 

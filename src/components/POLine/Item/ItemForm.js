@@ -204,10 +204,12 @@ class ItemForm extends Component {
 
     this.onChangeField(isPackageValue, POL_FORM_FIELDS.isPackage)
       .then(() => {
-        change(POL_FORM_FIELDS.checkinItems, isPackageValue);
-
         if (isPackageValue) {
           batch(() => {
+            // Packages require independent receiving; removing the package flag must not undo
+            // that choice or override another requirement, such as Bindery or Receipt not required.
+            change(POL_FORM_FIELDS.checkinItems, true);
+
             formValues?.locations?.forEach((_, i) => {
               change(`${POL_FORM_FIELDS.locations}[${i}].quantityPhysical`, null);
               change(`${POL_FORM_FIELDS.locations}[${i}].quantityElectronic`, null);
