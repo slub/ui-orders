@@ -666,6 +666,7 @@
   "manualExport.started": "{count, plural, one {Export started for # PO line} other {Export started for # PO lines}}",
   "manualExport.success": "{count, plural, one {# PO line was sent} other {# PO lines were sent}}",
   "manualExport.error": "{count, plural, one {# export method failed} other {# export methods failed}}",
+  "manualExport.loadError": "The export methods could not be loaded",
   "renewals.subscription": "Subscription",
   "renewals.subscription.tooltip": "Choose Order type as Ongoing to interact with this field",
   "renewals.manualRenewal.tooltip": "Check Subscription to interact with this field",
