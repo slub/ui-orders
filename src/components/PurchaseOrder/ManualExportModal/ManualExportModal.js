@@ -17,23 +17,21 @@ import {
   Checkbox,
   Icon,
   Loading,
+  MessageBanner,
   Modal,
   ModalFooter,
   MultiColumnList,
   Select,
 } from '@folio/stripes/components';
 import { useStripes } from '@folio/stripes/core';
-import {
-  useIntegrationConfigs,
-  useShowCallout,
-} from '@folio/stripes-acq-components';
+import { useShowCallout } from '@folio/stripes-acq-components';
 
 import {
   EXPORT_JOB_STATUSES,
+  useEffectiveExportConfigs,
   useManualExport,
   useManualExportJobs,
 } from '../../../common/hooks';
-import { getApplicableOrderingIntegrations } from '../../Utils/toggleAutomaticExport';
 
 const VISIBLE_COLUMNS = ['selected', 'poLineNumber', 'title', 'status', 'integration'];
 
@@ -109,15 +107,9 @@ const truncate = (value, maxLength = MAX_TITLE_LENGTH) => (
   value && value.length > maxLength ? `${value.slice(0, maxLength)}…` : value
 );
 
-// Same matching simulation as the AutomaticExportInfo hint, but for every line
-// regardless of the automaticExport flag - that is the point of a manual export.
-const buildRow = (line, integrationConfigs, isManualOrder) => {
-  const applicable = getApplicableOrderingIntegrations({
-    vendorAccount: line.vendorDetail?.vendorAccount,
-    acquisitionMethod: line.acquisitionMethod,
-    integrationConfigs,
-  });
-
+// The matches come from the backend and ignore the automaticExport flag - sending
+// such lines anyway is the point of a manual export.
+const buildRow = (line, { configs: applicable, scheduledConfigIds }, isManualOrder) => {
   // Would go out on its own, so it must not be pre-selected (double send).
   // Manual orders are excluded: the scheduler never picks them up
   // (`NOT purchaseOrder.manualPo`), so the hint would be a false statement.
@@ -125,7 +117,7 @@ const buildRow = (line, integrationConfigs, isManualOrder) => {
     !isManualOrder
     && line.automaticExport
     && applicable.length === 1
-    && getSchedule(applicable[0])?.enableScheduledExport,
+    && scheduledConfigIds.includes(applicable[0].id),
   );
 
   return {
@@ -171,9 +163,10 @@ export const ManualExportModal = ({
   // NB: `isFetching`, not `isLoading` - the wrong key would initialise the
   // selection before the configs arrive, leaving matched lines unselectable.
   const {
-    integrationConfigs,
+    configsByLineId,
+    isError,
     isFetching,
-  } = useIntegrationConfigs({ organizationId: order.vendor });
+  } = useEffectiveExportConfigs({ vendorId: order.vendor, poLines });
 
   const {
     manualExport,
@@ -181,8 +174,8 @@ export const ManualExportModal = ({
   } = useManualExport();
 
   const rows = useMemo(
-    () => poLines.map((line) => buildRow(line, integrationConfigs, order.manualPo)),
-    [poLines, integrationConfigs, order.manualPo],
+    () => poLines.map((line) => buildRow(line, configsByLineId[line.id], order.manualPo)),
+    [poLines, configsByLineId, order.manualPo],
   );
 
   // Initialised only once the configs are loaded, so the defaults reflect the
@@ -466,6 +459,30 @@ export const ManualExportModal = ({
     { orderNumber: order.poNumber },
   );
 
+  const renderContent = () => {
+    // Without the lookup every line would read "no matching export method".
+    if (isError) {
+      return (
+        <MessageBanner type="error">
+          <FormattedMessage id="ui-orders.manualExport.loadError" />
+        </MessageBanner>
+      );
+    }
+
+    if (isFetching || selection === null) return <Loading />;
+
+    return (
+      <MultiColumnList
+        id="manual-export-po-lines"
+        contentData={rows}
+        visibleColumns={VISIBLE_COLUMNS}
+        columnMapping={columnMapping}
+        formatter={formatter}
+        interactive={false}
+      />
+    );
+  };
+
   return (
     <Modal
       aria-label={modalLabel}
@@ -477,18 +494,7 @@ export const ManualExportModal = ({
       onClose={onClose}
       size="large"
     >
-      {(isFetching || selection === null)
-        ? <Loading />
-        : (
-          <MultiColumnList
-            id="manual-export-po-lines"
-            contentData={rows}
-            visibleColumns={VISIBLE_COLUMNS}
-            columnMapping={columnMapping}
-            formatter={formatter}
-            interactive={false}
-          />
-        )}
+      {renderContent()}
     </Modal>
   );
 };

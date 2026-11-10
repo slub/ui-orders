@@ -2,6 +2,7 @@ export * from './consortium';
 export * from './useAcqMethod';
 export * from './useAcqMethods';
 export * from './useDeprecatedAcqMethods';
+export * from './useEffectiveExportConfigs';
 export * from './useAccordionErrorTrigger';
 export * from './useAccordionStatus';
 export * from './useErrorAccordionStatus';
