@@ -35,6 +35,17 @@ import {
 
 const VISIBLE_COLUMNS = ['selected', 'poLineNumber', 'title', 'status', 'integration'];
 
+// Fixed widths switch off the MCL measuring, so a long status or export method
+// name wraps instead of widening the table beyond the modal. The last column
+// still takes the remaining space.
+const COLUMN_WIDTHS = {
+  selected: '80px',
+  poLineNumber: '140px',
+  title: '200px',
+  status: '270px',
+  integration: '250px',
+};
+
 const MAX_TITLE_LENGTH = 20;
 
 // `errorDetails` is the raw root-cause message from the worker; the full text
@@ -476,6 +487,7 @@ export const ManualExportModal = ({
         id="manual-export-po-lines"
         contentData={rows}
         visibleColumns={VISIBLE_COLUMNS}
+        columnWidths={COLUMN_WIDTHS}
         columnMapping={columnMapping}
         formatter={formatter}
         interactive={false}
