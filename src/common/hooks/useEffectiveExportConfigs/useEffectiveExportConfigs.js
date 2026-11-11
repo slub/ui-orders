@@ -9,7 +9,7 @@ import { FOLIO_EXPORT_TYPE } from '@folio/stripes-acq-components';
 
 export const EFFECTIVE_EXPORT_CONFIGS_API = 'data-export-spring/effective-configs';
 
-const NO_CONFIGS = { configs: [], scheduledConfigIds: [] };
+const NO_CONFIGS = [];
 
 // An omitted vendorAccount disables the account filter in the backend; an empty
 // one stands for a line without an account number. So it is always sent.
@@ -24,9 +24,6 @@ const getCriteriaKey = ({ acquisitionMethod, vendorAccount }) => `${acquisitionM
  * Asks the backend which ordering integrations apply to the PO lines (MODEXPS-323).
  * The endpoint matches by field values, so lines sharing the acquisition method and
  * vendor account are covered by one lookup.
- *
- * Whether an integration is scheduled is the backend's call as well, hence the
- * second request with `scheduled=true` per lookup.
  */
 export const useEffectiveExportConfigs = ({ vendorId, poLines = [] }) => {
   const ky = useOkapiKy();
@@ -43,11 +40,6 @@ export const useEffectiveExportConfigs = ({ vendorId, poLines = [] }) => {
     return [...new Map(byKey).values()];
   }, [poLines]);
 
-  const fetchConfigs = (searchParams, signal) => ky
-    .get(EFFECTIVE_EXPORT_CONFIGS_API, { searchParams, signal })
-    .json()
-    .then(({ configs = [] }) => configs);
-
   const {
     data,
     isError,
@@ -62,15 +54,11 @@ export const useEffectiveExportConfigs = ({ vendorId, poLines = [] }) => {
         ...criteria,
       };
 
-      const [configs, scheduledConfigs] = await Promise.all([
-        fetchConfigs(searchParams, signal),
-        fetchConfigs({ ...searchParams, scheduled: true }, signal),
-      ]);
+      const { configs = NO_CONFIGS } = await ky
+        .get(EFFECTIVE_EXPORT_CONFIGS_API, { searchParams, signal })
+        .json();
 
-      return [
-        getCriteriaKey(criteria),
-        { configs, scheduledConfigIds: scheduledConfigs.map(({ id }) => id) },
-      ];
+      return [getCriteriaKey(criteria), configs];
     })),
   });
 

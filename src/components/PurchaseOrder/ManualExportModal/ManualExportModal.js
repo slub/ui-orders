@@ -78,6 +78,14 @@ const buildLineResults = (results) => results.reduce((acc, { poLineIds, ...resul
 
 const getSchedule = (config) => getOrderingConfig(config)?.ediSchedule;
 
+// Same condition as the `scheduled` filter of the effective-configs endpoint.
+const isScheduledConfig = (config) => {
+  const schedule = getSchedule(config);
+  const period = schedule?.scheduleParameters?.schedulePeriod;
+
+  return Boolean(schedule?.enableScheduledExport && period && period !== 'NONE');
+};
+
 const formatConfigLabel = (config) => {
   const orderingConfig = getOrderingConfig(config);
   const name = orderingConfig?.configName;
@@ -120,7 +128,7 @@ const truncate = (value, maxLength = MAX_TITLE_LENGTH) => (
 
 // The matches come from the backend and ignore the automaticExport flag - sending
 // such lines anyway is the point of a manual export.
-const buildRow = (line, { configs: applicable, scheduledConfigIds }, isManualOrder) => {
+const buildRow = (line, applicable, isManualOrder) => {
   // Would go out on its own, so it must not be pre-selected (double send).
   // Manual orders are excluded: the scheduler never picks them up
   // (`NOT purchaseOrder.manualPo`), so the hint would be a false statement.
@@ -128,7 +136,7 @@ const buildRow = (line, { configs: applicable, scheduledConfigIds }, isManualOrd
     !isManualOrder
     && line.automaticExport
     && applicable.length === 1
-    && scheduledConfigIds.includes(applicable[0].id),
+    && isScheduledConfig(applicable[0]),
   );
 
   return {

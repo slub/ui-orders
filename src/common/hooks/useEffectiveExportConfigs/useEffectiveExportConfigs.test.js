@@ -30,14 +30,9 @@ const renderTestHook = () => {
 };
 
 describe('useEffectiveExportConfigs', () => {
-  // `config-1` matches every lookup; only the first acquisition method is scheduled.
   const kyMock = {
     get: jest.fn((_url, { searchParams }) => ({
-      json: () => Promise.resolve({
-        configs: searchParams.scheduled && searchParams.acquisitionMethod !== 'method-1'
-          ? []
-          : [{ id: 'config-1' }],
-      }),
+      json: () => Promise.resolve({ configs: [{ id: `config-${searchParams.acquisitionMethod}` }] }),
     })),
   };
 
@@ -53,8 +48,8 @@ describe('useEffectiveExportConfigs', () => {
 
     await waitFor(() => expect(result.current.isFetching).toBe(false));
 
-    // Two combinations, each with and without the `scheduled` filter.
-    expect(kyMock.get).toHaveBeenCalledTimes(4);
+    // Lines 1 and 2 share a combination, line 4 has no acquisition method.
+    expect(kyMock.get).toHaveBeenCalledTimes(2);
     expect(kyMock.get).toHaveBeenCalledWith(API, expect.objectContaining({
       searchParams: {
         vendorId,
@@ -75,16 +70,16 @@ describe('useEffectiveExportConfigs', () => {
     }));
   });
 
-  it('should return the matching and the scheduled configs per PO line', async () => {
+  it('should return the matching configs per PO line', async () => {
     const { result } = renderTestHook();
 
     await waitFor(() => expect(result.current.isFetching).toBe(false));
 
     expect(result.current.configsByLineId).toEqual({
-      'line-1': { configs: [{ id: 'config-1' }], scheduledConfigIds: ['config-1'] },
-      'line-2': { configs: [{ id: 'config-1' }], scheduledConfigIds: ['config-1'] },
-      'line-3': { configs: [{ id: 'config-1' }], scheduledConfigIds: [] },
-      'line-4': { configs: [], scheduledConfigIds: [] },
+      'line-1': [{ id: 'config-method-1' }],
+      'line-2': [{ id: 'config-method-1' }],
+      'line-3': [{ id: 'config-method-2' }],
+      'line-4': [],
     });
   });
 
@@ -95,6 +90,6 @@ describe('useEffectiveExportConfigs', () => {
 
     await waitFor(() => expect(result.current.isError).toBe(true));
 
-    expect(result.current.configsByLineId['line-1']).toEqual({ configs: [], scheduledConfigIds: [] });
+    expect(result.current.configsByLineId['line-1']).toEqual([]);
   });
 });
