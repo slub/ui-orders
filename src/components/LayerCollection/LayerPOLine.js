@@ -34,7 +34,6 @@ import {
   useContributorNameTypes,
   useFunds,
   useIdentifierTypes,
-  useIntegrationConfigs,
   useLocationsQuery,
   useMaterialTypes,
   useModalToggle,
@@ -202,11 +201,6 @@ function LayerPOLine({
     isLoading: isLinesLimitLoading,
     linesLimit,
   } = useLinesLimit(!(lineId || poLine));
-
-  const {
-    isFetching: isConfigsFetching,
-    integrationConfigs,
-  } = useIntegrationConfigs({ organizationId: vendor?.id });
 
   const {
     isLoading: isLocationsLoading,
@@ -615,7 +609,6 @@ function LayerPOLine({
     && order?.id === id
     && !isOrderTemplateFetching
     && !isLinesLimitLoading
-    && !isConfigsFetching
     && !isOpenOrderSettingsFetching
     && !isInstanceLoading
     && !isLocationsLoading
@@ -684,7 +677,6 @@ function LayerPOLine({
         identifierTypeOptions={identifierTypeOptions}
         initialValues={savingValues || initialValues}
         instance={instance}
-        integrationConfigs={integrationConfigs}
         isCreateFromInstance={isCreateFromInstance}
         isSaveAndOpenButtonVisible={isSaveAndOpenButtonVisible}
         linesLimit={linesLimit}

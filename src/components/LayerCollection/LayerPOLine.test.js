@@ -52,7 +52,6 @@ jest.mock('@folio/stripes-acq-components', () => ({
   useContributorNameTypes: jest.fn().mockReturnValue({ contributorNameTypes: [], isLoading: false }),
   useFunds: jest.fn(() => ({ funds: [] })),
   useIdentifierTypes: jest.fn().mockReturnValue({ identifierTypes: [], isLoading: false }),
-  useIntegrationConfigs: jest.fn().mockReturnValue({ integrationConfigs: [], isLoading: false }),
   useLocationsQuery: jest.fn(),
   useMaterialTypes: jest.fn().mockReturnValue({ materialTypes: [], isLoading: false }),
   useOrganization: jest.fn(),

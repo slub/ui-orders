@@ -1,37 +1,28 @@
 import { render, screen } from '@folio/jest-config-stripes/testing-library/react';
 import userEvent from '@folio/jest-config-stripes/testing-library/user-event';
 
-import { integrationConfig } from 'fixtures';
+import { useAutomaticExportConfigs } from '../../hooks/useAutomaticExportConfigs';
 import AutomaticExportInfo from './AutomaticExportInfo';
 
-const acquisitionMethod = integrationConfig
-  .exportTypeSpecificParameters
-  .vendorEdiOrdersExportConfig
-  .ediConfig
-  .defaultAcquisitionMethods[0];
-const vendorAccount = integrationConfig
-  .exportTypeSpecificParameters
-  .vendorEdiOrdersExportConfig
-  .ediConfig
-  .accountNoList[0];
+jest.mock('../../hooks/useAutomaticExportConfigs', () => ({
+  useAutomaticExportConfigs: jest.fn(),
+}));
 
-const secondConfig = {
-  ...integrationConfig,
-  id: 'second-config',
+const buildConfig = (id, configName, transmissionMethod) => ({
+  id,
   exportTypeSpecificParameters: {
-    vendorEdiOrdersExportConfig: {
-      ...integrationConfig.exportTypeSpecificParameters.vendorEdiOrdersExportConfig,
-      configName: 'secondConfig',
-      transmissionMethod: 'Email',
-    },
+    vendorEdiOrdersExportConfig: { configName, transmissionMethod },
   },
-};
+});
+
+const firstConfig = buildConfig('first-config', 'testConfig');
+const secondConfig = buildConfig('second-config', 'secondConfig', 'Email');
 
 const defaultProps = {
-  acquisitionMethod,
+  acquisitionMethod: 'acq-method-id',
   automaticExport: true,
-  integrationConfigs: [integrationConfig],
-  vendorAccount,
+  vendorAccount: '12345',
+  vendorId: 'vendor-id',
 };
 
 const renderAutomaticExportInfo = (props = {}) => render(
@@ -41,7 +32,14 @@ const renderAutomaticExportInfo = (props = {}) => render(
   />,
 );
 
+const mockConfigs = (configs) => useAutomaticExportConfigs.mockReturnValue({ configs });
+
 describe('AutomaticExportInfo', () => {
+  beforeEach(() => {
+    useAutomaticExportConfigs.mockClear();
+    mockConfigs([firstConfig]);
+  });
+
   describe('placement "below"', () => {
     it('should render the single matching integration with its full label as title', () => {
       renderAutomaticExportInfo({ placement: 'below' });
@@ -53,29 +51,26 @@ describe('AutomaticExportInfo', () => {
     });
 
     it('should include the transmission method in the label', () => {
-      renderAutomaticExportInfo({
-        placement: 'below',
-        integrationConfigs: [secondConfig],
-      });
+      mockConfigs([secondConfig]);
+
+      renderAutomaticExportInfo({ placement: 'below' });
 
       expect(screen.getByText('ui-orders.poLine.automaticExport.exportVia').closest('[title]'))
         .toHaveAttribute('title', 'secondConfig (Email)');
     });
 
     it('should render nothing when no integration matches', () => {
-      const { container } = renderAutomaticExportInfo({
-        placement: 'below',
-        integrationConfigs: [],
-      });
+      mockConfigs([]);
+
+      const { container } = renderAutomaticExportInfo({ placement: 'below' });
 
       expect(container).toBeEmptyDOMElement();
     });
 
     it('should render nothing when several integrations match', () => {
-      const { container } = renderAutomaticExportInfo({
-        placement: 'below',
-        integrationConfigs: [integrationConfig, secondConfig],
-      });
+      mockConfigs([firstConfig, secondConfig]);
+
+      const { container } = renderAutomaticExportInfo({ placement: 'below' });
 
       expect(container).toBeEmptyDOMElement();
     });
@@ -83,10 +78,9 @@ describe('AutomaticExportInfo', () => {
 
   describe('placement "label"', () => {
     it('should render a warning icon when no integration matches', async () => {
-      renderAutomaticExportInfo({
-        placement: 'label',
-        integrationConfigs: [],
-      });
+      mockConfigs([]);
+
+      renderAutomaticExportInfo({ placement: 'label' });
 
       const warning = screen.getByRole('button', { name: 'ui-orders.poLine.automaticExport.noIntegration' });
 
@@ -97,10 +91,9 @@ describe('AutomaticExportInfo', () => {
     });
 
     it('should render an info popover listing all matching integrations', async () => {
-      renderAutomaticExportInfo({
-        placement: 'label',
-        integrationConfigs: [integrationConfig, secondConfig],
-      });
+      mockConfigs([firstConfig, secondConfig]);
+
+      renderAutomaticExportInfo({ placement: 'label' });
 
       await userEvent.click(screen.getByRole('button'));
 
@@ -117,42 +110,36 @@ describe('AutomaticExportInfo', () => {
     });
   });
 
-  it('should render nothing when automatic export is off', () => {
-    const { container } = renderAutomaticExportInfo({
-      placement: 'label',
-      automaticExport: false,
-      integrationConfigs: [],
-    });
+  it('should render nothing as long as there is no answer', () => {
+    mockConfigs(undefined);
+
+    const { container } = renderAutomaticExportInfo({ placement: 'label' });
 
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('should render nothing without integration configs (order templates)', () => {
-    const { container } = renderAutomaticExportInfo({
-      placement: 'label',
-      integrationConfigs: undefined,
-    });
+  it('should look up the integrations for the values of the line', () => {
+    renderAutomaticExportInfo();
 
-    expect(container).toBeEmptyDOMElement();
+    expect(useAutomaticExportConfigs).toHaveBeenCalledWith(
+      {
+        vendorId: defaultProps.vendorId,
+        acquisitionMethod: defaultProps.acquisitionMethod,
+        vendorAccount: defaultProps.vendorAccount,
+      },
+      { enabled: true },
+    );
   });
 
-  it('should render nothing while the integration configs are loading', () => {
-    const { container } = renderAutomaticExportInfo({
-      placement: 'label',
-      isLoading: true,
-      integrationConfigs: [],
-    });
+  it('should switch the lookup off when automatic export is off', () => {
+    renderAutomaticExportInfo({ automaticExport: false });
 
-    expect(container).toBeEmptyDOMElement();
+    expect(useAutomaticExportConfigs).toHaveBeenCalledWith(expect.any(Object), { enabled: false });
   });
 
-  it('should render nothing for a manual order', () => {
-    const { container } = renderAutomaticExportInfo({
-      placement: 'label',
-      manualOrder: true,
-      integrationConfigs: [],
-    });
+  it('should switch the lookup off for a manual order', () => {
+    renderAutomaticExportInfo({ manualOrder: true });
 
-    expect(container).toBeEmptyDOMElement();
+    expect(useAutomaticExportConfigs).toHaveBeenCalledWith(expect.any(Object), { enabled: false });
   });
 });

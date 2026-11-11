@@ -13,15 +13,14 @@ import { RECEIPT_STATUS } from '@folio/stripes-acq-components';
 
 import { WORKFLOW_STATUS } from '../../../common/constants';
 import { useAcqMethods } from '../../../common/hooks/useAcqMethods';
-import { toggleAutomaticExport } from '../../Utils/toggleAutomaticExport';
+import { useToggleAutomaticExport } from '../../../common/hooks/useToggleAutomaticExport';
 import POLineDetailsForm from './POLineDetailsForm';
 
 jest.mock('../../../common/hooks/useAcqMethods', () => ({
   useAcqMethods: jest.fn(() => ({ acqMethods: [], isLoading: false })),
 }));
-jest.mock('../../Utils/toggleAutomaticExport', () => ({
-  ...jest.requireActual('../../Utils/toggleAutomaticExport'),
-  toggleAutomaticExport: jest.fn(),
+jest.mock('../../../common/hooks/useToggleAutomaticExport', () => ({
+  useToggleAutomaticExport: jest.fn(() => jest.fn()),
 }));
 
 const acqMethod = { id: 'acq-method-id', value: 'Purchase' };
@@ -309,6 +308,9 @@ describe('POLineDetailsForm', () => {
   });
 
   describe('Acquisition method change', () => {
+    const toggleAutomaticExport = jest.fn();
+    const order = { workflowStatus: 'Pending', vendor: 'vendor-id' };
+
     const selectAcqMethod = async () => {
       await userEvent.click(screen.getByRole('button', { name: /ui-orders.poLine.acquisitionMethod/ }));
       await userEvent.click(screen.getByRole('option', { name: /acquisition_method/ }));
@@ -316,22 +318,24 @@ describe('POLineDetailsForm', () => {
 
     beforeEach(() => {
       toggleAutomaticExport.mockClear();
+      useToggleAutomaticExport.mockClear().mockReturnValue(toggleAutomaticExport);
       useAcqMethods.mockReturnValue({ acqMethods: [acqMethod], isLoading: false });
     });
 
     it('should recalculate automatic export', async () => {
-      renderPOLineDetailsForm({ integrationConfigs: [] });
+      renderPOLineDetailsForm({ order }, { vendorDetail: { vendorAccount: '12345' } });
 
       await selectAcqMethod();
 
-      expect(toggleAutomaticExport).toHaveBeenCalled();
+      expect(useToggleAutomaticExport).toHaveBeenCalledWith(order.vendor);
+      expect(toggleAutomaticExport).toHaveBeenCalledWith({
+        acquisitionMethod: acqMethod.id,
+        vendorAccount: '12345',
+      });
     });
 
     it('should not recalculate automatic export for a manual order', async () => {
-      renderPOLineDetailsForm({
-        integrationConfigs: [],
-        order: { workflowStatus: 'Pending', manualPo: true },
-      });
+      renderPOLineDetailsForm({ order: { ...order, manualPo: true } });
 
       await selectAcqMethod();
 

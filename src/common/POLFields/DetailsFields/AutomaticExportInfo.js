@@ -6,34 +6,34 @@ import {
   InfoPopover,
 } from '@folio/stripes/components';
 
-import {
-  formatConfigLabel,
-  getApplicableOrderingIntegrations,
-} from '../../../components/Utils/toggleAutomaticExport';
+import { useAutomaticExportConfigs } from '../../hooks/useAutomaticExportConfigs';
 import css from './AutomaticExportInfo.css';
+
+const formatConfigLabel = (config) => {
+  const { configName, transmissionMethod } = config.exportTypeSpecificParameters?.vendorEdiOrdersExportConfig || {};
+
+  return transmissionMethod ? `${configName} (${transmissionMethod})` : configName;
+};
 
 // Hint for the "Automatic export" checkbox. placement="label" renders an icon
 // next to the label (warning: no match, info popover: several matches),
 // placement="below" renders the single matching integration as a text line.
-// Without integrationConfigs (order templates) there is nothing to match.
+// Without a vendorId (order templates) there is nothing to match.
 const AutomaticExportInfo = ({
   acquisitionMethod,
   automaticExport = false,
-  integrationConfigs,
-  isLoading = false,
   manualOrder = false,
   placement = 'below',
   vendorAccount,
+  vendorId,
 }) => {
   const intl = useIntl();
+  const { configs: applicableIntegrations } = useAutomaticExportConfigs(
+    { vendorId, acquisitionMethod, vendorAccount },
+    { enabled: automaticExport && !manualOrder },
+  );
 
-  if (manualOrder || !automaticExport || isLoading || !integrationConfigs) return null;
-
-  const applicableIntegrations = getApplicableOrderingIntegrations({
-    vendorAccount,
-    acquisitionMethod,
-    integrationConfigs,
-  });
+  if (!applicableIntegrations) return null;
 
   if (placement === 'below') {
     if (applicableIntegrations.length !== 1) return null;
@@ -95,11 +95,10 @@ const AutomaticExportInfo = ({
 AutomaticExportInfo.propTypes = {
   acquisitionMethod: PropTypes.string,
   automaticExport: PropTypes.bool,
-  integrationConfigs: PropTypes.arrayOf(PropTypes.object),
-  isLoading: PropTypes.bool,
   manualOrder: PropTypes.bool,
   placement: PropTypes.oneOf(['label', 'below']),
   vendorAccount: PropTypes.string,
+  vendorId: PropTypes.string,
 };
 
 export default AutomaticExportInfo;
