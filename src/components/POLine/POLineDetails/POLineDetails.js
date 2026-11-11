@@ -63,10 +63,9 @@ const DEFAULT_LINE = {};
 
 const POLineDetails = ({
   hiddenFields = DEFAULT_HIDDEN_FIELDS,
-  integrationConfigs,
-  isIntegrationConfigsLoading = false,
   line = DEFAULT_LINE,
   manualOrder = false,
+  vendorId,
 }) => {
   const intl = useIntl();
   const receiptDate = get(line, 'receiptDate');
@@ -79,10 +78,9 @@ const POLineDetails = ({
   const exportInfoProps = {
     acquisitionMethod: line.acquisitionMethod,
     automaticExport: line.automaticExport,
-    integrationConfigs,
-    isLoading: isIntegrationConfigsLoading,
     manualOrder,
     vendorAccount: line.vendorDetail?.vendorAccount,
+    vendorId,
   };
 
   return (
@@ -400,10 +398,9 @@ const POLineDetails = ({
 
 POLineDetails.propTypes = {
   hiddenFields: PropTypes.object,
-  integrationConfigs: PropTypes.arrayOf(PropTypes.object),
-  isIntegrationConfigsLoading: PropTypes.bool,
   line: PropTypes.object,
   manualOrder: PropTypes.bool,
+  vendorId: PropTypes.string,
 };
 
 export default POLineDetails;

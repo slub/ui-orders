@@ -20,8 +20,8 @@ import {
   FieldVendorInstructions,
   FieldVendorAccountNumber,
 } from '../../../common/POLFields';
+import { useToggleAutomaticExport } from '../../../common/hooks/useToggleAutomaticExport';
 import { isWorkflowStatusIsPending } from '../../PurchaseOrder/util';
-import { toggleAutomaticExport } from '../../Utils/toggleAutomaticExport';
 import { ACCOUNT_STATUS } from '../const';
 
 const { ACTIVE, INACTIVE } = ACCOUNT_STATUS;
@@ -30,7 +30,6 @@ const VendorForm = ({
   order,
   accounts = [],
   hiddenFields = {},
-  integrationConfigs = [],
 }) => {
   const { formatMessage } = useIntl();
   const { change, getState } = useForm();
@@ -38,6 +37,7 @@ const VendorForm = ({
   const currentAccountNumber = vendorDetail?.vendorAccount;
   const isPostPendingOrder = !isWorkflowStatusIsPending(order);
   const isManualOrder = Boolean(order?.manualPo);
+  const toggleAutomaticExport = useToggleAutomaticExport(order?.vendor);
   const initialAccountNumber = useRef(currentAccountNumber);
 
   const activeAccountOptions = useMemo(() => {
@@ -64,8 +64,8 @@ const VendorForm = ({
 
       const acquisitionMethod = getState().values?.acquisitionMethod;
 
-      toggleAutomaticExport({ vendorAccount: value, acquisitionMethod, integrationConfigs, change });
-    }, [change, getState, integrationConfigs, isManualOrder],
+      toggleAutomaticExport({ vendorAccount: value, acquisitionMethod });
+    }, [change, getState, isManualOrder, toggleAutomaticExport],
   );
 
   const isSelectedAccountInactive = useMemo(() => {
@@ -117,7 +117,6 @@ VendorForm.propTypes = {
   accounts: PropTypes.arrayOf(PropTypes.object),
   order: PropTypes.object.isRequired,
   hiddenFields: PropTypes.object,
-  integrationConfigs: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default VendorForm;

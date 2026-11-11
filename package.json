@@ -245,6 +245,7 @@
         "visible": true,
         "subPermissions": [
           "data-export.config.collection.get",
+          "data-export.effective-configs.collection.get",
           "orders.item.post",
           "orders.order-templates.collection.get",
           "orders.order-templates.item.get",

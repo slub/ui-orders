@@ -17,6 +17,7 @@ import {
 } from '@folio/stripes-acq-components';
 
 import { POL_FORM_FIELDS } from '../../../common/constants';
+import { useToggleAutomaticExport } from '../../../common/hooks/useToggleAutomaticExport';
 import {
   FieldPOLineNumber,
   FieldAcquisitionMethod,
@@ -47,7 +48,6 @@ import {
   isWorkflowStatusIsPending,
   isWorkflowStatusOpen,
 } from '../../PurchaseOrder/util';
-import { toggleAutomaticExport } from '../../Utils/toggleAutomaticExport';
 import { ConfirmReceivingWorkflowChangeModal } from '../ConfirmReceivingWorkflowChange';
 import { useReceivingWorkflowChange } from '../hooks';
 import { isReceiptNotRequired } from '../utils';
@@ -65,11 +65,11 @@ function POLineDetailsForm({
   formValues,
   hiddenFields = defaultProps.hiddenFields,
   initialValues: poLine,
-  integrationConfigs,
   order = defaultProps.order,
   vendor = defaultProps.vendor,
 }) {
   const isManualOrder = Boolean(order?.manualPo);
+  const toggleAutomaticExport = useToggleAutomaticExport(order?.vendor);
   const isPostPendingOrder = !isWorkflowStatusIsPending(order);
   const isClosedOrder = isWorkflowStatusClosed(order);
   const isOpenedOrder = isWorkflowStatusOpen(order);
@@ -103,8 +103,8 @@ function POLineDetailsForm({
 
       const vendorAccount = formValues?.vendorDetail?.vendorAccount;
 
-      toggleAutomaticExport({ vendorAccount, acquisitionMethod: value, integrationConfigs, change });
-    }, [change, formValues, integrationConfigs, isManualOrder],
+      toggleAutomaticExport({ vendorAccount, acquisitionMethod: value });
+    }, [change, formValues, isManualOrder, toggleAutomaticExport],
   );
 
   const onReceiptStatusChange = useCallback(async ({ target: { value } }) => {
@@ -171,9 +171,9 @@ function POLineDetailsForm({
   const exportInfoProps = {
     acquisitionMethod: formValues?.acquisitionMethod,
     automaticExport: formValues?.automaticExport,
-    integrationConfigs,
     manualOrder: isManualOrder,
     vendorAccount: formValues?.vendorDetail?.vendorAccount,
+    vendorId: order?.vendor,
   };
 
   return (
@@ -513,7 +513,6 @@ POLineDetailsForm.propTypes = {
   formValues: PropTypes.object.isRequired,
   hiddenFields: PropTypes.object,
   initialValues: PropTypes.object.isRequired,
-  integrationConfigs: PropTypes.arrayOf(PropTypes.object),
   order: PropTypes.object,
   vendor: PropTypes.object,
 };

@@ -119,7 +119,6 @@ const PAYMENT_TERMS_VISIBILITY_FIELD_NAMES = [
 ].map((field) => `${POL_FORM_FIELDS.paymentTerms}.${field}`);
 
 const defaultProps = {
-  integrationConfigs: [],
   isCreateFromInstance: false,
   vendor: {},
 };
@@ -135,7 +134,6 @@ function POLineForm({
   handleSubmit,
   identifierTypeOptions,
   initialValues,
-  integrationConfigs = defaultProps.integrationConfigs,
   isCreateFromInstance = defaultProps.isCreateFromInstance,
   isSaveAndOpenButtonVisible,
   linesLimit,
@@ -593,7 +591,6 @@ function POLineForm({
                             order={order}
                             vendor={vendor}
                             hiddenFields={hiddenFields}
-                            integrationConfigs={integrationConfigs}
                           />
                           {renderEmbeddedCustomFields('lineDetails')}
                         </Accordion>
@@ -633,7 +630,6 @@ function POLineForm({
                             accounts={accounts}
                             order={order}
                             hiddenFields={hiddenFields}
-                            integrationConfigs={integrationConfigs}
                           />
                         </Accordion>
                         <Accordion
@@ -808,7 +804,6 @@ POLineForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   identifierTypeOptions: selectOptionsShape,
   initialValues: PropTypes.object,
-  integrationConfigs: PropTypes.arrayOf(PropTypes.object),
   isCreateFromInstance: PropTypes.bool,
   isSaveAndOpenButtonVisible: PropTypes.bool,
   linesLimit: PropTypes.number.isRequired,
