@@ -797,8 +797,6 @@
   "settings.claimSequences.stage.delivery.ftp": "FTP",
   "settings.claimSequences.stage.delivery.fileDownload": "File download",
   "settings.claimSequences.stage.interval": "Days until claim expiry",
-  "settings.claimSequences.stage.internalNote": "Internal note",
-  "settings.claimSequences.stage.externalNote": "External note (shared with the vendor)",
   "settings.claimSequences.afterLastStage": "After the last stage",
   "settings.claimSequences.afterLastStage.STOP": "Stop claiming",
   "settings.claimSequences.afterLastStage.REPEAT_LAST": "Repeat the last stage",
