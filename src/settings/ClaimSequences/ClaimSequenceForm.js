@@ -152,22 +152,6 @@ const ClaimSequenceForm = ({
           />
         </Col>
       </Row>
-      <Row>
-        <Col xs={12} md={6}>
-          <Field
-            name={`${field}.internalNote`}
-            label={<FormattedMessage id="ui-orders.settings.claimSequences.stage.internalNote" />}
-            component={TextArea}
-          />
-        </Col>
-        <Col xs={12} md={6}>
-          <Field
-            name={`${field}.externalNote`}
-            label={<FormattedMessage id="ui-orders.settings.claimSequences.stage.externalNote" />}
-            component={TextArea}
-          />
-        </Col>
-      </Row>
     </>
   );
 
