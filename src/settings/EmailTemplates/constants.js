@@ -33,60 +33,66 @@ export const FUND_DISTRIBUTION_LOOP_TAG = 'orderLine.fundDistribution';
 // fallback of the backend-rendered preview. They come from the first item
 // of each loop in the sample context, so both previews show the same data.
 // The regex preview only inserts strings and numbers, hence the String().
-const [firstOrder] = SAMPLE_PREVIEW_CONTEXT.orders;
-const [firstOrderLine] = firstOrder.orderLines;
-
 export const buildTokens = (base, tokens) => tokens.map((token) => ({
   token,
   previewValue: String(get(base, token)),
 }));
 
-export const ORDER_EMAIL_TOKENS = {
-  [TOKEN_SECTIONS.GENERAL]: buildTokens(SAMPLE_PREVIEW_CONTEXT, [
-    'createdAt',
-  ]),
-  [TOKEN_SECTIONS.ORGANIZATION]: buildTokens(SAMPLE_PREVIEW_CONTEXT, [
-    'organization.name',
-    'organization.primaryAddress.addressLine1',
-    'organization.primaryAddress.city',
-    'organization.primaryAddress.zipCode',
-    'organization.primaryAddress.country',
-  ]),
-  [TOKEN_SECTIONS.ORDER]: buildTokens(firstOrder, [
-    'order.poNumber',
-    'order.orderType',
-    'order.metadata.createdByUser.fullName',
-    'order.shipTo.address',
-    'order.billTo.address',
-  ]),
-  [TOKEN_SECTIONS.ORDER_LINES]: buildTokens(firstOrderLine, [
-    'orderLine.poLineNumber',
-    'orderLine.titleOrPackage',
-    'orderLine.publisher',
-    'orderLine.publicationDate',
-    'orderLine.edition',
-    'orderLine.rush',
-    'orderLine.cost.listUnitPrice',
-    'orderLine.cost.listUnitPriceElectronic',
-    'orderLine.cost.quantityPhysical',
-    'orderLine.cost.quantityElectronic',
-    'orderLine.cost.poLineEstimatedPrice',
-    'orderLine.cost.currency',
-    'orderLine.vendorDetail.instructions',
-  ]),
-  [TOKEN_SECTIONS.CONTRIBUTORS]: buildTokens(firstOrderLine.orderLine.contributors[0], [
-    'contributor',
-    'contributorNameType.name',
-  ]),
-  [TOKEN_SECTIONS.PRODUCT_IDS]: buildTokens(firstOrderLine.orderLine.details.productIds[0], [
-    'productId',
-    'qualifier',
-    'productIdType.name',
-  ]),
-  [TOKEN_SECTIONS.FUNDS]: buildTokens(firstOrderLine.orderLine.fundDistribution[0], [
-    'code',
-  ]),
+// The claim email templates share these sections, built against their own
+// sample context, which nests the same way.
+export const buildOrderEmailTokens = (context) => {
+  const [firstOrder] = context.orders;
+  const [firstOrderLine] = firstOrder.orderLines;
+
+  return {
+    [TOKEN_SECTIONS.GENERAL]: buildTokens(context, [
+      'createdAt',
+    ]),
+    [TOKEN_SECTIONS.ORGANIZATION]: buildTokens(context, [
+      'organization.name',
+      'organization.primaryAddress.addressLine1',
+      'organization.primaryAddress.city',
+      'organization.primaryAddress.zipCode',
+      'organization.primaryAddress.country',
+    ]),
+    [TOKEN_SECTIONS.ORDER]: buildTokens(firstOrder, [
+      'order.poNumber',
+      'order.orderType',
+      'order.metadata.createdByUser.fullName',
+      'order.shipTo.address',
+      'order.billTo.address',
+    ]),
+    [TOKEN_SECTIONS.ORDER_LINES]: buildTokens(firstOrderLine, [
+      'orderLine.poLineNumber',
+      'orderLine.titleOrPackage',
+      'orderLine.publisher',
+      'orderLine.publicationDate',
+      'orderLine.edition',
+      'orderLine.rush',
+      'orderLine.cost.listUnitPrice',
+      'orderLine.cost.listUnitPriceElectronic',
+      'orderLine.cost.quantityPhysical',
+      'orderLine.cost.quantityElectronic',
+      'orderLine.cost.poLineEstimatedPrice',
+      'orderLine.cost.currency',
+      'orderLine.vendorDetail.instructions',
+    ]),
+    [TOKEN_SECTIONS.CONTRIBUTORS]: buildTokens(firstOrderLine.orderLine.contributors[0], [
+      'contributor',
+      'contributorNameType.name',
+    ]),
+    [TOKEN_SECTIONS.PRODUCT_IDS]: buildTokens(firstOrderLine.orderLine.details.productIds[0], [
+      'productId',
+      'qualifier',
+      'productIdType.name',
+    ]),
+    [TOKEN_SECTIONS.FUNDS]: buildTokens(firstOrderLine.orderLine.fundDistribution[0], [
+      'code',
+    ]),
+  };
 };
+
+export const ORDER_EMAIL_TOKENS = buildOrderEmailTokens(SAMPLE_PREVIEW_CONTEXT);
 
 // Sections of the token picker in display order; `loop` marks repeatable sections.
 export const ORDER_TOKEN_SECTIONS = [

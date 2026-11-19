@@ -17,7 +17,7 @@ const claimSequence = {
   afterLastStage: 'STOP',
   stages: [
     { stage: 1, name: '1st claim', deliveryType: 'INTEGRATION', transmissionMethod: 'Email', interval: 14 },
-    { stage: 2, name: 'Phone reminder', deliveryType: 'MANUAL', interval: 7, internalNote: 'Call the vendor' },
+    { stage: 2, name: 'Phone reminder', deliveryType: 'MANUAL', interval: 7 },
   ],
 };
 

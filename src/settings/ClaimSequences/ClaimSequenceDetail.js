@@ -19,13 +19,13 @@ import { ViewMetaData } from '@folio/stripes/smart-components';
 
 import { getDeliveryLabelId } from './constants';
 
-const STAGE_COLUMNS = ['stage', 'name', 'delivery', 'interval', 'internalNote', 'externalNote'];
+const STAGE_COLUMNS = ['stage', 'name', 'delivery', 'interval'];
 
 const STAGE_COLUMN_WIDTHS = {
-  stage: '8%',
-  name: '20%',
-  delivery: '16%',
-  interval: '12%',
+  stage: '10%',
+  name: '40%',
+  delivery: '25%',
+  interval: '25%',
 };
 
 const ClaimSequenceDetail = ({ initialValues = {} }) => {
@@ -48,8 +48,6 @@ const ClaimSequenceDetail = ({ initialValues = {} }) => {
   const formatter = {
     stage: (stage) => stage.rowIndex + 1,
     delivery: (stage) => formatMessage({ id: getDeliveryLabelId(stage) }),
-    internalNote: (stage) => stage.internalNote || <NoValue />,
-    externalNote: (stage) => stage.externalNote || <NoValue />,
   };
 
   return (
@@ -129,8 +127,6 @@ ClaimSequenceDetail.propTypes = {
       deliveryType: PropTypes.string,
       transmissionMethod: PropTypes.string,
       interval: PropTypes.number,
-      internalNote: PropTypes.string,
-      externalNote: PropTypes.string,
     })),
     metadata: PropTypes.object,
   }),
