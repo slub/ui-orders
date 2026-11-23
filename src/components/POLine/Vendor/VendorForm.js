@@ -59,7 +59,6 @@ const VendorForm = ({
     ({ target: { value } }) => {
       change('vendorDetail.vendorAccount', value);
 
-      // Manual orders are never exported, so leave the disabled checkbox alone.
       if (isManualOrder) return;
 
       const acquisitionMethod = getState().values?.acquisitionMethod;

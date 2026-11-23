@@ -25,7 +25,6 @@ export const useToggleAutomaticExport = (vendorId) => {
   const [namespace] = useNamespace({ key: AUTOMATIC_EXPORT_CONFIGS_NAMESPACE });
 
   return useCallback(async ({ acquisitionMethod, vendorAccount }) => {
-    // Nothing matches without an acquisition method, and the endpoint rejects an empty one.
     if (!acquisitionMethod) {
       change(POL_FORM_FIELDS.automaticExport, false);
 

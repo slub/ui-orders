@@ -7,7 +7,6 @@ export { exportReport } from './exportReport';
 export { hydratedOrder } from './hydratedOrder';
 export { identifierType } from './identifierType';
 export { instance } from './instance';
-export { integrationConfig } from './integrationConfig';
 export { location } from './location';
 export { materialType } from './materialType';
 export { order } from './order';

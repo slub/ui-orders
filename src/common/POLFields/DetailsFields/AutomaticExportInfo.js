@@ -15,10 +15,6 @@ const formatConfigLabel = (config) => {
   return transmissionMethod ? `${configName} (${transmissionMethod})` : configName;
 };
 
-// Hint for the "Automatic export" checkbox. placement="label" renders an icon
-// next to the label (warning: no match, info popover: several matches),
-// placement="below" renders the single matching integration as a text line.
-// Without a vendorId (order templates) there is nothing to match.
 const AutomaticExportInfo = ({
   acquisitionMethod,
   automaticExport = false,
