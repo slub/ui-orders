@@ -1,5 +1,5 @@
-/* Two lines, then an ellipsis. `anywhere` lets a long name without spaces wrap
-   instead of being clipped mid-word. */
+/* `anywhere` lets a long name without spaces wrap instead of being clipped
+   mid-word. */
 .exportVia {
   display: -webkit-box;
   overflow: hidden;
