@@ -104,6 +104,12 @@ describe('POLineDetails', () => {
       expect(screen.queryByRole('button')).not.toBeInTheDocument();
     });
 
+    it('should not look up the integrations when automatic export is off', () => {
+      renderPOLineDetails({ line: { ...line, automaticExport: undefined }, vendorId: 'vendor-id' });
+
+      expect(useAutomaticExportConfigs).toHaveBeenCalledWith(expect.any(Object), { enabled: false });
+    });
+
     it('should show the manual order info instead of the hint for a manual order', () => {
       renderPOLineDetails({ line, vendorId: 'vendor-id', manualOrder: true });
 

@@ -6,47 +6,15 @@ import {
   InfoPopover,
 } from '@folio/stripes/components';
 
-import { useAutomaticExportConfigs } from '../../hooks/useAutomaticExportConfigs';
+import { getExportConfigLabel } from '../utils';
 import css from './AutomaticExportInfo.css';
 
-const formatConfigLabel = (config) => {
-  const { configName, transmissionMethod } = config.exportTypeSpecificParameters?.vendorEdiOrdersExportConfig || {};
-
-  return transmissionMethod ? `${configName} (${transmissionMethod})` : configName;
-};
-
-const AutomaticExportInfo = ({
-  acquisitionMethod,
-  automaticExport = false,
-  manualOrder = false,
-  placement = 'below',
-  vendorAccount,
-  vendorId,
-}) => {
+const AutomaticExportInfo = ({ configs }) => {
   const intl = useIntl();
-  const { configs: applicableIntegrations } = useAutomaticExportConfigs(
-    { vendorId, acquisitionMethod, vendorAccount },
-    { enabled: automaticExport && !manualOrder },
-  );
 
-  if (!applicableIntegrations) return null;
+  if (!configs) return null;
 
-  if (placement === 'below') {
-    if (applicableIntegrations.length !== 1) return null;
-
-    const label = formatConfigLabel(applicableIntegrations[0]);
-
-    return (
-      <div className={css.exportVia} title={label}>
-        <FormattedMessage
-          id="ui-orders.poLine.automaticExport.exportVia"
-          values={{ name: label }}
-        />
-      </div>
-    );
-  }
-
-  if (applicableIntegrations.length === 0) {
+  if (configs.length === 0) {
     return (
       <InfoPopover
         content={<FormattedMessage id="ui-orders.poLine.automaticExport.noIntegration" />}
@@ -65,7 +33,7 @@ const AutomaticExportInfo = ({
     );
   }
 
-  if (applicableIntegrations.length > 1) {
+  if (configs.length > 1) {
     return (
       <InfoPopover
         content={(
@@ -74,8 +42,8 @@ const AutomaticExportInfo = ({
               <FormattedMessage id="ui-orders.poLine.automaticExport.multipleTitle" />
             </strong>
             <ul className={css.list}>
-              {applicableIntegrations.map((config) => (
-                <li key={config.id}>{formatConfigLabel(config)}</li>
+              {configs.map((config) => (
+                <li key={config.id}>{getExportConfigLabel(config)}</li>
               ))}
             </ul>
             <FormattedMessage id="ui-orders.poLine.automaticExport.multipleHint" />
@@ -89,12 +57,7 @@ const AutomaticExportInfo = ({
 };
 
 AutomaticExportInfo.propTypes = {
-  acquisitionMethod: PropTypes.string,
-  automaticExport: PropTypes.bool,
-  manualOrder: PropTypes.bool,
-  placement: PropTypes.oneOf(['label', 'below']),
-  vendorAccount: PropTypes.string,
-  vendorId: PropTypes.string,
+  configs: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default AutomaticExportInfo;

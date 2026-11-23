@@ -1,15 +1,3 @@
-/* `anywhere` lets a long name without spaces wrap instead of being clipped
-   mid-word. */
-.exportVia {
-  display: -webkit-box;
-  overflow: hidden;
-  margin-bottom: 1rem;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  overflow-wrap: anywhere;
-}
-
 .warningButton {
   color: var(--warn);
 }
