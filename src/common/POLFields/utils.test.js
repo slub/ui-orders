@@ -1,5 +1,24 @@
 import { POL_FORM_FIELDS } from '../constants';
-import { isBinderyActiveDisabled } from './utils';
+import {
+  getExportConfigLabel,
+  isBinderyActiveDisabled,
+} from './utils';
+
+describe('getExportConfigLabel', () => {
+  const buildConfig = (vendorEdiOrdersExportConfig) => ({
+    exportTypeSpecificParameters: { vendorEdiOrdersExportConfig },
+  });
+
+  it('should return the name of the integration', () => {
+    expect(getExportConfigLabel(buildConfig({ configName: 'testConfig' }))).toBe('testConfig');
+  });
+
+  it('should append the transmission method', () => {
+    const config = buildConfig({ configName: 'testConfig', transmissionMethod: 'Email' });
+
+    expect(getExportConfigLabel(config)).toBe('testConfig (Email)');
+  });
+});
 
 describe('isBinderyActiveDisabled', () => {
   it('should return false if order format is not defined', () => {

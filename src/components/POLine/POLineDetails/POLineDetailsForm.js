@@ -17,12 +17,16 @@ import {
 } from '@folio/stripes-acq-components';
 
 import { POL_FORM_FIELDS } from '../../../common/constants';
-import { useToggleAutomaticExport } from '../../../common/hooks/useToggleAutomaticExport';
+import {
+  useAutomaticExportConfigs,
+  useToggleAutomaticExport,
+} from '../../../common/hooks';
 import {
   FieldPOLineNumber,
   FieldAcquisitionMethod,
   FieldAutomaticExport,
   AutomaticExportInfo,
+  AutomaticExportVia,
   FieldOrderFormat,
   FieldReceiptDate,
   FieldDonor,
@@ -168,13 +172,14 @@ function POLineDetailsForm({
     }
   }, [change, initReceivingWorkflowChange, isPostPendingOrder]);
 
-  const exportInfoProps = {
-    acquisitionMethod: formValues?.acquisitionMethod,
-    automaticExport: formValues?.automaticExport,
-    manualOrder: isManualOrder,
-    vendorAccount: formValues?.vendorDetail?.vendorAccount,
-    vendorId: order?.vendor,
-  };
+  const { configs: automaticExportConfigs } = useAutomaticExportConfigs(
+    {
+      vendorId: order?.vendor,
+      acquisitionMethod: formValues?.acquisitionMethod,
+      vendorAccount: formValues?.vendorDetail?.vendorAccount,
+    },
+    { enabled: Boolean(formValues?.automaticExport) && !isManualOrder },
+  );
 
   return (
     <>
@@ -212,18 +217,10 @@ function POLineDetailsForm({
             <FieldAutomaticExport
               disabled={isPostPendingOrder || isManualOrder}
               isManualOrder={isManualOrder}
-              exportInfo={(
-                <AutomaticExportInfo
-                  placement="label"
-                  {...exportInfoProps}
-                />
-              )}
+              exportInfo={<AutomaticExportInfo configs={automaticExportConfigs} />}
             />
 
-            <AutomaticExportInfo
-              placement="below"
-              {...exportInfoProps}
-            />
+            <AutomaticExportVia configs={automaticExportConfigs} />
           </Col>
         </IfFieldVisible>
 

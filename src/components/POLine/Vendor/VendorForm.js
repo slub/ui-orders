@@ -20,7 +20,7 @@ import {
   FieldVendorInstructions,
   FieldVendorAccountNumber,
 } from '../../../common/POLFields';
-import { useToggleAutomaticExport } from '../../../common/hooks/useToggleAutomaticExport';
+import { useToggleAutomaticExport } from '../../../common/hooks';
 import { isWorkflowStatusIsPending } from '../../PurchaseOrder/util';
 import { ACCOUNT_STATUS } from '../const';
 

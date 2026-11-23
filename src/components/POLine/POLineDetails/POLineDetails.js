@@ -26,9 +26,13 @@ import {
   PAYMENT_STATUS_TRANSLATED_VALUES,
   RECEIPT_STATUS_TRANSLATED_VALUES,
 } from '../../../common/constants';
-import { AutomaticExportInfo } from '../../../common/POLFields';
+import {
+  AutomaticExportInfo,
+  AutomaticExportVia,
+} from '../../../common/POLFields';
 import {
   useAcqMethod,
+  useAutomaticExportConfigs,
   useClaimSequences,
 } from '../../../common/hooks';
 
@@ -75,13 +79,14 @@ const POLineDetails = ({
     isLoading: isClaimSequencesLoading,
   } = useClaimSequences({ enabled: Boolean(line?.claimSequenceId) });
 
-  const exportInfoProps = {
-    acquisitionMethod: line.acquisitionMethod,
-    automaticExport: line.automaticExport,
-    manualOrder,
-    vendorAccount: line.vendorDetail?.vendorAccount,
-    vendorId,
-  };
+  const { configs: automaticExportConfigs } = useAutomaticExportConfigs(
+    {
+      vendorId,
+      acquisitionMethod: line.acquisitionMethod,
+      vendorAccount: line.vendorDetail?.vendorAccount,
+    },
+    { enabled: Boolean(line.automaticExport) && !manualOrder },
+  );
 
   return (
     <>
@@ -129,19 +134,13 @@ const POLineDetails = ({
                 <>
                   <FormattedMessage id="ui-orders.poLine.automaticExport" />
                   {manualOrder && <InfoPopover content={<FormattedMessage id="ui-orders.poLine.manualPO.info" />} />}
-                  <AutomaticExportInfo
-                    placement="label"
-                    {...exportInfoProps}
-                  />
+                  <AutomaticExportInfo configs={automaticExportConfigs} />
                 </>
               )}
               vertical
             />
 
-            <AutomaticExportInfo
-              placement="below"
-              {...exportInfoProps}
-            />
+            <AutomaticExportVia configs={automaticExportConfigs} />
           </Col>
         </IfVisible>
 

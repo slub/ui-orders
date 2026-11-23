@@ -16,6 +16,12 @@ export const isPhresource = (format) => PHRESOURCES.includes(format);
 
 export const isOtherResource = (format) => format === ORDER_FORMATS.other;
 
+export const getExportConfigLabel = (config) => {
+  const { configName, transmissionMethod } = config.exportTypeSpecificParameters?.vendorEdiOrdersExportConfig || {};
+
+  return transmissionMethod ? `${configName} (${transmissionMethod})` : configName;
+};
+
 export const isBinderyActiveDisabled = (values, order) => {
   const orderFormat = get(values, POL_FORM_FIELDS.orderFormat);
   const physicalCreateInventory = get(values, POL_FORM_FIELDS.physicalCreateInventory);

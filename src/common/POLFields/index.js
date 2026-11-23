@@ -26,6 +26,7 @@ export { default as FieldCancellationRestrictionNote } from './DetailsFields/Fie
 export { default as FieldPOLineDescription } from './DetailsFields/FieldPOLineDescription';
 export { default as FieldAutomaticExport } from './DetailsFields/FieldAutomaticExport';
 export { default as AutomaticExportInfo } from './DetailsFields/AutomaticExportInfo';
+export { default as AutomaticExportVia } from './DetailsFields/AutomaticExportVia';
 
 // vendor
 export { default as FieldVendorInstructions } from './VendorFields/FieldVendorInstructions';
