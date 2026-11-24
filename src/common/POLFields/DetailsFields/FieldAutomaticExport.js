@@ -9,12 +9,12 @@ import {
 
 import { POL_FORM_FIELDS } from '../../constants';
 
-const FieldAutomaticExport = ({ isManualOrder = false, exportInfo = null, ...props }) => {
+const FieldAutomaticExport = ({ isManualOrder = false, integrationsPopover = null, ...props }) => {
   const label = (
     <>
       <FormattedMessage id="ui-orders.poLine.automaticExport" />
       {isManualOrder && <InfoPopover content={<FormattedMessage id="ui-orders.poLine.manualPO.info" />} />}
-      {exportInfo}
+      {integrationsPopover}
     </>
   );
 
@@ -33,7 +33,7 @@ const FieldAutomaticExport = ({ isManualOrder = false, exportInfo = null, ...pro
 };
 
 FieldAutomaticExport.propTypes = {
-  exportInfo: PropTypes.node,
+  integrationsPopover: PropTypes.node,
   isManualOrder: PropTypes.bool,
 };
 

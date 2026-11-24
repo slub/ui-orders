@@ -27,8 +27,8 @@ import {
   RECEIPT_STATUS_TRANSLATED_VALUES,
 } from '../../../common/constants';
 import {
-  AutomaticExportInfo,
-  AutomaticExportVia,
+  AutomaticExportIntegrationName,
+  AutomaticExportIntegrationsPopover,
 } from '../../../common/POLFields';
 import {
   useAcqMethod,
@@ -122,13 +122,13 @@ const POLineDetails = ({
                 <>
                   <FormattedMessage id="ui-orders.poLine.automaticExport" />
                   {manualOrder && <InfoPopover content={<FormattedMessage id="ui-orders.poLine.manualPO.info" />} />}
-                  <AutomaticExportInfo configs={automaticExportConfigs} />
+                  <AutomaticExportIntegrationsPopover configs={automaticExportConfigs} />
                 </>
               )}
               vertical
             />
 
-            <AutomaticExportVia configs={automaticExportConfigs} />
+            <AutomaticExportIntegrationName configs={automaticExportConfigs} />
           </Col>
         </IfVisible>
 

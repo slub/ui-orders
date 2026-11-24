@@ -29,9 +29,9 @@ describe('FieldAutomaticExport', () => {
     expect(screen.getByRole('checkbox', { name: /ui-orders.poLine.automaticExport/ })).toBeInTheDocument();
   });
 
-  it('should render the export info inside the label', () => {
-    renderFieldAutomaticExport({ exportInfo: <span>export info</span> });
+  it('should render the integrations popover inside the label', () => {
+    renderFieldAutomaticExport({ integrationsPopover: <span>integrations popover</span> });
 
-    expect(screen.getByRole('checkbox', { name: /export info/ })).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: /integrations popover/ })).toBeInTheDocument();
   });
 });

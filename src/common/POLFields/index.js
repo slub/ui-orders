@@ -24,8 +24,8 @@ export { default as FieldCheckInItems } from './DetailsFields/FieldCheckInItems'
 export { default as FieldCancellationRestrictionNote } from './DetailsFields/FieldCancellationRestrictionNote';
 export { default as FieldPOLineDescription } from './DetailsFields/FieldPOLineDescription';
 export { default as FieldAutomaticExport } from './DetailsFields/FieldAutomaticExport';
-export { default as AutomaticExportInfo } from './DetailsFields/AutomaticExportInfo';
-export { default as AutomaticExportVia } from './DetailsFields/AutomaticExportVia';
+export { default as AutomaticExportIntegrationsPopover } from './DetailsFields/AutomaticExportIntegrationsPopover';
+export { default as AutomaticExportIntegrationName } from './DetailsFields/AutomaticExportIntegrationName';
 
 // vendor
 export { default as FieldVendorInstructions } from './VendorFields/FieldVendorInstructions';

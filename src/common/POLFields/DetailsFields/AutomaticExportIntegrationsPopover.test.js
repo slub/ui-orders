@@ -1,7 +1,7 @@
 import { render, screen } from '@folio/jest-config-stripes/testing-library/react';
 import userEvent from '@folio/jest-config-stripes/testing-library/user-event';
 
-import AutomaticExportInfo from './AutomaticExportInfo';
+import AutomaticExportIntegrationsPopover from './AutomaticExportIntegrationsPopover';
 
 const buildConfig = (id, configName, transmissionMethod) => ({
   id,
@@ -13,13 +13,13 @@ const buildConfig = (id, configName, transmissionMethod) => ({
 const firstConfig = buildConfig('first-config', 'testConfig');
 const secondConfig = buildConfig('second-config', 'secondConfig', 'Email');
 
-const renderAutomaticExportInfo = (configs) => render(
-  <AutomaticExportInfo configs={configs} />,
+const renderAutomaticExportIntegrationsPopover = (configs) => render(
+  <AutomaticExportIntegrationsPopover configs={configs} />,
 );
 
-describe('AutomaticExportInfo', () => {
+describe('AutomaticExportIntegrationsPopover', () => {
   it('should render a warning icon when no integration matches', async () => {
-    renderAutomaticExportInfo([]);
+    renderAutomaticExportIntegrationsPopover([]);
 
     const warning = screen.getByRole('button', { name: 'ui-orders.poLine.automaticExport.noIntegration' });
 
@@ -30,7 +30,7 @@ describe('AutomaticExportInfo', () => {
   });
 
   it('should render an info popover listing all matching integrations', async () => {
-    renderAutomaticExportInfo([firstConfig, secondConfig]);
+    renderAutomaticExportIntegrationsPopover([firstConfig, secondConfig]);
 
     await userEvent.click(screen.getByRole('button'));
 
@@ -41,13 +41,13 @@ describe('AutomaticExportInfo', () => {
   });
 
   it('should render nothing when exactly one integration matches', () => {
-    const { container } = renderAutomaticExportInfo([firstConfig]);
+    const { container } = renderAutomaticExportIntegrationsPopover([firstConfig]);
 
     expect(container).toBeEmptyDOMElement();
   });
 
   it('should render nothing as long as there is no answer', () => {
-    const { container } = renderAutomaticExportInfo(undefined);
+    const { container } = renderAutomaticExportIntegrationsPopover(undefined);
 
     expect(container).toBeEmptyDOMElement();
   });
