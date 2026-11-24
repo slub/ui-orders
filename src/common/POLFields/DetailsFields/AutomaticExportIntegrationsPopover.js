@@ -7,9 +7,9 @@ import {
 } from '@folio/stripes/components';
 
 import { getExportConfigLabel } from '../utils';
-import css from './AutomaticExportInfo.css';
+import css from './AutomaticExportIntegrationsPopover.css';
 
-const AutomaticExportInfo = ({ configs }) => {
+const AutomaticExportIntegrationsPopover = ({ configs }) => {
   const intl = useIntl();
 
   if (!configs) return null;
@@ -56,8 +56,8 @@ const AutomaticExportInfo = ({ configs }) => {
   return null;
 };
 
-AutomaticExportInfo.propTypes = {
+AutomaticExportIntegrationsPopover.propTypes = {
   configs: PropTypes.arrayOf(PropTypes.object),
 };
 
-export default AutomaticExportInfo;
+export default AutomaticExportIntegrationsPopover;

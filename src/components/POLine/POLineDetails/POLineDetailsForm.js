@@ -25,8 +25,8 @@ import {
   FieldPOLineNumber,
   FieldAcquisitionMethod,
   FieldAutomaticExport,
-  AutomaticExportInfo,
-  AutomaticExportVia,
+  AutomaticExportIntegrationsPopover,
+  AutomaticExportIntegrationName,
   FieldOrderFormat,
   FieldReceiptDate,
   FieldDonor,
@@ -217,10 +217,10 @@ function POLineDetailsForm({
             <FieldAutomaticExport
               disabled={isPostPendingOrder || isManualOrder}
               isManualOrder={isManualOrder}
-              exportInfo={<AutomaticExportInfo configs={automaticExportConfigs} />}
+              integrationsPopover={<AutomaticExportIntegrationsPopover configs={automaticExportConfigs} />}
             />
 
-            <AutomaticExportVia configs={automaticExportConfigs} />
+            <AutomaticExportIntegrationName configs={automaticExportConfigs} />
           </Col>
         </IfFieldVisible>
 
