@@ -12,6 +12,12 @@ import {
 } from './const';
 import { createPOLDataFromInstance } from './Item/util';
 import { POL_FORM_FIELDS } from '../../common/constants';
+import {
+  getExpectedDateFromInterval,
+  isEresource,
+  isOtherResource,
+  isPhresource,
+} from '../../common/POLFields/utils';
 
 const DEFAULT_INITIAL_VALUES = {};
 
@@ -50,6 +56,7 @@ export const buildInitialPOLineFormValues = ({
       customFields,
       essentialInitialValues,
       template,
+      vendor,
     })
     : buildInitialValuesWithoutTemplate({
       createInventorySetting,
@@ -115,11 +122,23 @@ function buildInitialValuesWithoutTemplate({
   return newObj;
 }
 
+function prefillExpectedDate(values, field, interval) {
+  const expectedDate = getExpectedDateFromInterval(interval);
+
+  if (!expectedDate || get(values, field)) return;
+
+  const [section, key] = field.split('.');
+
+  // The section object still belongs to the template, so replace it instead of mutating it.
+  values[section] = { ...values[section], [key]: expectedDate };
+}
+
 function buildInitialValuesBasedOnTemplate({
   acqMethods,
   customFields,
   essentialInitialValues,
   template,
+  vendor,
 }) {
   const fieldsToPopulate = Array.from(
     new Set([
@@ -147,6 +166,17 @@ function buildInitialValuesBasedOnTemplate({
 
   if (isTemplateAcqMethodDeprecated) {
     delete initialValues[POL_FORM_FIELDS.acquisitionMethod];
+  }
+
+  // A format set by the template never passes the order format handler, so prefill here.
+  const orderFormat = initialValues[POL_FORM_FIELDS.orderFormat];
+
+  if (isEresource(orderFormat)) {
+    prefillExpectedDate(initialValues, POL_FORM_FIELDS.eresourceExpectedActivation, vendor?.expectedActivationInterval);
+  }
+
+  if (isPhresource(orderFormat) || isOtherResource(orderFormat)) {
+    prefillExpectedDate(initialValues, POL_FORM_FIELDS.physicalExpectedReceiptDate, vendor?.expectedReceiptInterval);
   }
 
   return initialValues;

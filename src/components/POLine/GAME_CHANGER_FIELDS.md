@@ -14,6 +14,7 @@ flowchart LR
     Format -->|"always clear"| Cost["cost.quantityPhysical / cost.quantityElectronic<br/>cost.listUnitPrice / cost.listUnitPriceElectronic"]
     Format -->|"package only: undefined"| Quantities["locations[].quantityPhysical<br/>locations[].quantityElectronic"]
     Package -->|"enable, after instance check: null"| Quantities
+    Format -->|"if empty: today + vendor interval"| ExpectedDates["physical.expectedReceiptDate<br/>eresource.expectedActivation"]
 ```
 
 **Shared targets are the collision points:** inventory has both format and Bindery writers; receiving has Bindery, package, and receipt-status writers. Disabling package/Bindery or leaving Receipt Not Required does not reverse those receiving writes. Receipt Not Required forces receiving only when it is currently falsy, and not for a Closed live order; Open live orders require confirmation.
@@ -51,6 +52,12 @@ flowchart TD
     ElectronicDefault --> Due{"activationDue is undefined<br/>and vendor interval is truthy?"}
     Due -->|"yes"| FillDue["eresource.activationDue = vendor interval"]
     Due -->|"no"| KeepDue["Keep existing activationDue"]
+    ElectronicDefault --> Activation{"expectedActivation is empty<br/>and vendor activation interval > 0?"}
+    Activation -->|"yes"| FillActivation["eresource.expectedActivation = today + interval"]
+    Activation -->|"no"| KeepActivation["Keep existing expectedActivation"]
+    Format -->|"Physical, P/E mix or Other"| Receipt{"expectedReceiptDate is empty<br/>and vendor receipt interval > 0?"}
+    Receipt -->|"yes"| FillReceipt["physical.expectedReceiptDate = today + interval"]
+    Receipt -->|"no"| KeepReceipt["Keep existing expectedReceiptDate"]
     Format -->|"empty or unrecognized"| ClearBoth["physical = undefined<br/>eresource = undefined"]
 ```
 
@@ -70,6 +77,15 @@ Every order-format selection, including clearing the selection:
 | Empty/unrecognized value | Clears both resource objects. |
 
 For Electronic and P/E mix, `eresource.activationDue` is filled from `vendor.expectedActivationInterval` only when its current value is `undefined` and the vendor interval is truthy. An existing value, including `0` or `null`, is not replaced. The template details form does not pass a vendor to this field.
+
+The same selection prefills two dates as today plus a vendor interval in days, written as `YYYY-MM-DD`:
+
+| Selected format | Date | Vendor interval |
+| --- | --- | --- |
+| Electronic resource, P/E mix | `eresource.expectedActivation` | `expectedActivationInterval` |
+| Physical resource, P/E mix, Other | `physical.expectedReceiptDate` | `expectedReceiptInterval` |
+
+A date is written only when the field is empty (`undefined`, `null`, or `''`) and the interval is greater than zero. An existing date is never replaced. The handler reads the form values from before the selection, and each format reads only its own resource object, so a date cleared by an earlier format change is prefilled again: Physical, Electronic, Physical ends with a new `physical.expectedReceiptDate`. “Today” is the browser's date. Template `hiddenFields` are not considered, as for `activationDue`. Without a vendor, as in the template details form, nothing is prefilled.
 
 While Bindery is active, selectable non-empty formats are limited to Physical resource and P/E mix. The placeholder remains available. These options do not normalize an incompatible value loaded from a record.
 
@@ -302,7 +318,7 @@ For example, filtering the available funds does not replace `fundDistribution`, 
 
 ## 8. Initialization boundaries and maintenance
 
-[buildInitialPOLineFormValues](buildInitialPOLineFormValues.js) builds new-line values from vendor/tenant defaults or copied template fields. It omits a deprecated template acquisition method. Create-from-instance additionally replaces protected bibliographic fields with inventory data and forces `isPackage` false. These are initialization rules, not user-change handlers.
+[buildInitialPOLineFormValues](buildInitialPOLineFormValues.js) builds new-line values from vendor/tenant defaults or copied template fields. It omits a deprecated template acquisition method. When a template sets `orderFormat`, it prefills `eresource.expectedActivation` and `physical.expectedReceiptDate` from the vendor's intervals under the same conditions as the order format handler, because a format coming from a template never passes that handler. A date from the template wins, and no other vendor default is applied on the template path. Create-from-instance additionally replaces protected bibliographic fields with inventory data and forces `isPackage` false. These are initialization rules, not user-change handlers.
 
 Both root editors retain `keepDirtyOnReinitialize`. Loading/refreshed records and direct form writes are not processed by a central invariant resolver. The fixes described here do not repair every inconsistent saved record, intercept every programmatic write, or change existing initialization behavior. In particular, clearing a format clears resource objects without clearing Bindery, and disabled controls do not normalize incompatible loaded values.
 
