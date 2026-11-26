@@ -1,6 +1,10 @@
 import get from 'lodash/get';
 
-import { ORDER_FORMATS } from '@folio/stripes-acq-components';
+import { dayjs } from '@folio/stripes/components';
+import {
+  DATE_FORMAT,
+  ORDER_FORMATS,
+} from '@folio/stripes-acq-components';
 
 import {
   ERESOURCES,
@@ -15,6 +19,13 @@ export const isEresource = (format) => ERESOURCES.includes(format);
 export const isPhresource = (format) => PHRESOURCES.includes(format);
 
 export const isOtherResource = (format) => format === ORDER_FORMATS.other;
+
+// Today plus a vendor interval in days; an interval of 0 means "not set".
+export const getExpectedDateFromInterval = (days) => {
+  return days > 0
+    ? dayjs().add(days, 'day').format(DATE_FORMAT)
+    : undefined;
+};
 
 export const getExportConfigLabel = (config) => {
   const { configName, transmissionMethod } = config.exportTypeSpecificParameters?.vendorEdiOrdersExportConfig || {};

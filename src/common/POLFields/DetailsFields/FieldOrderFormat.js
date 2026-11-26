@@ -10,6 +10,7 @@ import {
 
 import { OPTION_VALUE_WITH_BINDERY_ACTIVE } from '../../../components/POLine/const';
 import { POL_FORM_FIELDS } from '../../constants';
+import { getExpectedDateFromInterval } from '../utils';
 
 const ORDER_FORMAT_OPTIONS = Object.keys(ORDER_FORMATS).map((key) => ({
   labelId: `ui-orders.order_format.${key}`,
@@ -26,6 +27,15 @@ const handleEmpty = (change) => {
   change(POL_FORM_FIELDS.eresource, undefined);
 };
 
+// Fills an empty date (undefined, null or '') only; a handler reads its own section, never the one just cleared.
+const prefillExpectedDate = (change, formValues, field, interval) => {
+  const expectedDate = getExpectedDateFromInterval(interval);
+
+  if (expectedDate && !get(formValues, field)) {
+    change(field, expectedDate);
+  }
+};
+
 const handleElectronic = (change, settings, formValues, vendor) => {
   change(POL_FORM_FIELDS.eresourceCreateInventory, settings.eresource);
 
@@ -34,19 +44,38 @@ const handleElectronic = (change, settings, formValues, vendor) => {
   if (activationDue === undefined && vendor?.expectedActivationInterval) {
     change(POL_FORM_FIELDS.eresourceActivationDue, vendor.expectedActivationInterval);
   }
+
+  prefillExpectedDate(
+    change,
+    formValues,
+    POL_FORM_FIELDS.eresourceExpectedActivation,
+    vendor?.expectedActivationInterval,
+  );
 };
 
-const handlePhysical = (change, settings, formValues) => {
+const handlePhysical = (change, settings, formValues, vendor) => {
   // Bindery's required inventory takes precedence over tenant defaults in both physical formats.
   const createInventory = get(formValues, POL_FORM_FIELDS.isBinderyActive)
     ? OPTION_VALUE_WITH_BINDERY_ACTIVE
     : settings.physical;
 
   change(POL_FORM_FIELDS.physicalCreateInventory, createInventory);
+  prefillExpectedDate(
+    change,
+    formValues,
+    POL_FORM_FIELDS.physicalExpectedReceiptDate,
+    vendor?.expectedReceiptInterval,
+  );
 };
 
-const handleOther = (change, settings) => {
+const handleOther = (change, settings, formValues, vendor) => {
   change(POL_FORM_FIELDS.physicalCreateInventory, settings.other);
+  prefillExpectedDate(
+    change,
+    formValues,
+    POL_FORM_FIELDS.physicalExpectedReceiptDate,
+    vendor?.expectedReceiptInterval,
+  );
 };
 
 export const formatHandlers = {
@@ -54,17 +83,17 @@ export const formatHandlers = {
     change(POL_FORM_FIELDS.physical, undefined);
     handleElectronic(change, settings, formValues, vendor);
   },
-  [ORDER_FORMATS.physicalResource]: (change, settings, formValues, _vendor) => {
+  [ORDER_FORMATS.physicalResource]: (change, settings, formValues, vendor) => {
     change(POL_FORM_FIELDS.eresource, undefined);
-    handlePhysical(change, settings, formValues);
+    handlePhysical(change, settings, formValues, vendor);
   },
-  [ORDER_FORMATS.other]: (change, settings, _formValues, _vendor) => {
+  [ORDER_FORMATS.other]: (change, settings, formValues, vendor) => {
     change(POL_FORM_FIELDS.eresource, undefined);
-    handleOther(change, settings);
+    handleOther(change, settings, formValues, vendor);
   },
   [ORDER_FORMATS.PEMix]: (change, settings, formValues, vendor) => {
     handleElectronic(change, settings, formValues, vendor);
-    handlePhysical(change, settings, formValues);
+    handlePhysical(change, settings, formValues, vendor);
   },
 };
 
