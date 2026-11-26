@@ -26,17 +26,17 @@ export const AFTER_LAST_STAGE = {
 export const STAGE_INTERVAL_MIN = 1;
 export const STAGE_INTERVAL_MAX = 3650;
 
-const DELIVERY_LABEL_IDS = {
-  [TRANSMISSION_METHOD.email]: 'ui-orders.settings.claimSequences.stage.delivery.email',
-  [TRANSMISSION_METHOD.ftp]: 'ui-orders.settings.claimSequences.stage.delivery.ftp',
-  [TRANSMISSION_METHOD.fileDownload]: 'ui-orders.settings.claimSequences.stage.delivery.fileDownload',
+const TRANSMISSION_METHOD_LABEL_IDS = {
+  [TRANSMISSION_METHOD.email]: 'ui-orders.settings.claimSequences.stage.transmissionMethod.email',
+  [TRANSMISSION_METHOD.ftp]: 'ui-orders.settings.claimSequences.stage.transmissionMethod.ftp',
+  [TRANSMISSION_METHOD.fileDownload]: 'ui-orders.settings.claimSequences.stage.transmissionMethod.fileDownload',
 };
 
-export const MANUAL_DELIVERY_LABEL_ID = 'ui-orders.settings.claimSequences.stage.delivery.manual';
+export const MANUAL_TRANSMISSION_LABEL_ID = 'ui-orders.settings.claimSequences.stage.transmissionMethod.manual';
 
-export const DELIVERY_OPTIONS = [
-  { value: '', labelId: MANUAL_DELIVERY_LABEL_ID },
-  ...Object.entries(DELIVERY_LABEL_IDS).map(([value, labelId]) => ({ value, labelId })),
+export const TRANSMISSION_METHOD_OPTIONS = [
+  { value: '', labelId: MANUAL_TRANSMISSION_LABEL_ID },
+  ...Object.entries(TRANSMISSION_METHOD_LABEL_IDS).map(([value, labelId]) => ({ value, labelId })),
 ];
 
 export const AFTER_LAST_STAGE_OPTIONS = Object.values(AFTER_LAST_STAGE).map((value) => ({
@@ -44,10 +44,10 @@ export const AFTER_LAST_STAGE_OPTIONS = Object.values(AFTER_LAST_STAGE).map((val
   labelId: `ui-orders.settings.claimSequences.afterLastStage.${value}`,
 }));
 
-export const getDeliveryLabelId = ({ deliveryType, transmissionMethod } = {}) => (
+export const getTransmissionMethodLabelId = ({ deliveryType, transmissionMethod } = {}) => (
   deliveryType === DELIVERY_TYPE.integration
-    ? DELIVERY_LABEL_IDS[transmissionMethod]
-    : MANUAL_DELIVERY_LABEL_ID
+    ? TRANSMISSION_METHOD_LABEL_IDS[transmissionMethod]
+    : MANUAL_TRANSMISSION_LABEL_ID
 );
 
 // The storage rejects a transmission method on a manual stage, so the key is dropped.
