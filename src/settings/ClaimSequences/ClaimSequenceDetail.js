@@ -17,14 +17,14 @@ import {
 } from '@folio/stripes/components';
 import { ViewMetaData } from '@folio/stripes/smart-components';
 
-import { getDeliveryLabelId } from './constants';
+import { getTransmissionMethodLabelId } from './constants';
 
-const STAGE_COLUMNS = ['stage', 'name', 'delivery', 'interval'];
+const STAGE_COLUMNS = ['stage', 'name', 'transmissionMethod', 'interval'];
 
 const STAGE_COLUMN_WIDTHS = {
   stage: '10%',
   name: '40%',
-  delivery: '25%',
+  transmissionMethod: '25%',
   interval: '25%',
 };
 
@@ -47,7 +47,7 @@ const ClaimSequenceDetail = ({ initialValues = {} }) => {
 
   const formatter = {
     stage: (stage) => stage.rowIndex + 1,
-    delivery: (stage) => formatMessage({ id: getDeliveryLabelId(stage) }),
+    transmissionMethod: (stage) => formatMessage({ id: getTransmissionMethodLabelId(stage) }),
   };
 
   return (
