@@ -34,7 +34,7 @@ import {
 
 import {
   AFTER_LAST_STAGE_OPTIONS,
-  DELIVERY_OPTIONS,
+  TRANSMISSION_METHOD_OPTIONS,
   STAGE_INTERVAL_MAX,
   STAGE_INTERVAL_MIN,
 } from './constants';
@@ -130,12 +130,12 @@ const ClaimSequenceForm = ({
             name={`${field}.transmissionMethod`}
             label={(
               <>
-                <FormattedMessage id="ui-orders.settings.claimSequences.stage.delivery" />
-                <InfoPopover content={<FormattedMessage id="ui-orders.settings.claimSequences.stage.delivery.info" />} />
+                <FormattedMessage id="ui-orders.settings.claimSequences.stage.transmissionMethod" />
+                <InfoPopover content={<FormattedMessage id="ui-orders.settings.claimSequences.stage.transmissionMethod.info" />} />
               </>
             )}
             component={Select}
-            dataOptions={toOptions(DELIVERY_OPTIONS)}
+            dataOptions={toOptions(TRANSMISSION_METHOD_OPTIONS)}
           />
         </Col>
         <Col xs={12} md={4}>

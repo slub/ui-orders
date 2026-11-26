@@ -23,12 +23,12 @@ const claimSequence = {
 
 // Smoke tests only while the PoC is in flux; the full suite comes with the PR.
 describe('ClaimSequenceDetail', () => {
-  it('should list the stages with their delivery', () => {
+  it('should list the stages with their transmission method', () => {
     render(<ClaimSequenceDetail initialValues={claimSequence} />);
 
     expect(screen.getByText('1st claim')).toBeInTheDocument();
-    expect(screen.getByText('ui-orders.settings.claimSequences.stage.delivery.email')).toBeInTheDocument();
-    expect(screen.getByText('ui-orders.settings.claimSequences.stage.delivery.manual')).toBeInTheDocument();
+    expect(screen.getByText('ui-orders.settings.claimSequences.stage.transmissionMethod.email')).toBeInTheDocument();
+    expect(screen.getByText('ui-orders.settings.claimSequences.stage.transmissionMethod.manual')).toBeInTheDocument();
   });
 });
 
